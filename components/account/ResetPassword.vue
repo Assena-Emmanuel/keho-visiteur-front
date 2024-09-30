@@ -10,7 +10,8 @@ export default {
       password: "",
       confirmPassword: "",
       submitted: false,
-      isSuccess: false
+      isSuccess: false,
+      isDif: false,
     };
   },
   validations: {
@@ -29,10 +30,15 @@ export default {
       if (this.v$.$invalid) {
         return;
       } else {
-        this.isSuccess = true;
-        this.$router.push({
-          path: "/login"
-        });
+        if(this.password !== this.confirmPassword){
+            this.isDif = true
+        }else{
+            this.isSuccess = true;
+            this.$router.push({
+            path: "/login"
+            });
+        }
+        
       }
     }
   }
@@ -49,7 +55,10 @@ export default {
             <!-- <p class="text-muted">Reset Password with Minible.</p> -->
           </div>
           <div class="p-2 mt-4">
-            
+            <div v-if="isDif" class="alert alert-danger alert-dismissible fade show">
+                Mot de passe non identique
+                <button type="button" class="btn-close" @click="isDif = !isDif"></button>
+            </div>
             <BForm>
                 <div class="mb-3">
                     <label for="userpassword">Nouveau Mot de passe</label>
