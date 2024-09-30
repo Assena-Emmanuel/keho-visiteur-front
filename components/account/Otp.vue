@@ -48,8 +48,7 @@ export default {
       <BCard no-body>
         <BCardBody class="p-4">
           <div class="text-center mt-2">
-            <h3 class="text-primary">Vérifivation du code</h3>
-            <!-- <p class="text-muted">Reset Password with Minible.</p> -->
+            <h3 class="text-primary">Vérification du code</h3>
           </div>
           <div class="p-2 mt-4">
             <div class="border-end-primary alert-info text-center mb-4" role="alert">

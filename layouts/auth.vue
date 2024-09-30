@@ -16,8 +16,8 @@ export default {
         <BRow class="d-flex justify-content-center">
           <BCol cols="12">
             <nuxt-link to="/" class="mb-5 d-block auth-logo">
-              <img src="/images/logo-dark.png" alt="" height="22" class="logo logo-dark" />
-              <img src="/images/logo-light.png" alt="" height="22" class="logo logo-light" />
+              <img src="/images/logo_keho.jpg" alt="" height="120" class="logo logo-dark" />
+              <img src="/images/logo_keho.jpg" alt="" height="120" class="logo logo-light" />
             </nuxt-link>
           </BCol>
         </BRow>

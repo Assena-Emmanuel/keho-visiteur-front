@@ -45,8 +45,7 @@ export default {
       <BCard no-body>
         <BCardBody class="p-4">
           <div class="text-center mt-2">
-            <h5 class="text-primary">Réinitialiser son mot de passe</h5>
-            <!-- <p class="text-muted">Reset Password with Minible.</p> -->
+            <h5 class="text-primary">Réinitialiser votre mot de passe</h5>
           </div>
           <div class="p-2 mt-4">
             <div class="alert alert-info text-center mb-4" role="alert">

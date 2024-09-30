@@ -16,6 +16,7 @@ export default {
       errorMsg: "",
       submitted: false,
       showAlert: localStorage.getItem('isOk') || false,
+      passwordVisible: false,
     };
   },
   validations: {
@@ -32,6 +33,9 @@ export default {
     localStorage.removeItem('email');
   },
   methods: {
+    togglePasswordVisibility() {
+      this.passwordVisible = !this.passwordVisible;
+    },
     dismissAlert(){
       this.showAlert = !this.showAlert
       localStorage.removeItem("isOk")
@@ -92,45 +96,43 @@ export default {
             <BForm>
               <div class="mb-3">
                 <label for="email">Email</label>
-                <input v-model="email" type="text" class="form-control" id="email" placeholder="Enter email" :class="{
+                <input v-model="email" type="text" class="form-control" id="email" placeholder="Votre email" :class="{
                   'is-invalid': submitted && v$.email.$error
                 }" />
+                
 
                 <div v-if="submitted && v$.email.$error" class="invalid-feedback">
-                  <span v-if="v$.email.email.$invalid">Email is not valid
+                  <span v-if="v$.email.email.$invalid">Email invalide
                   </span>
-                  <span v-if="v$.email.required.$invalid">Please Enter Your Email
+                  <span v-if="v$.email.required.$invalid">Email obligatoire
                   </span>
                 </div>
               </div>
 
               <div class="mb-3">
-                <label for="userpassword">Password</label>
-                <input v-model="password" type="password" id="userpassword" class="form-control" aria-describedby="passwordHelpBlock" placeholder="Enter password" :class="{
-                  'is-invalid': submitted && v$.password.$error
-                }">
-                <!-- <input v-model="password" type="password" class="form-control" id="userpassword" placeholder="Enter password" :class="{
-                  'is-invalid': submitted && v$.password.$error
-                }" /> -->
+                <label for="userpassword">Mot de passe</label>
+                <div class="input-group">
+                  <input 
+                    v-model="password" 
+                    id="userpassword" 
+                    class="form-control" 
+                    aria-describedby="passwordHelpBlock" 
+                    placeholder="Votre password" 
+                    :type="passwordVisible ? 'text' : 'password'"
+                    :class="{
+                    'is-invalid': submitted && v$.password.$error
+                  }">
+                  <span class="input-group-text" @click="togglePasswordVisibility">
+                      <i :class="passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                  </span>
+                </div>
                 <div v-if="submitted && v$.password.$error" class="invalid-feedback">
-                  <span v-if="v$.password.required.$invalid">Password is required
+                  <span v-if="v$.password.required.$invalid">Mot de passe obligatoire
                   </span>
                 </div>
               </div>
 
-              
 
-              <div class="d-flex justify-content-between">
-                <div class="form-check">
-                  <input v-model="isRemember" type="checkbox" class="form-check-input" id="auth-remember-check" />
-                  <label class="form-check-label" for="auth-remember-check">Se souvenir</label>
-                </div>
-                <div class="">
-                  <nuxt-link to="/forgot-password" >
-                    Mot de passe oublié?</nuxt-link>
-                </div>
-              </div>
-              
               <div class="mt-3 text-danger">{{ errorMsg }}</div>
               <div class="mt-4 text-center">
                 <BButton variant="primary" class="w-sm waves-effect waves-light" :disabled="processing" @click="onLogin">
@@ -138,37 +140,13 @@ export default {
                 </BButton>
               </div>
 
-              <!-- <div class="mt-4 text-center">
-                <div class="signin-other-title">
-                  <h5 class="font-size-14 mb-3 title">Sign in with</h5>
+              <div class="d-flex justify-content-center mt-4">
+                <div class="btn btn-outline-info">
+                  <nuxt-link to="/forgot-password" >
+                    Mot de passe oublié?</nuxt-link>
                 </div>
-
-                <ul class="list-inline">
-                  <li class="list-inline-item">
-                    <a href="#" class="social-list-item bg-primary text-white border-primary">
-                      <i class="mdi mdi-facebook"></i>
-                    </a>
-                  </li>
-                  <li class="list-inline-item">
-                    <a href="#" class="social-list-item bg-info text-white border-info">
-                      <i class="mdi mdi-twitter"></i>
-                    </a>
-                  </li>
-                  <li class="list-inline-item">
-                    <a href="#" class="social-list-item bg-danger text-white border-danger">
-                      <i class="mdi mdi-google"></i>
-                    </a>
-                  </li>
-                </ul>
-              </div> -->
-
-              <!-- <div class="mt-4 text-center">
-                <p class="mb-0">
-                  Don't have an account ?
-                  <nuxt-link to="/register" class="fw-medium text-primary">
-                    Signup now</nuxt-link>
-                </p>
-              </div> -->
+                
+              </div>
             </BForm>
           </div>
         </BCardBody>
