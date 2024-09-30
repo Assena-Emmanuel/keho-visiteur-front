@@ -14,7 +14,8 @@ export default {
       isRemember: true,
       processing: false,
       errorMsg: "",
-      submitted: false
+      submitted: false,
+      showAlert: localStorage.getItem('isOk') || false,
     };
   },
   validations: {
@@ -28,10 +29,13 @@ export default {
   },
   mounted() {
     // Vide le localStorage lorsque ce composant est monté
-    localStorage.clear();
+    localStorage.removeItem('email');
   },
   methods: {
-
+    dismissAlert(){
+      this.showAlert = !this.showAlert
+      localStorage.removeItem("isOk")
+    },
     async onLogin() {
       this.submitted = true;
       this.v$.$touch();
@@ -80,6 +84,11 @@ export default {
             <p class="text-muted">Se connecter a son compte</p>
           </div>
           <div class="p-2 mt-4">
+            
+            <div v-if="showAlert" class="alert alert-success alert-dismissible fade show">
+                Mot de passe réinitialisé avec succes!
+                <button type="button" class="btn-close" @click="dismissAlert"></button>
+            </div>
             <BForm>
               <div class="mb-3">
                 <label for="email">Email</label>

@@ -34,6 +34,7 @@ export default {
             this.isDif = true
         }else{
             this.isSuccess = true;
+            localStorage.setItem("isOk", true)
             this.$router.push({
             path: "/login"
             });
