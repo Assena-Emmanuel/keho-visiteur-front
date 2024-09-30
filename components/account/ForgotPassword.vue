@@ -7,7 +7,7 @@ export default {
   },
   data() {
     return {
-      email: "",
+      email: localStorage.getItem('email') || '',
       submitted: false,
       isSuccess: false
     };
@@ -18,6 +18,8 @@ export default {
       email
     }
   },
+
+
   methods: {
     onReset() {
       this.submitted = true;
@@ -27,6 +29,10 @@ export default {
         return;
       } else {
         this.isSuccess = true;
+        localStorage.setItem('email', this.email)
+        this.$router.push({
+          path: "/otp"
+        });
       }
     }
   }
@@ -39,16 +45,16 @@ export default {
       <BCard no-body>
         <BCardBody class="p-4">
           <div class="text-center mt-2">
-            <h5 class="text-primary">Reset Password</h5>
-            <p class="text-muted">Reset Password with Minible.</p>
+            <h5 class="text-primary">Réinitialiser son mot de passe</h5>
+            <!-- <p class="text-muted">Reset Password with Minible.</p> -->
           </div>
           <div class="p-2 mt-4">
-            <div class="alert alert-success text-center mb-4" role="alert">
-              Enter your Email and instructions will be sent to you!
+            <div class="alert alert-info text-center mb-4" role="alert">
+              Entrez votre adresse <span class="fw-bold">Email</span> pour la reinitialisation du mot de passe!
             </div>
-            <div v-if="isSuccess" class="alert alert-success text-center mb-4" role="alert">
+            <!-- <div v-if="isSuccess" class="alert alert-success text-center mb-4" role="alert">
               Reset link are sended to your mailbox, check there first
-            </div>
+            </div> -->
             <BForm>
               <div class="mb-3">
                 <label for="useremail">Email</label>
@@ -56,36 +62,30 @@ export default {
                   'is-invalid': v$.email.$error
                 }" />
                 <div v-if="submitted && v$.email.$error" class="invalid-feedback">
-                  <span v-if="v$.email.email.$invalid">Email is not valid
+                  <span v-if="v$.email.email.$invalid">Email invalide
                   </span>
-                  <span v-if="v$.email.required.$invalid">Please Enter Your Email
+                  <span v-if="v$.email.required.$invalid">Cet champ est obligatoire
                   </span>
                 </div>
               </div>
 
-              <div class="mt-3 text-end">
+              <div class="mt-3 text-center">
                 <BButton variant="primary" class="w-sm waves-effect waves-light" @click="onReset">
-                  Reset
+                  Envoyer
                 </BButton>
               </div>
 
               <div class="mt-4 text-center">
                 <p class="mb-0">
-                  Remember It ?
-
-                  <nuxt-link to="/login" class="fw-medium text-primary">Signin</nuxt-link>
+                  Vous avez déjà un compte ?
+                  <nuxt-link to="/login" class="fw-medium text-primary">Connectez-vous</nuxt-link>
                 </p>
               </div>
             </BForm>
           </div>
         </BCardBody>
       </BCard>
-      <div class="mt-5 text-center">
-        <p>
-          © {{ new Date().getFullYear() }} Minible. Crafted with
-          <i class="mdi mdi-heart text-danger"></i> by Themesbrand
-        </p>
-      </div>
+      
     </BCol>
   </BRow>
 </template>
