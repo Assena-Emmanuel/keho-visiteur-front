@@ -27,7 +27,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     //   redirect("/login");
     // }
   } else if (auth === "fakebackend") {
-    const publicPages = ["/login", "/register", "/forgot-password"];
+    const publicPages = ["/login", "/register", "/forgot-password", "/otp", "/reset-password"];
     const authPage = !publicPages.includes(to.fullPath);
     if (typeof window !== "undefined") {
       const loggedUser = localStorage.getItem("user");

@@ -31,7 +31,7 @@ export default {
         this.isSuccess = true;
         localStorage.setItem('email', this.email)
         this.$router.push({
-          path: "/otp"
+          path: "otp"
         });
       }
     }
