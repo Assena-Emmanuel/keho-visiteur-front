@@ -85,6 +85,7 @@ export default {
         <BCardBody class="">
           <div class="text-center">
             <!-- <img src="/images/logo_keho.jpg" alt="logo-dark" height="70" /> -->
+             <h5 class="text-primary">Keho-Visiteur</h5>
             <p class="text-muted">Se connecter a son compte</p>
           </div>
           <div class="p-2 mt-2">
