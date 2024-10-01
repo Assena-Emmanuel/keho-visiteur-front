@@ -171,13 +171,13 @@ export default {
 
 <template>
   <div class="vertical-menu">
-    <div class="navbar-brand-box">
+    <div class="navbar-brand-box d-flex justify-content-center">
       <nuxt-link to="/" class="logo logo-dark">
         <span class="logo-sm" >
           <img src="/images/logo_keho.jpg" alt height="30" />
         </span>
         <span class="logo-lg">
-          <img src="/images/logo_keho.jpg" alt height="70" />
+          <img src="/images/logo_keho.jpg" alt height="60" />
         </span>
       </nuxt-link>
       <nuxt-link to="/" class="logo logo-light">

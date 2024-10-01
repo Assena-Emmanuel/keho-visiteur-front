@@ -5,7 +5,7 @@
         <img src="/images/logo_keho.jpg" alt="logo-sm" height="22" />
       </span>
       <span class="logo-lg">
-        <img src="/images/logo_keho.jpg" alt="logo-dark" height="70" />
+        <img src="/images/logo_keho.jpg" alt="logo-dark" height="50" />
       </span>
     </nuxt-link>
 

@@ -250,7 +250,7 @@ export default {
     <div class="navbar-header">
       <div class="d-flex">
         <HederLogo />
-
+        
         <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item" data-toggle="collapse" data-target="#topnav-menu-content" @click="toggleMenu">
           <i class="fa fa-fw fa-bars"></i>
         </button>
