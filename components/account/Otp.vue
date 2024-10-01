@@ -2,7 +2,7 @@
 export default {
   data() {
     return {
-      otp: ['', '', '', ''],
+      otp: Array(4).fill(''),
       msgError: '',
       showAlert: false,
 
@@ -27,7 +27,7 @@ export default {
       // Vérifie que tous les champs sont remplis
       const otpCode = this.otp.join('');
       if (otpCode.length === 4) {
-        console.log(this.otp)
+        // console.log(`__________________________: ${this.otp.join("")}`)
         this.$router.push({path: "/reset-password"})
         // try {
         // //   const response = await this.$axios.post('/api/verify-otp', { otp: otpCode });
