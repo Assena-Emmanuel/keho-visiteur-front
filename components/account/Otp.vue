@@ -44,7 +44,7 @@ export default {
 
 <template>
   <BRow class="justify-content-center">
-    <BCol md="8" lg="6" cols="xl-5">
+    <BCol md="8" lg="6" cols="xl-5" style="width: 400px">
       <BCard no-body>
         <BCardBody class="p-4">
           <div class="text-center mt-2">
@@ -76,7 +76,7 @@ export default {
                 </div>
 
               <div class="mt-3 text-center">
-                <BButton variant="primary" class="w-sm waves-effect waves-light" @click="verifyOtp">
+                <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" @click="verifyOtp">
                   Vérifier
                 </BButton>
               </div>

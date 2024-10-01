@@ -41,7 +41,7 @@ export default {
 
 <template>
   <BRow class="justify-content-center">
-    <BCol md="8" lg="6" cols="xl-5">
+    <BCol md="8" lg="6" cols="xl-5" style="width: 400px;">
       <BCard no-body>
         <BCardBody class="p-4">
           <div class="text-center mt-2">
@@ -57,7 +57,7 @@ export default {
             <BForm>
               <div class="mb-3">
                 <label for="useremail">Email</label>
-                <input v-model="email" type="email" class="form-control" id="useremail" placeholder="Enter email" :class="{
+                <input v-model="email" type="email" class="form-control form-control-sm" id="useremail" placeholder="Enter email" :class="{
                   'is-invalid': v$.email.$error
                 }" />
                 <div v-if="submitted && v$.email.$error" class="invalid-feedback">
@@ -69,7 +69,7 @@ export default {
               </div>
 
               <div class="mt-3 text-center">
-                <BButton variant="primary" class="w-sm waves-effect waves-light" @click="onReset">
+                <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" @click="onReset">
                   Envoyer
                 </BButton>
               </div>

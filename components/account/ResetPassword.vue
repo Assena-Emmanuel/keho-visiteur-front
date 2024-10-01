@@ -52,7 +52,7 @@ export default {
 
 <template>
   <BRow class="justify-content-center">
-    <BCol md="8" lg="6" cols="xl-5">
+    <BCol md="8" lg="6" cols="xl-5" style="width: 400px">
       <BCard no-body>
         <BCardBody class="p-4">
           <div class="text-center mt-2">
@@ -66,7 +66,7 @@ export default {
             </div>
             <BForm>
               <div class="mb-3">
-                <label for="userpassword">Nouveau Mot de passe</label>
+                <label for="userpassword" style="font-size: 12px;">Nouveau Mot de passe</label>
                 <div class="input-group">
                     <input 
                         v-model="password" 
@@ -86,7 +86,7 @@ export default {
             </div>
 
                 <div class="mb-3">
-                    <label for="usercpassword">Confirmation du Mot de passe</label>
+                    <label for="usercpassword" style="font-size: 12px;">Confirmation du Mot de passe</label>
                     <div class="input-group">
                       <input 
                         v-model="confirmPassword" 
@@ -107,7 +107,7 @@ export default {
                 </div>
 
               <div class="mt-3 text-center">
-                <BButton variant="primary" class="w-sm waves-effect waves-light" @click="onReset">
+                <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" @click="onReset">
                   Valider
                 </BButton>
               </div>

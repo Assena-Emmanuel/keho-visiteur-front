@@ -80,14 +80,14 @@ export default {
 
 <template>
   <BRow class="align-items-center justify-content-center">
-    <BCol md="8" lg="6" cols="xl-5">
+    <BCol md="8" lg="6" cols="xl-5" style="width: 400px; height: 700;">
       <BCard no-body>
-        <BCardBody class="p-4">
-          <div class="text-center mt-2">
-            <h5 class="text-primary">KEHO-VISITEUR</h5>
+        <BCardBody class="">
+          <div class="text-center">
+            <!-- <img src="/images/logo_keho.jpg" alt="logo-dark" height="70" /> -->
             <p class="text-muted">Se connecter a son compte</p>
           </div>
-          <div class="p-2 mt-4">
+          <div class="p-2 mt-2">
             
             <div v-if="showAlert" class="alert alert-success alert-dismissible fade show">
                 Mot de passe réinitialisé avec succes!
@@ -95,8 +95,8 @@ export default {
             </div>
             <BForm>
               <div class="mb-3">
-                <label for="email">Email</label>
-                <input v-model="email" type="text" class="form-control" id="email" placeholder="Votre email" :class="{
+                <label for="email" style="font-size: 12px;">Email</label>
+                <input v-model="email" type="text" class="form-control form-control-sm" id="email" placeholder="Votre email" :class="{
                   'is-invalid': submitted && v$.email.$error
                 }" />
                 
@@ -110,12 +110,12 @@ export default {
               </div>
 
               <div class="mb-3">
-                <label for="userpassword">Mot de passe</label>
+                <label for="userpassword" style="font-size: 12px;">Mot de passe</label>
                 <div class="input-group">
                   <input 
                     v-model="password" 
                     id="userpassword" 
-                    class="form-control" 
+                    class="form-control form-control-sm" 
                     aria-describedby="passwordHelpBlock" 
                     placeholder="Votre password" 
                     :type="passwordVisible ? 'text' : 'password'"
@@ -135,13 +135,13 @@ export default {
 
               <div class="mt-3 text-danger">{{ errorMsg }}</div>
               <div class="mt-4 text-center">
-                <BButton variant="primary" class="w-sm waves-effect waves-light" :disabled="processing" @click="onLogin">
+                <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" :disabled="processing" @click="onLogin">
                   {{ processing ? "Please wait..." : "Se connecter" }}
                 </BButton>
               </div>
 
               <div class="d-flex justify-content-center mt-4">
-                <div class="btn btn-outline-info">
+                <div class="btn btn-outline-info btn-sm">
                   <nuxt-link to="/forgot-password" >
                     Mot de passe oublié?</nuxt-link>
                 </div>
