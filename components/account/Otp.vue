@@ -10,6 +10,13 @@ export default {
   },
   
   methods: {
+    // Empêcher toute saisie autre qu'un chiffre
+    validateInput(event) {
+      // On permet seulement les chiffres (de 0 à 9), et les touches de contrôle (backspace, tab, etc.)
+      if (!/^\d$/.test(event.key) && event.key !== "Backspace" && event.key !== "Tab") {
+        event.preventDefault();
+      }
+    },
     moveToNext(index) {
       // Déplace automatiquement le curseur vers le champ suivant
       if (this.otp[index].length === 1 && index < 3) {
@@ -67,10 +74,11 @@ export default {
                     <input
                     v-for="(digit, index) in otp"
                     :key="index"
-                    type="number"
+                    type="text"
                     class="form-control otp-input"
                     maxlength="1"
                     v-model="otp[index]"
+                    @keydown="validateInput"
                     @input="moveToNext(index)"
                     ref="otpField"
                     />
@@ -88,7 +96,7 @@ export default {
                 </p>
               </div>
               <div class="mt-4 text-center">
-                <p class="mb-0">
+                <p class="mb-0" style="font-size: 10px;">
                   Vous avez déjà un compte ?
                   <nuxt-link to="/login" class="fw-medium text-primary">Connectez-vous</nuxt-link>
                 </p>

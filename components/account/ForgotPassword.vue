@@ -75,7 +75,7 @@ export default {
               </div>
 
               <div class="mt-4 text-center">
-                <p class="mb-0">
+                <p class="mb-0" style="font-size: 10px;">
                   Vous avez déjà un compte ?
                   <nuxt-link to="/login" class="fw-medium text-primary">Connectez-vous</nuxt-link>
                 </p>
