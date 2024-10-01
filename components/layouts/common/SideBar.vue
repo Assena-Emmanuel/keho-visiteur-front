@@ -177,7 +177,7 @@ export default {
           <img src="/images/logo_keho.jpg" alt height="30" />
         </span>
         <span class="logo-lg">
-          <img src="/images/logo_keho.jpg" alt height="60" />
+          <img src="/images/logo_keho.jpg" alt height="50" />
         </span>
       </nuxt-link>
       <nuxt-link to="/" class="logo logo-light">

@@ -20,6 +20,7 @@ export default {
       // Vérifie que tous les champs sont remplis
       const otpCode = this.otp.join('');
       if (otpCode.length === 4) {
+        console.log(this.otp)
         this.$router.push({path: "/reset-password"})
         // try {
         // //   const response = await this.$axios.post('/api/verify-otp', { otp: otpCode });
@@ -66,7 +67,7 @@ export default {
                     <input
                     v-for="(digit, index) in otp"
                     :key="index"
-                    type="text"
+                    type="number"
                     class="form-control otp-input"
                     maxlength="1"
                     v-model="otp[index]"

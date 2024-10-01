@@ -94,6 +94,7 @@ export default {
       <div class="navbar-header">
         <div class="d-flex">
           <HederLogo />
+
           <button type="button" class="btn btn-sm px-3 font-size-16 header-item vertical-menu-btn" id="vertical-menu-btn" @click="toggleMenu">
             <i class="fa fa-fw fa-bars"></i>
           </button>
