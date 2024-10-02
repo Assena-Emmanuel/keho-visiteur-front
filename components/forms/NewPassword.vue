@@ -90,7 +90,6 @@ export default {
                             <i :class="showLastPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                           </span>
                       </div>
-                      {{ submitted && v$.lastPassword.$error }}
                       <div v-if="submitted && v$.lastPassword.$error" class="invalid-feedback">
 
                           <span v-if="v$.lastPassword.required.$invalid">Ce champ est obligatoire</span>
@@ -113,7 +112,6 @@ export default {
                               <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                             </span>
                         </div>
-                        {{ submitted && v$.newpassword.$error }}
                         <div v-if="submitted && v$.newpassword.$error" class="invalid-feedback">
                             <span v-if="v$.newpassword.required.$invalid">Ce champ est obligatoire</span>
                         </div>
@@ -135,7 +133,6 @@ export default {
                             <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                           </span>
                       </div>
-                      {{ submitted && v$.confirmPassword.$error }}
                         <div v-if="submitted && v$.confirmPassword.$error" class="invalid-feedback">
                           <span v-if="v$.confirmPassword.required.$invalid">Cet champ est obligatoire
                           </span>

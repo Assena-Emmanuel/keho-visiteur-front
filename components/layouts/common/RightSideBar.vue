@@ -147,10 +147,10 @@ export default {
             </button>
           </div>
           <div class="text-center mt-5">
-            <button class="btn text-danger">
+            <NuxtLink to="/login" class="btn btn-outline-danger"@click="$emit('logoutUser')">
               <i class="uil uil-sign-out-alt font-size-18 align-middle me-1"></i>
               <span class="align-middle">Déconnexion</span>
-            </button>
+            </NuxtLink>
           </div>
         
       </div>

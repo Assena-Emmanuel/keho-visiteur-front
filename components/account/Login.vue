@@ -60,8 +60,9 @@ export default {
           const response = data.data;
           if (status === "success") {
             localStorage.setItem("user", JSON.stringify(response));
+            localStorage.removeItem("isOk")
             this.$router.push({
-              path: "/"
+              path: "/dashboard"
             });
           } else {
             this.errorMsg = response;
@@ -90,7 +91,7 @@ export default {
           </div>
           <div class="p-2 mt-2">
             
-            <div v-if="showAlert" class="alert alert-success alert-dismissible fade show">
+            <div v-if="showAlert" class="alert alert-success alert-dismissible fade show font-size-13">
                 Mot de passe réinitialisé avec succes!
                 <button type="button" class="btn-close" @click="dismissAlert"></button>
             </div>
@@ -136,8 +137,8 @@ export default {
 
               <div class="mt-3 text-danger">{{ errorMsg }}</div>
               <div class="mt-4 text-center">
-                <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" :disabled="processing" @click="onLogin">
-                  {{ processing ? "Please wait..." : "Se connecter" }}
+                <BButton :loading="processing ? true : fasle" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" :disabled="processing" @click="onLogin">
+                  Se connecter
                 </BButton>
               </div>
 
