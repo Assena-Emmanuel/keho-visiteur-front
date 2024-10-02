@@ -11,7 +11,7 @@ export default defineNuxtConfig({
         },
         { name: "author", content: "Themesbrand" }
       ],
-      link: [{ rel: "icon", type: "image/ico", href: "/favicon.ico" }]
+      link: [{ rel: "icon", type: "image/ico", href: "/images/logo_keho.jpg" }]
     }
   },
   modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts"],

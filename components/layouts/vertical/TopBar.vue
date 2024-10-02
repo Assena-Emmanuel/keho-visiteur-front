@@ -101,8 +101,8 @@ export default {
           <AppSearch />
         </div>
 
-        <div class="d-flex">
-          <MobileAppSearch />
+        <div class="d-flex align-items-center">
+          <!-- <MobileAppSearch />
           <LanguageDropdown :flag="flag" :languages="languages" :current_language="current_language" @onChange="setLanguage" />
           <AppList />
 
@@ -110,14 +110,21 @@ export default {
             <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen" @click="initFullScreen">
               <i class="uil-minus-path"></i>
             </button>
-          </div>
+          </div> -->
           <Notifications />
-          <Profile @logoutUser="logoutUser" />
-          <div class="dropdown d-inline-block">
+          <!-- <Profile @logoutUser="logoutUser"  /> -->
+           <button @click="toggleRightSidebar" class="btn btn-outline-secondary " right  style="width: 100%; padding: 1px 3px;">
+            <div >
+              <img class="rounded-circle header-profile-user" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
+              <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">jshjdhzjdhjzhdjzhjezh</span>
+            </div>
+           </button>
+         
+          <!-- <div class="dropdown d-inline-block">
             <button type="button" class="btn header-item noti-icon right-bar-toggle toggle-right" @click="toggleRightSidebar">
               <i class="uil-cog toggle-right"></i>
             </button>
-          </div>
+          </div> -->
         </div>
       </div>
     </header>

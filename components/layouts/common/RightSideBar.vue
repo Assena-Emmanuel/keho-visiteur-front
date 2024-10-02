@@ -106,10 +106,38 @@ export default {
           <a href="#" class="right-bar-toggle float-end" @click="hide">
             <i class="mdi mdi-close noti-icon"></i>
           </a>
-          <h5 class="m-0">Settings</h5>
         </div>
         <div class="p-3">
-          <h6 class="mb-0">Layout</h6>
+          <div class="text-center">
+            <img class="rounded-circle header-profile-user" style="width: 100px; height: 100px;"src="/images/users/avatar-4.jpg" alt="Header Avatar" />
+            <div class="ms-1 fw-medium font-size-12">Assena Emanuel yao</div>
+            <div class="ms-1 fw-medium font-size-12 text-primary">assenaemmanuel3@outlook.com</div>
+          </div>
+          <div class="mt-5">
+            <button class="btn">
+              <div class="row ms-3">
+                <div class="col-2 border border-info-1 d-flex justify-content-center align-items-center ">
+                  <span >ICON</span>
+                </div>
+                <div class="col-9 text-start">
+                  <div><span class="font-size-12 ">Mon profil</span></div>
+                  <div><span class="font-size-12">Parametrage du profile</span></div>
+                </div>
+              </div>
+            </button>
+            <button class="btn">
+              <div class="row ms-3">
+                <div class="col-2 border border-info-1 d-flex justify-content-center align-items-center ">
+                  <span >ICON</span>
+                </div>
+                <div class="col-9 text-start">
+                  <div><span class="font-size-12 ">Mot de passe </span></div>
+                  <div><span class="font-size-12">Changer de mot de passe</span></div>
+                </div>
+              </div>
+            </button>
+          </div>
+          <!-- <h6 class="mb-0">Layout</h6>
           <hr class="border-1 border-top border-secondary mt-2" />
           <BFormRadioGroup class="right-sidebar-radio-group" v-model="layout" :options="layoutOptions" stacked />
 
@@ -129,29 +157,10 @@ export default {
             <h6 class="mb-0 mt-4">Top Bar</h6>
             <hr class="border-1 border-top border-secondary mt-2" />
             <BFormRadioGroup class="right-sidebar-radio-group" v-model="topbar" :options="topBarOptions" stacked />
-          </div>
-        </div>
-        <hr class="mt-0" />
-        <h6 class="text-center mb-0">Choose Layouts</h6>
-        <div class="p-4">
-          <div class="mb-2">
-            <nuxt-link target="_blank" href="//themes.themesbrand.com/minible/vue/v-light/">
-              <img src="/images/layouts/layout-1.jpg" class="img-fluid img-thumbnail" alt />
-            </nuxt-link>
-          </div>
-          <div class="mb-2">
-            <nuxt-link target="_blank" href="//themes.themesbrand.com/minible/vue/v-dark/">
-              <img src="/images/layouts/layout-2.jpg" class="img-fluid img-thumbnail" alt />
-            </nuxt-link>
-          </div>
-
-          <div class="mb-2">
-            <nuxt-link target="_blank" href="//themes.themesbrand.com/minible/vue/h-light/">
-              <img src="/images/layouts/layout-3.jpg" class="img-fluid img-thumbnail" alt />
-            </nuxt-link>
-          </div>
-        </div>
+          </div> -->
+        
       </div>
+    </div>
     </div>
   </ClientOnly>
   <div class="rightbar-overlay"></div>

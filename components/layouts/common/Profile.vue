@@ -1,18 +1,24 @@
 <script>
-export default {};
+export default {
+  data(){
+    
+  }
+};
 </script>
 
 <template>
-  <BDropdown class="d-inline-block" toggle-class="header-item" right variant="white" menu-class="dropdown-menu-end">
-    <template #button-content>
-      <img class="rounded-circle header-profile-user" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
-      <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">{{
-        $t("navbar.dropdown.marcus.text")
-      }}</span>
-      <i class="uil-angle-down d-none d-xl-inline-block font-size-15"></i>
-    </template>
+  
+  <BButton  right variant="white" >
+      <div style="width: 100px; border: 2px solid black; border-radius: 6px;">
+        <img class="rounded-circle header-profile-user" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
+        <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">{{
+          $t("navbar.dropdown.marcus.text")
+        }}</span>
+      </div>
+      
+      <!-- <i class="uil-angle-down d-none d-xl-inline-block font-size-15"></i> -->
 
-    <a class="dropdown-item" href="#">
+    <!-- <a class="dropdown-item" href="#">
       <i class="uil uil-user-circle font-size-18 align-middle text-muted me-1"></i>
       <span class="align-middle">{{
         $t("navbar.dropdown.marcus.list.profile")
@@ -42,6 +48,6 @@ export default {};
       <span class="align-middle">{{
         $t("navbar.dropdown.marcus.list.logout")
       }}</span>
-    </a>
-  </BDropdown>
+    </a> -->
+  </BButton>
 </template>
