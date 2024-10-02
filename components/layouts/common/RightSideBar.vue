@@ -8,6 +8,7 @@ import {
   topBarOptions,
   layoutModeOptions
 } from "~/components/layouts/utils/rightSideBar.js";
+// import { NuxtLink } from "#build/components";
 
 export default {
   data() {
@@ -79,11 +80,11 @@ export default {
   },
   methods: {
     profil(){
-      this.$router.push({path: "forms/profile"})
+      this.$router.push({path: "/forms/profile"})
       this.hide()
-    },
+    }, 
     resetPassword(){
-      this.$router.push({to: "forms/reset-password"})
+      this.$router.push({path: "/forms/new-password"})
       this.hide()
     },
     hide() {

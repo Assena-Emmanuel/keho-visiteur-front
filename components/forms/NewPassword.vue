@@ -83,28 +83,48 @@ export default {
                 <div v-if="submitted && v$.password.$error" class="invalid-feedback">
                     <span v-if="v$.password.required.$invalid">Ce champ est obligatoire</span>
                 </div>
-            </div>
+              </div>
 
-                <div class="mb-3">
-                    <label for="usercpassword" style="font-size: 12px;">Nouveau du Mot de passe</label>
-                    <div class="input-group">
-                      <input 
-                        v-model="confirmPassword" 
+              <div class="mb-3">
+                <label for="userpassword" style="font-size: 12px;">Nouveau Mot de passe</label>
+                <div class="input-group">
+                    <input 
+                        v-model="password" 
                         :type="passwordVisible ? 'text' : 'password'" 
                         class="form-control" 
-                        id="usercpassword" 
-                        placeholder="Confirmez le mot de passe" 
-                        :class="{'is-invalid': submitted && v$.password.$error }" 
-                      />
-                      <span class="input-group-text" @click="togglePasswordVisibility">
-                          <i :class="passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
-                      </span>
-                  </div>
-                    <div v-if="submitted && v$.password.$error" class="invalid-feedback">
-                      <span v-if="v$.confirmPassword.required.$invalid">Cet champ est obligatoire
-                      </span>
-                    </div>
+                        id="userpassword" 
+                        placeholder="Mot de passe"
+                        :class="{ 'is-invalid': submitted && v$.password.$error }" 
+                    />
+                    <span class="input-group-text" @click="togglePasswordVisibility">
+                        <i :class="passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                    </span>
                 </div>
+                <div v-if="submitted && v$.password.$error" class="invalid-feedback">
+                    <span v-if="v$.password.required.$invalid">Ce champ est obligatoire</span>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                  <label for="usercpassword" style="font-size: 12px;">Confirmation du Mot de passe</label>
+                  <div class="input-group">
+                    <input 
+                      v-model="confirmPassword" 
+                      :type="passwordVisible ? 'text' : 'password'" 
+                      class="form-control" 
+                      id="usercpassword" 
+                      placeholder="Confirmez le mot de passe" 
+                      :class="{'is-invalid': submitted && v$.password.$error }" 
+                    />
+                    <span class="input-group-text" @click="togglePasswordVisibility">
+                        <i :class="passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                    </span>
+                </div>
+                  <div v-if="submitted && v$.password.$error" class="invalid-feedback">
+                    <span v-if="v$.confirmPassword.required.$invalid">Cet champ est obligatoire
+                    </span>
+                  </div>
+              </div>
 
               <div class="mt-3 text-center">
                 <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" @click="onReset">

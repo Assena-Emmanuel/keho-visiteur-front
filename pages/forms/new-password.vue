@@ -1,6 +1,6 @@
 <script>
 
-import ResetPassword from '~/components/forms/ResetPassword.vue';
+import NewPassword from '~/components/forms/NewPassword.vue';
 
 export default {
   data() {
@@ -9,12 +9,12 @@ export default {
     };
   },
   components: {
-    ResetPassword
+    NewPassword
   }
 };
 </script>
 
 <template>
   <SiteHeader :title="title" />
-  <ResetPassword />
+  <NewPassword />
 </template>
