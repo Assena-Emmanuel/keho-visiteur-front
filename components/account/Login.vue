@@ -124,7 +124,7 @@ export default {
                     'is-invalid': submitted && v$.password.$error
                   }">
                   <span class="input-group-text" @click="togglePasswordVisibility">
-                      <i :class="passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                      <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash' "></i>
                   </span>
                 </div>
                 <div v-if="submitted && v$.password.$error" class="invalid-feedback">
