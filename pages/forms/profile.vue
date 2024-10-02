@@ -1,26 +1,27 @@
 <script>
-import "simplebar";
-
+import Profile from '~/components/forms/Profile.vue';
 export default {
   data() {
     return {
-      title: "Dashboard",
+      title: "user-profil",
       items: [
         {
           text: "Minible"
         },
         {
-          text: "Dashboard",
+          text: "profil",
           active: true
         }
       ]
     };
   },
+  components: {
+    Profile
+  }
 };
 </script>
 
 <template>
   <SiteHeader :title="title" />
-  <PageHeader :title="title" :items="items" />
-
+  <Profile />
 </template>

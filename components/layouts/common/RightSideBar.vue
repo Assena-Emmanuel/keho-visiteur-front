@@ -78,6 +78,14 @@ export default {
     this.addEventListener();
   },
   methods: {
+    profil(){
+      this.$router.push({path: "forms/profile"})
+      this.hide()
+    },
+    resetPassword(){
+      this.$router.push({path: "forms/reset-password"})
+      this.hide()
+    },
     hide() {
       this.$parent.toggleRightSidebar();
     },
@@ -109,15 +117,15 @@ export default {
         </div>
         <div class="p-3">
           <div class="text-center">
-            <img class="rounded-circle header-profile-user" style="width: 100px; height: 100px;"src="/images/users/avatar-4.jpg" alt="Header Avatar" />
+            <img class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
             <div class="ms-1 fw-medium font-size-12">Assena Emanuel yao</div>
             <div class="ms-1 fw-medium font-size-12 text-primary">assenaemmanuel3@outlook.com</div>
           </div>
           <div class="mt-5">
-            <button class="btn">
-              <div class="row ms-3">
-                <div class="col-2 border border-info-1 d-flex justify-content-center align-items-center ">
-                  <span >ICON</span>
+            <button class="btn btn-custom" @click="profil">
+              <div class="row ms-1">
+                <div class="col-2 bg rounded-3 d-flex justify-content-center align-items-center icone">
+                  <span class="font-size-20" ><i class="uil uil-user"></i></span>
                 </div>
                 <div class="col-9 text-start">
                   <div><span class="font-size-12 ">Mon profil</span></div>
@@ -125,10 +133,10 @@ export default {
                 </div>
               </div>
             </button>
-            <button class="btn">
-              <div class="row ms-3">
-                <div class="col-2 border border-info-1 d-flex justify-content-center align-items-center ">
-                  <span >ICON</span>
+            <button class="btn btn-custom" @click="resetPassword">
+              <div class="row ms-1">
+                <div class="col-1 rounded-3 d-flex justify-content-center align-items-center icone">
+                  <span ><i class="uil uil-lock"></i></span>
                 </div>
                 <div class="col-9 text-start">
                   <div><span class="font-size-12 ">Mot de passe </span></div>
@@ -137,27 +145,12 @@ export default {
               </div>
             </button>
           </div>
-          <!-- <h6 class="mb-0">Layout</h6>
-          <hr class="border-1 border-top border-secondary mt-2" />
-          <BFormRadioGroup class="right-sidebar-radio-group" v-model="layout" :options="layoutOptions" stacked />
-
-          <h6 class="mb-0 mt-4">Layout mode</h6>
-          <hr class="border-1 border-top border-secondary mt-2" />
-          <BFormRadioGroup class="right-sidebar-radio-group" v-model="mode" :options="layoutModeOptions" stacked />
-
-          <h6 class="mb-0 mt-4">Width</h6>
-          <hr class="border-1 border-top border-secondary mt-2" />
-          <BFormRadioGroup class="right-sidebar-radio-group" v-model="width" :options="widthOptions" stacked />
-          <div v-if="layout === 'vertical'">
-            <h6 class="mb-0 mt-4">Sidebar</h6>
-            <hr class="border-1 border-top border-secondary mt-2" />
-            <BFormRadioGroup class="right-sidebar-radio-group" v-model="sidebarType" :options="sideBarTypeOptions" stacked />
+          <div class="text-center mt-5">
+            <button class="btn text-danger">
+              <i class="uil uil-sign-out-alt font-size-18 align-middle me-1"></i>
+              <span class="align-middle">Déconnexion</span>
+            </button>
           </div>
-          <div v-if="layout === 'horizontal'">
-            <h6 class="mb-0 mt-4">Top Bar</h6>
-            <hr class="border-1 border-top border-secondary mt-2" />
-            <BFormRadioGroup class="right-sidebar-radio-group" v-model="topbar" :options="topBarOptions" stacked />
-          </div> -->
         
       </div>
     </div>
@@ -170,4 +163,18 @@ export default {
 .right-sidebar-radio-group .form-check {
   margin-bottom: 10px !important;
 }
+</style>
+
+<style>
+.icone{
+  background: linear-gradient(rgba(135, 206, 235, 0.6), rgba(135, 206, 235, 0.6));
+  width: 50px;
+  height: 50px;
+}
+.btn {
+  width: 230px;
+}
+.btn-custom:hover {
+      transform: scale(1.05); /* Agrandissement au survol */
+  }
 </style>
