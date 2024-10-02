@@ -114,9 +114,9 @@ export default {
           <Notifications />
           <!-- <Profile @logoutUser="logoutUser"  /> -->
            <button @click="toggleRightSidebar" class="btn btn-outline-secondary " right  style="width: 100%; padding: 1px 3px;">
-            <div >
+            <div class="px-1">
               <img class="rounded-circle header-profile-user" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
-              <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">jshjdhzjdhjzhdjzhjezh</span>
+              <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">Assena emmanuel</span>
             </div>
            </button>
          

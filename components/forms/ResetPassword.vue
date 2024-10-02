@@ -66,7 +66,7 @@ export default {
             </div>
             <BForm>
               <div class="mb-3">
-                <label for="userpassword" style="font-size: 12px;">Nouveau Mot de passe</label>
+                <label for="userpassword" style="font-size: 12px;">Ancien Mot de passe</label>
                 <div class="input-group">
                     <input 
                         v-model="password" 
@@ -86,7 +86,7 @@ export default {
             </div>
 
                 <div class="mb-3">
-                    <label for="usercpassword" style="font-size: 12px;">Confirmation du Mot de passe</label>
+                    <label for="usercpassword" style="font-size: 12px;">Nouveau du Mot de passe</label>
                     <div class="input-group">
                       <input 
                         v-model="confirmPassword" 
@@ -108,16 +108,10 @@ export default {
 
               <div class="mt-3 text-center">
                 <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" @click="onReset">
-                  Valider
+                  Confirmer
                 </BButton>
               </div>
 
-              <div class="mt-4 text-center">
-                <p class="mb-0" style="font-size: 10px;">
-                  Vous avez déjà un compte ?
-                  <nuxt-link to="/login" class="fw-medium text-primary">Connectez-vous</nuxt-link>
-                </p>
-              </div>
             </BForm>
           </div>
         </BCardBody>

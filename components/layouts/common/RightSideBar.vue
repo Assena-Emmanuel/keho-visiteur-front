@@ -83,7 +83,7 @@ export default {
       this.hide()
     },
     resetPassword(){
-      this.$router.push({path: "forms/reset-password"})
+      this.$router.push({to: "forms/reset-password"})
       this.hide()
     },
     hide() {
@@ -129,7 +129,7 @@ export default {
                 </div>
                 <div class="col-9 text-start">
                   <div><span class="font-size-12 ">Mon profil</span></div>
-                  <div><span class="font-size-12">Parametrage du profile</span></div>
+                  <div><span class="font-size-12 text-primary">Parametrage du profile</span></div>
                 </div>
               </div>
             </button>
@@ -140,7 +140,7 @@ export default {
                 </div>
                 <div class="col-9 text-start">
                   <div><span class="font-size-12 ">Mot de passe </span></div>
-                  <div><span class="font-size-12">Changer de mot de passe</span></div>
+                  <div><span class="font-size-12 text-primary">Changer de mot de passe</span></div>
                 </div>
               </div>
             </button>
@@ -174,7 +174,5 @@ export default {
 .btn {
   width: 230px;
 }
-.btn-custom:hover {
-      transform: scale(1.05); /* Agrandissement au survol */
-  }
+
 </style>
