@@ -1,78 +1,209 @@
-<script setup>
-    const props = defineProps({
-  userData: {
-    type: Object,
-    required: true,
-  },
+<script>
+  import axios from "axios";
+  import { useVuelidate } from "@vuelidate/core";
+  import { required, email } from "@vuelidate/validators";
+
+  export default {
+    setup() {
+      return { v$: useVuelidate() };
+    },
+    data() {
+      return {
+        nom: "",
+        prenom: "",
+        civilite: "",
+        email : "",
+        civilite: "",
+        mobile1: "",
+        mobile2: "",
+        processing: false,
+        submitted: false,
+      };
+    },
+    validations: {
+      email: {
+        required,
+        email
+      },
+      nom: {
+        required,
+      },
+      prenom: {
+        required,
+      },
+      civilite: {
+        required,
+      },
+      mobile1: {
+        required,
+      },
+   
+    },
+    methods:{
+      async onLogin() {
+      this.submitted = true;
+      this.v$.$touch();
+      if (this.v$.$invalid) {
+        return;
+      } else {
+        this.errorMsg = "";
+
+        // try {
+        //   this.processing = true;
+        //   const { data } = await axios.post(
+        //     "https://api-node.themesbrand.website/auth/signin",
+        //     {
+        //       email: this.email,
+        //       password: this.password
+        //     }
+        //   );
+        //   const status = data.status;
+        //   const response = data.data;
+        //   if (status === "success") {
+        //     localStorage.setItem("user", JSON.stringify(response));
+        //     localStorage.removeItem("isOk")
+        //     this.$router.push({
+        //       path: "/dashboard"
+        //     });
+        //   } else {
+        //     this.errorMsg = response;
+        //   }
+        // } catch (error) {
+        //   console.error("failed at onLogin", { error });
+        //   localStorage.removeItem("user");
+        // } finally {
+        //   this.processing = false;
+        // }
+      }
+    }
+    }
+  }
+  
+const formData = ref({
+  nom: "",
+  prenom: "",
+  civilite: "",
+  email : "",
+  civilite: "",
+  mobile1: "",
+  mobile2: "", 
 })
 
-const standardPlan = {
-  plan: 'Standard',
-  price: 99,
-  benefits: [
-    '10 Users',
-    'Up to 10GB storage',
-    'Basic Support',
-  ],
-}
+const civiliteValue = [
+  {value: null, text: 'Votre Civilité'},
+  {value: 'IVOIRIENNE', text: 'IVOIRIENNE'},
 
-const isUserInfoEditDialogVisible = ref(false)
-const isUpgradePlanDialogVisible = ref(false)
+]
 
-const resolveUserRoleVariant = role => {
-  if (role === 'subscriber')
-    return {
-      color: 'warning',
-      icon: 'tabler-user',
-    }
-  if (role === 'author')
-    return {
-      color: 'success',
-      icon: 'tabler-circle-check',
-    }
-  if (role === 'maintainer')
-    return {
-      color: 'primary',
-      icon: 'tabler-chart-pie-2',
-    }
-  if (role === 'editor')
-    return {
-      color: 'info',
-      icon: 'tabler-pencil',
-    }
-  if (role === 'admin')
-    return {
-      color: 'secondary',
-      icon: 'tabler-server-2',
-    }
-  
-  return {
-    color: 'primary',
-    icon: 'tabler-user',
-  }
-}
+
 </script>
 
 <template>
-    <div>
-        <BRow>
-      <BCol lg="6">
-        <BCard no-body>
-          <BCardBody class="pb-0">
-            <BCardTitle>Validation type</BCardTitle>
-            <p class="card-title-desc">
-              Parsley is a javascript form validation library. It helps you
-              provide your users with feedback on their form submission before
-              sending it to your server.
-            </p>
+    <BRow>
+      <span>Paramétrage du Profil</span>
+      <BCard no-body>
+        <BCardBody class="pb-0">
+          <BCardTitle class="text-center font-size-20 mb-5">Informations Personnelles</BCardTitle>
+          <BForm>
+            <BRow class="mt-3 mb-4">
+              <BCol sm="3" class="mb-3">
+                <label for="civilite" style="font-size: 12px;">Civilité</label>
+                <div class="input-group">
+                  <select v-model="password" id="civilite" class="form-select" aria-label="Default select example" :class="{
+                    'is-invalid': submitted && v$.civilite.$error
+                  }">
+                    <option selected>civilité...</option>
+                    <option value="MONSIEUR">MONSIEUR</option>
+                    <option value="MADAME">MADAME</option>
+                    <option value="MADEMOISELLE">MADEMOISELLE</option>
+                  </select>
+                  <div v-if="submitted && v$.civilite.$error" class="invalid-feedback">
+                    <span v-if="v$.civilite.required.$invalid">Civilité obligatoire
+                    </span>
+                  </div>
+                </div>
+              </BCol>
+              <BCol sm="3" class="mb-3">
+                <label for="nom" style="font-size: 12px;">Nom</label>
+                <div class="input-group">
+                  <input 
+                    v-model="nom" 
+                    id="nom" 
+                    class="form-control" 
+                    type="text"
+                    :class="{
+                    'is-invalid': submitted && v$.nom.$error
+                  }">
+                  <div v-if="submitted && v$.nom.$error" class="invalid-feedback">
+                    <span v-if="v$.nom.required.$invalid">Prénom obligatoire
+                    </span>
+                  </div>
+                </div>
+              </BCol>
+              <BCol sm="3" class="mb-3">
+                <label for="prenom" style="font-size: 12px;">Prénom</label>
+                <div class="input-group">
+                  <input 
+                    v-model="prenom" 
+                    id="prenom" 
+                    class="form-control" 
+                    type="text"
+                    :class="{
+                    'is-invalid': submitted && v$.prenom.$error
+                  }">
+                  <div v-if="submitted && v$.prenom.$error" class="invalid-feedback">
+                  <span v-if="v$.prenom.required.$invalid">Prénom obligatoire
+                  </span>
+                </div>
+                </div>
+              </BCol>
+              <BCol sm="3" class="mb-3">
+                <label for="email" style="font-size: 12px;">E-mail</label>
+                <input v-model="email" type="email" class="form-control" id="email" :class="{
+                  'is-invalid': submitted && v$.email.$error
+                }" />
+                <div v-if="submitted && v$.email.$error" class="invalid-feedback">
+                  <span v-if="v$.email.email.$invalid">Email invalide
+                  </span>
+                  <span v-if="v$.email.required.$invalid">Email obligatoire
+                  </span>
+                </div>
+              
+              </BCol>
+              <BCol sm="3" class="mb-3">
+                <label for="mobile1" style="font-size: 12px;">Mobile</label>
+                <input v-model="mobile1" 
+                  type="tel" 
+                  class="form-control" 
+                  id="mobile1" 
+                  :class="{'is-invalid': submitted && v$.mobile1.$error}"
+                  @input="mobile1 = $event.target.value.replace(/\D/g, '')" 
+                  maxlength="10" 
+                />
+                <div v-if="submitted && v$.mobile1.$error" class="invalid-feedback">
+                  <span v-if="v$.mobile1.required.$invalid">Numéro obligatoire</span>
+                </div>
+              </BCol>
 
-            
-          </BCardBody>
-        </BCard>
-      </BCol>
-
-      
-
+              <BCol sm="3" class="mb-3">
+                <label for="mobile2" style="font-size: 12px;">Autre mobile</label>
+                <input v-model="mobile2" 
+                  type="tel" 
+                  class="form-control" 
+                  id="mobile2" 
+                  @input="mobile2 = $event.target.value.replace(/\D/g, '')" 
+                  maxlength="10" 
+                />
+              </BCol>
+            </BRow>
+            <BRow class="d-flex justify-content-center mb-5">
+              <BButton :loading="processing ? true : fasle" variant="primary" class="w-sm waves-effect waves-light btn" :disabled="processing" @click="onLogin">
+                Enregistrer
+              </BButton>
+            </BRow>
+        </BForm>
+          
+        </BCardBody>
+      </BCard>
     </BRow>
-    </div>
 </template>

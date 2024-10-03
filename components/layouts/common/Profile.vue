@@ -8,7 +8,7 @@ export default {
 
 <template>
   
-  <BButton  right variant="white" >
+  <BButton class="d-inline-block" right variant="white" >
       <div style="width: 100px; border: 2px solid black; border-radius: 6px;">
         <img class="rounded-circle header-profile-user" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
         <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">{{

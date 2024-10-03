@@ -84,7 +84,7 @@ export default {
       this.hide()
     },
     profil(){
-      this.$router.push({path: "/forms/profile"})
+      this.$router.push({path: "/forms/parametrage-profile"})
       this.hide()
     }, 
     resetPassword(){
@@ -151,7 +151,7 @@ export default {
             </button>
           </div>
           <div class="text-center mt-5">
-            <BButton class="btn btn-outline-danger" @click="deconnexion">
+            <BButton variant="outline-danger" @click="deconnexion">
               <i class="uil uil-sign-out-alt font-size-18 align-middle me-1"></i>
               <span class="align-middle">Déconnexion</span>
             </BButton>

@@ -94,31 +94,22 @@ export default {
       <div class="navbar-header">
         <div class="d-flex">
           <HederLogo />
-
-          <button type="button" class="btn btn-sm px-3 font-size-16 header-item vertical-menu-btn" id="vertical-menu-btn" @click="toggleMenu">
+          <button type="button" class="btn-sm px-3 font-size-16 header-item vertical-menu-btn"  @click="toggleMenu">
             <i class="fa fa-fw fa-bars"></i>
           </button>
           <AppSearch />
         </div>
 
-        <div class="d-flex align-items-center">
-          <!-- <MobileAppSearch />
-          <LanguageDropdown :flag="flag" :languages="languages" :current_language="current_language" @onChange="setLanguage" />
-          <AppList />
-
-          <div class="dropdown d-none d-lg-inline-block ms-1">
-            <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen" @click="initFullScreen">
-              <i class="uil-minus-path"></i>
-            </button>
-          </div> -->
+        <div class="d-flex">
           <Notifications />
           <!-- <Profile @logoutUser="logoutUser"  /> -->
-           <button @click="toggleRightSidebar" class="btn btn-outline-secondary " right  style="width: 100%; padding: 1px 3px;">
-            <div class="px-1">
+           <div class="d-flex align-items-center">
+            <button @click="toggleRightSidebar" class="btn btn-outline-secondary "  style="width: 100%; padding: 1px 3px;">
               <img class="rounded-circle header-profile-user" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
               <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">Assena emmanuel</span>
-            </div>
            </button>
+           </div>
+           
          
           <!-- <div class="dropdown d-inline-block">
             <button type="button" class="btn header-item noti-icon right-bar-toggle toggle-right" @click="toggleRightSidebar">
