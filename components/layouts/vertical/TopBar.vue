@@ -94,9 +94,9 @@ export default {
       <div class="navbar-header">
         <div class="d-flex">
           <HederLogo />
-          <button type="button" class="btn-sm px-3 font-size-16 header-item vertical-menu-btn"  @click="toggleMenu">
+          <BButton variant="white"style="width: 25px;"type="button" class="btn-sm px-1 font-size-16 header-item vertical-menu-btn" @click="toggleMenu">
             <i class="fa fa-fw fa-bars"></i>
-          </button>
+          </BButton>
           <AppSearch />
         </div>
 

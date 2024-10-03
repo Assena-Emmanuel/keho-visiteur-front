@@ -9,6 +9,7 @@
     },
     data() {
       return {
+        // infos personnelles
         nom: "",
         prenom: "",
         civilite: "",
@@ -16,6 +17,11 @@
         civilite: "",
         mobile1: "",
         mobile2: "",
+        // infos professionnelles
+        matricule: "",
+        codeVisite: "",
+        departement: "",
+        service: "",
         processing: false,
         submitted: false,
       };
@@ -37,6 +43,18 @@
       mobile1: {
         required,
       },
+      matricule:{
+        required
+      },
+      codeVisite: {
+        required
+      },
+      departement:{
+        required
+      },
+      service: {
+        required
+      }
    
     },
     methods:{
@@ -97,8 +115,8 @@
       <span>Paramétrage du Profil</span>
       <BCard no-body>
         <BCardBody class="pb-0">
-          <BCardTitle class="text-center font-size-20 mb-5">Informations Personnelles</BCardTitle>
           <BForm>
+            <BCardTitle class="text-center font-size-20 mb-5">Informations Personnelles</BCardTitle>
             <BRow class="mt-3 mb-4">
               <BCol sm="3" class="mb-3">
                 <label for="civilite" style="font-size: 12px;">Civilité</label>
@@ -190,7 +208,81 @@
                 />
               </BCol>
             </BRow>
-            <BRow class="d-flex justify-content-center mb-5">
+            <BRow> <hr class="border-secondary"> </BRow>
+            <BRow>
+              <BCardTitle class="text-center font-size-20 mb-5">Informations Professionnelles</BCardTitle>
+              <BCol sm="3" class="mb-3">
+                <label for="nom" style="font-size: 12px;">Matricule</label>
+                <div class="input-group">
+                  <input 
+                    v-model="matricule" 
+                    id="nom" 
+                    class="form-control" 
+                    type="text"
+                    :class="{
+                    'is-invalid': submitted && v$.nom.$error
+                  }">
+                  <div v-if="submitted && v$.matricule.$error" class="invalid-feedback">
+                    <span v-if="v$.matricule.required.$invalid">Matricule obligatoire
+                    </span>
+                  </div>
+                </div>
+              </BCol>
+              <BCol sm="3" class="mb-3">
+                <label for="nom" style="font-size: 12px;">Code Visite</label>
+                <div class="input-group">
+                  <input 
+                    v-model="codeVisite" 
+                    id="nom" 
+                    class="form-control" 
+                    type="text"
+                    :class="{
+                    'is-invalid': submitted && v$.codeVisite.$error
+                  }">
+                  <div v-if="submitted && v$.codeVisite.$error" class="invalid-feedback">
+                    <span v-if="v$.codeVisite.required.$invalid">Code visite obligatoire
+                    </span>
+                  </div>
+                </div>
+              </BCol>
+              <BCol sm="3" class="mb-3">
+                <label for="nom" style="font-size: 12px;">Département</label>
+                <div class="input-group">
+                  <input 
+                    v-model="departement" 
+                    id="nom" 
+                    class="form-control" 
+                    type="text"
+                    :class="{
+                    'is-invalid': submitted && v$.nom.$error
+                  }">
+                  <div v-if="submitted && v$.departement.$error" class="invalid-feedback">
+                    <span v-if="v$.departement.required.$invalid">Département obligatoire
+                    </span>
+                  </div>
+                </div>
+              </BCol>
+              <BCol sm="3" class="mb-3">
+                <label for="service" style="font-size: 12px;">Service</label>
+                <div class="input-group">
+                  <input 
+                    v-model="service" 
+                    id="service" 
+                    class="form-control" 
+                    type="text"
+                    :class="{
+                    'is-invalid': submitted && v$.service.$error
+                  }">
+                  <div v-if="submitted && v$.service.$error" class="invalid-feedback">
+                    <span v-if="v$.service.required.$invalid">Service obligatoire
+                    </span>
+                  </div>
+                </div>
+              </BCol>
+            
+            </BRow>
+
+            <BRow class="d-flex justify-content-center mb-5 mt-5">
               <BButton :loading="processing ? true : fasle" variant="primary" class="w-sm waves-effect waves-light btn" :disabled="processing" @click="onLogin">
                 Enregistrer
               </BButton>

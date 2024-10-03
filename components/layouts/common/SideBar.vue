@@ -177,14 +177,14 @@ export default {
           <img src="/images/logo_keho.jpg" alt height="22" />
         </span>
         <span class="logo-lg">
-          <img src="/images/logo_keho.jpg" alt height="20" />
+          <img src="/images/logo_keho.jpg" alt height="70" />
         </span>
       </nuxt-link>
     </div>
 
-    <button type="button" @click="toggleMenu" class="btn btn-sm px-3 font-size-16 header-item vertical-menu-btn">
+    <BButton variant="white" style="width: 70px;" type="button" @click="toggleMenu" class="px-3 font-size-16 header-item vertical-menu-btn">
       <i class="fa fa-fw fa-bars"></i>
-    </button>
+    </BButton>
 
     <div data-simplebar class="sidebar-menu-scroll">
       <div id="sidebar-menu">

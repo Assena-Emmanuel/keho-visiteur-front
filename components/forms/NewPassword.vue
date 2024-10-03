@@ -45,11 +45,13 @@ export default {
         if(this.newpassword !== this.confirmPassword){
             this.isDif = true
         }else{
+            alert(`last: ${this.lastPassword} - new: ${this.newpassword} - cnew: ${this.confirmPassword}`)
             this.isSuccess = true;
-            localStorage.setItem("isOk", true)
-            this.$router.push({
-            path: "/login"
-            });
+            this.lastPassword = ""
+            this.newpassword = "",
+            this.confirmPassword = ""
+            this.submitted = false
+            
         }
         
       }
@@ -60,6 +62,7 @@ export default {
 
 <template>
   <BRow class="justify-content-center">
+    <span>Paremétrage du mot de passe</span>
     <BCol>
       <BCard no-body>
         <BCardBody class="p-4">
@@ -76,7 +79,7 @@ export default {
                 <BRow>
                   <BCol md="4" sm="4">
                     <div class="mb-3">
-                      <label for="lastpassword" style="font-size: 12px;">Ancien Mot de passe</label>
+                      <label for="lastpassword" style="font-size: 12px;">Ancien Mot de passe <span class="fw-bool">*</span></label>
                       <div class="input-group">
                           <input 
                               v-model="lastPassword" 
@@ -89,16 +92,18 @@ export default {
                           <span class="input-group-text" @click="toggleLastPasswordVisibility">
                             <i :class="showLastPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                           </span>
-                      </div>
-                      <div v-if="submitted && v$.lastPassword.$error" class="invalid-feedback">
 
-                          <span v-if="v$.lastPassword.required.$invalid">Ce champ est obligatoire</span>
+                          <div v-if="submitted && v$.lastPassword.$error" class="invalid-feedback">
+                            <span v-if="v$.lastPassword.required.$invalid">Ce champ est obligatoire
+                            </span>
+                          </div>
                       </div>
+                      
                     </div>
                   </BCol>
                   <BCol md="4" sm="4">
                     <div class="mb-3">
-                        <label for="userpassword" style="font-size: 12px;">Nouveau Mot de passe</label>
+                        <label for="userpassword" style="font-size: 12px;">Nouveau Mot de passe <span class="fw-bool">*</span></label>
                         <div class="input-group">
                             <input 
                                 v-model="newpassword" 
@@ -111,15 +116,16 @@ export default {
                             <span class="input-group-text" @click="togglePasswordVisibility">
                               <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                             </span>
+                            <div v-if="submitted && v$.newpassword.$error" class="invalid-feedback">
+                              <span v-if="v$.newpassword.required.$invalid">Ce champ est obligatoire</span>
+                          </div>
                         </div>
-                        <div v-if="submitted && v$.newpassword.$error" class="invalid-feedback">
-                            <span v-if="v$.newpassword.required.$invalid">Ce champ est obligatoire</span>
-                        </div>
+                        
                       </div>
                   </BCol>
                   <BCol md="4" sm="4">
                     <div class="mb-3">
-                        <label for="usercpassword" style="font-size: 12px;">Confirmation du Mot de passe</label>
+                        <label for="usercpassword" style="font-size: 12px;">Confirmation du Mot de passe <span class="fw-bool">*</span></label>
                         <div class="input-group">
                           <input 
                             v-model="confirmPassword" 
@@ -132,11 +138,12 @@ export default {
                           <span class="input-group-text" @click="togglePasswordVisibility">
                             <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                           </span>
+                          <div v-if="submitted && v$.confirmPassword.$error" class="invalid-feedback">
+                            <span v-if="v$.confirmPassword.required.$invalid">Cet champ est obligatoire
+                            </span>
+                          </div>
                       </div>
-                        <div v-if="submitted && v$.confirmPassword.$error" class="invalid-feedback">
-                          <span v-if="v$.confirmPassword.required.$invalid">Cet champ est obligatoire
-                          </span>
-                        </div>
+                        
                     </div>
                   </BCol>
                 </BRow>
