@@ -84,12 +84,12 @@ export default {
                           <input 
                               v-model="lastPassword" 
                               :type="showLastPassword ? 'text' : 'password'" 
-                              class="form-control" 
+                              class="form-control border border-black" 
                               id="lastpassword" 
                               placeholder="Mot de passe"
                               :class="{ 'is-invalid': submitted && v$.lastPassword.$error }" 
                           />
-                          <span class="input-group-text" @click="toggleLastPasswordVisibility">
+                          <span class="input-group-text border border-black" @click="toggleLastPasswordVisibility">
                             <i :class="showLastPassword ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                           </span>
 
@@ -108,12 +108,12 @@ export default {
                             <input 
                                 v-model="newpassword" 
                                 :type="passwordVisible ? 'text' : 'password'" 
-                                class="form-control" 
+                                class="form-control border border-black" 
                                 id="userpassword" 
                                 placeholder="Mot de passe"
                                 :class="{ 'is-invalid': submitted && v$.newpassword.$error }" 
                             />
-                            <span class="input-group-text" @click="togglePasswordVisibility">
+                            <span class="input-group-text border border-black" @click="togglePasswordVisibility">
                               <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                             </span>
                             <div v-if="submitted && v$.newpassword.$error" class="invalid-feedback">
@@ -130,12 +130,12 @@ export default {
                           <input 
                             v-model="confirmPassword" 
                             :type="passwordVisible ? 'text' : 'password'" 
-                            class="form-control" 
+                            class="form-control border border-black" 
                             id="usercpassword" 
                             placeholder="Confirmez le mot de passe" 
                             :class="{'is-invalid': submitted && v$.confirmPassword.$error }" 
                           />
-                          <span class="input-group-text" @click="togglePasswordVisibility">
+                          <span class="input-group-text border border-black" @click="togglePasswordVisibility">
                             <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                           </span>
                           <div v-if="submitted && v$.confirmPassword.$error" class="invalid-feedback">

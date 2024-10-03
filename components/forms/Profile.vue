@@ -17,6 +17,7 @@
         civilite: "",
         mobile1: "",
         mobile2: "",
+        photo: "",
         // infos professionnelles
         matricule: "",
         codeVisite: "",
@@ -24,6 +25,7 @@
         service: "",
         processing: false,
         submitted: false,
+        statut: ""
       };
     },
     validations: {
@@ -54,10 +56,19 @@
       },
       service: {
         required
-      }
+      },
+      photo:{required},
+      statut: {required},
    
     },
     methods:{
+      handleFileUpload(event) {
+      // Récupérer le fichier sélectionné
+      const file = event.target.files[0];
+      console.log(file);
+
+  
+      },
       async onLogin() {
       this.submitted = true;
       this.v$.$touch();
@@ -113,7 +124,7 @@
 <template>
     <BRow>
       <span>Paramétrage du Profil</span>
-      <BCard no-body id="cardFrom">
+      <BCard no-body >
         <BCardBody class="pb-0">
           <BForm>
             <BCardTitle class="text-center font-size-20 mb-5">Informations Personnelles</BCardTitle>
@@ -121,7 +132,7 @@
               <BCol sm="3" class="mb-3">
                 <label for="civilite" style="font-size: 12px;">Civilité</label>
                 <div class="input-group">
-                  <select v-model="civilite" id="civilite" class="form-select" aria-label="Default select example" :class="{
+                  <select v-model="civilite" id="civilite" class="form-select border border-black" aria-label="Default select example" :class="{
                     'is-invalid': submitted && v$.civilite.$error
                   }">
                     <option value="" selected>civilité...</option>
@@ -137,7 +148,7 @@
               </BCol>
               <BCol sm="3" class="mb-3">
                 <label for="nom" style="font-size: 12px;">Nom</label>
-                <div class="input-group">
+                <div class="input-group border border-black">
                   <input 
                     v-model="nom" 
                     id="nom" 
@@ -158,7 +169,7 @@
                   <input 
                     v-model="prenom" 
                     id="prenom" 
-                    class="form-control" 
+                    class="form-control border border-black" 
                     type="text"
                     :class="{
                     'is-invalid': submitted && v$.prenom.$error
@@ -171,7 +182,7 @@
               </BCol>
               <BCol sm="3" class="mb-3">
                 <label for="email" style="font-size: 12px;">E-mail</label>
-                <input v-model="email" type="email" class="form-control" id="email" :class="{
+                <input v-model="email" type="email" class="form-control border border-black" id="email" :class="{
                   'is-invalid': submitted && v$.email.$error
                 }" />
                 <div v-if="submitted && v$.email.$error" class="invalid-feedback">
@@ -183,10 +194,10 @@
               
               </BCol>
               <BCol sm="3" class="mb-3">
-                <label for="mobile1" style="font-size: 12px;">Mobile</label>
+                <label for="mobile1" style="font-size: 12px;">Tel. Mobile</label>
                 <input v-model="mobile1" 
                   type="tel" 
-                  class="form-control" 
+                  class="form-control border border-black" 
                   id="mobile1" 
                   :class="{'is-invalid': submitted && v$.mobile1.$error}"
                   @input="mobile1 = $event.target.value.replace(/\D/g, '')" 
@@ -198,13 +209,22 @@
               </BCol>
 
               <BCol sm="3" class="mb-3">
-                <label for="mobile2" style="font-size: 12px;">Autre mobile</label>
+                <label for="mobile2" style="font-size: 12px;">Autre Tel. Mobile</label>
                 <input v-model="mobile2" 
                   type="tel" 
-                  class="form-control" 
+                  class="form-control border border-black" 
                   id="mobile2" 
                   @input="mobile2 = $event.target.value.replace(/\D/g, '')" 
                   maxlength="10" 
+                />
+              </BCol>
+              <BCol sm="3" class="mb-3">
+                <label for="photo" style="font-size: 12px;">Photo</label>
+                <input 
+                  @change="handleFileUpload" 
+                  type="file" 
+                  class="form-control border border-black" 
+                  id="photo" 
                 />
               </BCol>
             </BRow>
@@ -217,7 +237,7 @@
                   <input 
                     v-model="matricule" 
                     id="nom" 
-                    class="form-control" 
+                    class="form-control border border-black" 
                     type="text"
                     :class="{
                     'is-invalid': submitted && v$.nom.$error
@@ -234,7 +254,7 @@
                   <input 
                     v-model="codeVisite" 
                     id="nom" 
-                    class="form-control" 
+                    class="form-control border border-black" 
                     type="text"
                     :class="{
                     'is-invalid': submitted && v$.codeVisite.$error
@@ -251,7 +271,7 @@
                   <input 
                     v-model="departement" 
                     id="nom" 
-                    class="form-control" 
+                    class="form-control border border-black" 
                     type="text"
                     :class="{
                     'is-invalid': submitted && v$.nom.$error
@@ -268,11 +288,26 @@
                   <input 
                     v-model="service" 
                     id="service" 
-                    class="form-control" 
+                    class="form-control border border-black" 
                     type="text"
                     :class="{
                     'is-invalid': submitted && v$.service.$error
                   }">
+                  <div v-if="submitted && v$.service.$error" class="invalid-feedback">
+                    <span v-if="v$.service.required.$invalid">Service obligatoire
+                    </span>
+                  </div>
+                </div>
+              </BCol>
+              <BCol sm="3" class="mb-3">
+                <label for="statut" style="font-size: 12px;">Statut</label>
+                <div class="input-group">
+                  <select v-model="statut" id="statut" class="form-select border border-black" aria-label="Default select example" :class="{
+                    'is-invalid': submitted && v$.statut.$error
+                  }">
+                    <option value="ACTIF">ACTIF</option>
+
+                  </select>
                   <div v-if="submitted && v$.service.$error" class="invalid-feedback">
                     <span v-if="v$.service.required.$invalid">Service obligatoire
                     </span>
