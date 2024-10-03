@@ -14,7 +14,9 @@ export default defineNuxtConfig({
       link: [{ rel: "icon", type: "image/ico", href: "/images/logo_keho.jpg" }]
     }
   },
+
   modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts"],
+
   pinia: {
     autoImports: ["defineStore", ["defineStore", "definePiniaStore"]]
   },
@@ -24,10 +26,12 @@ export default defineNuxtConfig({
     "~/assets/scss/app.scss",
     "simplebar/dist/simplebar.css"
   ],
+
   alias: {
     assets: "/assets",
     public: "/public"
   },
+
   googleFonts: {
     families: {
       Poppins: [300, 400, 500, 600, 700],
@@ -39,9 +43,16 @@ export default defineNuxtConfig({
     },
     display: "swap"
   },
+
   runtimeConfig: {
     public: {
       auth: "fakebackend"
     }
+  },
+  routeRules: {
+    '/': {redirect: "/login"}
+  },
+  devtools: {
+    enabled: true
   }
 });

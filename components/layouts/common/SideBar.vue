@@ -171,7 +171,7 @@ export default {
 
 <template>
   <div class="vertical-menu">
-    <div class="navbar-brand-box d-flex justify-content-center">
+    <div class="navbar-brand-box ">
       <nuxt-link to="/" class="logo logo-dark">
         <span class="logo-sm" >
           <img src="/images/logo_keho.jpg" alt height="30" />
@@ -223,7 +223,7 @@ export default {
                   <a v-if="hasItems(subitem)" class="side-nav-link-a-ref has-arrow" href="javascript:void(0);">{{ $t(subitem.label) }}</a>
                   <ul v-if="hasItems(subitem)" class="sub-menu mm-collapse" aria-expanded="false">
                     <li v-for="(subSubitem, index) of subitem.subItems" :key="index">
-                      <nuxt-link :to="subSubitem.link" class="side-nav-link-ref">{{ $t(subSubitem.label) }}</nuxt-link>
+                      <nuxt-link :to="subSubitem.link" class="side-nav-link-ref">{{ $t(subSubitem.label) }}</nuxt-link> 
                     </li>
                   </ul>
                 </li>

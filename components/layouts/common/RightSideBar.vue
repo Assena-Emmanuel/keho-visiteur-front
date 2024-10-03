@@ -79,6 +79,10 @@ export default {
     this.addEventListener();
   },
   methods: {
+    deconnexion(){
+      this.$router.push({path: "/login"})
+      this.hide()
+    },
     profil(){
       this.$router.push({path: "/forms/profile"})
       this.hide()
@@ -147,10 +151,10 @@ export default {
             </button>
           </div>
           <div class="text-center mt-5">
-            <NuxtLink to="/login" class="btn btn-outline-danger"@click="$emit('logoutUser')">
+            <BButton class="btn btn-outline-danger" @click="deconnexion">
               <i class="uil uil-sign-out-alt font-size-18 align-middle me-1"></i>
               <span class="align-middle">Déconnexion</span>
-            </NuxtLink>
+            </BButton>
           </div>
         
       </div>
