@@ -113,7 +113,7 @@
 <template>
     <BRow>
       <span>Paramétrage du Profil</span>
-      <BCard no-body>
+      <BCard no-body id="cardFrom">
         <BCardBody class="pb-0">
           <BForm>
             <BCardTitle class="text-center font-size-20 mb-5">Informations Personnelles</BCardTitle>
@@ -293,3 +293,8 @@
       </BCard>
     </BRow>
 </template>
+<style>
+  #cardFrom{
+    background: linear-gradient(90deg, rgb(226, 226, 231), rgb(226, 226, 231));
+  }
+</style>
