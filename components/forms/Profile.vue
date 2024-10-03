@@ -47,7 +47,14 @@
         return;
       } else {
         this.errorMsg = "";
-
+        alert(`nom: ${this.nom}, nom: ${this.prenom}, nom: ${this.civilite}, nom: ${this.email}, nom: ${this.mobile1}, nom: ${this.mobile2}`)
+        this.nom = ""
+        this.prenom = ""
+        this.civilite = ""
+        this.email = ""
+        this.mobile1 = ""
+        this.mobile2 = ""
+        this.submitted = false;
         // try {
         //   this.processing = true;
         //   const { data } = await axios.post(
@@ -79,21 +86,8 @@
     }
   }
   
-const formData = ref({
-  nom: "",
-  prenom: "",
-  civilite: "",
-  email : "",
-  civilite: "",
-  mobile1: "",
-  mobile2: "", 
-})
 
-const civiliteValue = [
-  {value: null, text: 'Votre Civilité'},
-  {value: 'IVOIRIENNE', text: 'IVOIRIENNE'},
 
-]
 
 
 </script>
@@ -109,10 +103,10 @@ const civiliteValue = [
               <BCol sm="3" class="mb-3">
                 <label for="civilite" style="font-size: 12px;">Civilité</label>
                 <div class="input-group">
-                  <select v-model="password" id="civilite" class="form-select" aria-label="Default select example" :class="{
+                  <select v-model="civilite" id="civilite" class="form-select" aria-label="Default select example" :class="{
                     'is-invalid': submitted && v$.civilite.$error
                   }">
-                    <option selected>civilité...</option>
+                    <option value="" selected>civilité...</option>
                     <option value="MONSIEUR">MONSIEUR</option>
                     <option value="MADAME">MADAME</option>
                     <option value="MADEMOISELLE">MADEMOISELLE</option>
