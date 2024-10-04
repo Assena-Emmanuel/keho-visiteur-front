@@ -1,5 +1,5 @@
 <script>
-import Profile from '~/components/forms/Profile.vue';
+import ParametrageProfile from '~/components/forms/ParametrageProfile.vue';
 export default {
   data() {
     return {
@@ -16,12 +16,12 @@ export default {
     };
   },
   components: {
-    Profile
+    ParametrageProfile
   }
 };
 </script>
 
 <template>
   <SiteHeader :title="title" />
-  <Profile />
+  <ParametrageProfile />
 </template>

@@ -44,6 +44,7 @@
     "maska": "^2.1.10",
     "metismenujs": "^1.4.0",
     "nuxt-storage": "^1.2.2",
+    "nuxt-sweetalert2": "^1.0.0",
     "pinia": "^2.2.2",
     "sass": "^1.66.1",
     "sass-loader": "^13.3.3",

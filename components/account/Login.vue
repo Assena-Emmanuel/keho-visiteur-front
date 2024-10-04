@@ -137,7 +137,7 @@ export default {
 
               <div class="mt-3 text-danger">{{ errorMsg }}</div>
               <div class="mt-4 text-center">
-                <BButton :loading="processing ? true : fasle" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" :disabled="processing" @click="onLogin">
+                <BButton :loading="processing ? true : false" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" :disabled="processing" @click="onLogin">
                   Se connecter
                 </BButton>
               </div>
