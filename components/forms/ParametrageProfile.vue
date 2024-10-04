@@ -75,13 +75,7 @@ export default {
 
     // SweetAlert
     successmsg() {
-      this.$swal.fire({
-        position: "top",
-        icon: "success",
-        title: "Modification réussie",
-        showConfirmButton: false,
-        timer: 1500
-      });
+      this.$swal.fire("Succes!", "Modification reussie!", "success");
     },
 
 
@@ -154,7 +148,8 @@ export default {
                 <li class="nav-item" role="presentation">
                   <button class="nav-link wizard-step" :disabled="!activeTabprofessionnelle" id="pills-success-tab" type="button" role="tab" :class="{ 
                     active: activeTab == 2, done: activeTab > 2 }" @click="onNext">
-                    <i class="wizard-icon mdi mdi-checkbox-marked-circle-outline font-size-24"></i>
+                    <i class="wizard-icon mdi mdi-briefcase font-size-24"></i>
+
                   </button>
                 </li>
               </ul>
@@ -165,6 +160,7 @@ export default {
               <!-- Informations personnelles -->
               <div class="tab-pane fade" :class="activeTab == 1 && 'show active'" id="pills-gen-info" role="tabpanel" aria-labelledby="pills-gen-info-tab">
                 <BRow class="mt-3 mb-4">
+                  <h4 class="text-center font-size-20 mb-5">Informations Personnelles</h4>
                   <BCol sm="3" class="mb-3">
                     <label for="civilite" style="font-size: 12px;">Civilité</label>
                     <div class="input-group">
@@ -296,7 +292,7 @@ export default {
               <!-- </div> -->
               <div class="tab-pane fade" :class="activeTab == 2 && 'show active'" id="steparrow-description-info" role="tabpanel" aria-labelledby="steparrow-description-info-tab">
                 <BRow>
-                  <BCardTitle class="text-center font-size-20 mb-5">Informations Professionnelles</BCardTitle>
+                  <h4 class="text-center font-size-20 mb-5">Informations Professionnelles</h4>
                   <BCol sm="3" class="mb-3">
                     <label for="nom" style="font-size: 12px;">Matricule</label>
                     <div class="input-group">
