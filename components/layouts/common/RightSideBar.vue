@@ -125,6 +125,7 @@ export default {
             <img class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
             <div class="ms-1 fw-medium font-size-12">Assena Emanuel yao</div>
             <div class="ms-1 fw-medium font-size-12 text-primary">assenaemmanuel3@outlook.com</div>
+            <div><BBadge variant="secondary">Administrateur</BBadge></div>
           </div>
           <div class="mt-5">
             <button class="btn btn-custom" @click="profil">

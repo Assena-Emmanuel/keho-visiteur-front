@@ -158,7 +158,7 @@
                     'is-invalid': submitted && v$.nom.$error
                   }">
                   <div v-if="submitted && v$.nom.$error" class="invalid-feedback">
-                    <span v-if="v$.nom.required.$invalid">Prénom obligatoire
+                    <span v-if="v$.nom.required.$invalid">Nom obligatoire
                     </span>
                   </div>
                 </div>
@@ -219,6 +219,21 @@
                 />
               </BCol>
               <BCol sm="3" class="mb-3">
+                <label for="statut" style="font-size: 12px;">Statut</label>
+                <div class="input-group">
+                  <select v-model="statut" id="statut" class="form-select border border-black" aria-label="Default select example" :class="{
+                    'is-invalid': submitted && v$.statut.$error
+                  }">
+                    <option value="ACTIF">ACTIF</option>
+
+                  </select>
+                  <div v-if="submitted && v$.service.$error" class="invalid-feedback">
+                    <span v-if="v$.service.required.$invalid">Service obligatoire
+                    </span>
+                  </div>
+                </div>
+              </BCol>
+              <BCol sm="3" class="mb-3">
                 <label for="photo" style="font-size: 12px;">Photo</label>
                 <input 
                   @change="handleFileUpload" 
@@ -231,7 +246,7 @@
             <BRow> <hr class="border-secondary"> </BRow>
             <BRow>
               <BCardTitle class="text-center font-size-20 mb-5">Informations Professionnelles</BCardTitle>
-              <BCol sm="3" class="mb-3">
+              <BCol sm="6" class="mb-3">
                 <label for="nom" style="font-size: 12px;">Matricule</label>
                 <div class="input-group">
                   <input 
@@ -299,21 +314,7 @@
                   </div>
                 </div>
               </BCol>
-              <BCol sm="3" class="mb-3">
-                <label for="statut" style="font-size: 12px;">Statut</label>
-                <div class="input-group">
-                  <select v-model="statut" id="statut" class="form-select border border-black" aria-label="Default select example" :class="{
-                    'is-invalid': submitted && v$.statut.$error
-                  }">
-                    <option value="ACTIF">ACTIF</option>
-
-                  </select>
-                  <div v-if="submitted && v$.service.$error" class="invalid-feedback">
-                    <span v-if="v$.service.required.$invalid">Service obligatoire
-                    </span>
-                  </div>
-                </div>
-              </BCol>
+              
             
             </BRow>
 
