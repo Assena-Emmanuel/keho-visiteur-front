@@ -91,12 +91,8 @@ export default {
           <!-- <AppSearch /> -->
         </div>
 
-        <div class="d-flex">
-          
-          <LayoutsCommonParametreDropdown :parametres="parametres" />
-            <!-- <BButton type="button" variant="white"  class="header-item noti-icon right-bar-toggle toggle-right" @click="toggleRightSidebar">
-              <i class="uil-cog toggle-right"></i>
-            </BButton> -->
+        <div class="d-flex gap-3">
+          <LayoutsCommonParametreDropdown/>
           <Notifications />
            <div class="d-flex align-items-center">
             <button @click="toggleRightSidebar" class="btn btn-outline-secondary "  style="width: 100%; padding: 1px 3px;">

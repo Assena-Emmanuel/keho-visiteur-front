@@ -128,7 +128,7 @@ export default {
             <div><BBadge variant="secondary">Administrateur</BBadge></div>
           </div>
           <div class="mt-5">
-            <button class="btn btn-custom" @click="profil">
+            <button class="btn  btnParam" @click="profil">
               <div class="row ms-1">
                 <div class="col-2 bg rounded-3 d-flex justify-content-center align-items-center icone">
                   <span class="font-size-20" ><i class="uil uil-user"></i></span>
@@ -139,7 +139,7 @@ export default {
                 </div>
               </div>
             </button>
-            <button class="btn btn-custom" @click="resetPassword">
+            <button class="btn btnParam" @click="resetPassword">
               <div class="row ms-1">
                 <div class="col-1 rounded-3 d-flex justify-content-center align-items-center icone">
                   <span ><i class="uil uil-lock"></i></span>
@@ -177,7 +177,7 @@ export default {
   width: 50px;
   height: 50px;
 }
-.btn {
+.btnParam {
   width: 230px;
 }
 
