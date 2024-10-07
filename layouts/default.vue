@@ -2,7 +2,7 @@
 import { useLayoutStore } from "~/stores/layout";
 import { LAYOUT_TYPE } from "~/app/const";
 import Vertical from "~/components/layouts/vertical/index.vue";
-import Horizontal from "~/components/layouts/horizontal/index.vue";
+// import Horizontal from "~/components/layouts/horizontal/index.vue";
 
 export default {
   data() {
@@ -12,7 +12,7 @@ export default {
   },
   components: {
     Vertical,
-    Horizontal
+    // Horizontal
   },
   computed: {
     ...useLayoutStore(),
@@ -22,9 +22,9 @@ export default {
     isVertical() {
       return this.layoutType === LAYOUT_TYPE.VERTICAL;
     },
-    isHorizontal() {
-      return this.layoutType === LAYOUT_TYPE.HORIZONTAL;
-    }
+    // isHorizontal() {
+    //   return this.layoutType === LAYOUT_TYPE.HORIZONTAL;
+    // }
   },
   mounted() {
     document.body.classList.remove("authentication-bg");
@@ -38,9 +38,9 @@ export default {
       <Vertical v-if="isVertical">
         <slot />
       </Vertical>
-      <Horizontal v-if="isHorizontal">
+      <!-- <Horizontal v-if="isHorizontal">
         <slot />
-      </Horizontal>
+      </Horizontal> -->
     </ClientOnly>
   </div>
 </template>

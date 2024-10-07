@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   plugins: [
     '~/plugins/sweetalert.ts'
   ],
+
   app: {
     head: {
       htmlAttrs: { dir: "ltr", lang: "en" },
@@ -52,10 +53,14 @@ export default defineNuxtConfig({
       auth: "fakebackend"
     }
   },
+
   routeRules: {
     '/': {redirect: "/login"}
   },
+
   devtools: {
     enabled: true
-  }
+  },
+
+  compatibilityDate: "2024-10-07"
 });
