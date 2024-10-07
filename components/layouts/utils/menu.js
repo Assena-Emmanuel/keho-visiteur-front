@@ -21,6 +21,12 @@ export const menuItems = [
     link: "/agenda"
   },
   {
+    id: 4,
+    label: "VISITEUR",
+    icon: "mdi:account-supervisor",
+    link: "/agenda"
+  },
+  {
     id: 25,
     label: "menuitems.pages.text",
     isTitle: true

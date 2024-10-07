@@ -2,7 +2,6 @@
 import HederLogo from "~/components/layouts/common/HeaderLogo.vue";
 // import AppSearch from "~/components/layouts/common/AppSearch.vue";
 // import MobileAppSearch from "~/components/layouts/common/MobileAppSearch.vue";
-// import ParametreDropdown from "../common/ParametreDropdown.vue";
 import AppList from "~/components/layouts/common/AppList.vue";
 import Notifications from "~/components/layouts/common/Notifications.vue";
 import Profile from "~/components/layouts/common/Profile.vue";
@@ -102,8 +101,8 @@ export default {
            </div>
 
         </div>
-
       </div>
     </header>
+    
   </ClientOnly>
 </template>

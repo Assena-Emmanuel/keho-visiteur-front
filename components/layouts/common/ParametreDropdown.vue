@@ -14,8 +14,8 @@
         </BRow>
       </div>
       
-      <div  data-simplebar style="width: 300px;">
-        <nuxt-link to="/login" class="text-reset notification-item">
+      <div  data-simplebar>
+        <nuxt-link to="/parametres/departement" class="text-reset notification-item">
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">
@@ -24,7 +24,7 @@
             </div>
           </div>
         </nuxt-link>
-        <nuxt-link to="/login" class="text-reset notification-item">
+        <nuxt-link to="/parametres/service" class="text-reset notification-item">
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">
@@ -33,7 +33,7 @@
             </div>
           </div>
         </nuxt-link>
-        <nuxt-link to="/login" class="text-reset notification-item">
+        <nuxt-link to="//parametres/menus" class="text-reset notification-item">
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">

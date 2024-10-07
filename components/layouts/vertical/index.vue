@@ -15,7 +15,7 @@ export default {
     TopBar,
     SideBarComponent,
     Footer,
-    RightSideBar
+    RightSideBar,
   },
   computed: {
     ...useLayoutStore(),

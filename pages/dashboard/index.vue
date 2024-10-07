@@ -1,5 +1,6 @@
 <script>
 import "simplebar";
+import Stat from "~/components/dashboard/Stat.vue";
 
 export default {
   data() {
@@ -22,5 +23,5 @@ export default {
 <template>
   <SiteHeader :title="title" />
   <PageHeader :title="title" :items="items" />
-
+  
 </template>

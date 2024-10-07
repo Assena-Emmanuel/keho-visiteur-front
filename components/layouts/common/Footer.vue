@@ -9,7 +9,7 @@ export default {};
   <footer class="footer">
     <BContainer fluid>
       <BRow class="justify-content-end">
-        <BCol sm="6" class="text-end">{{ new Date().getFullYear() }} © KEHO-GROUP</BCol>
+        <BCol sm="6" class="text-end">{{ new Date().getFullYear() }} © KEHO-GROUPE</BCol>
         <!-- <BCol sm="6">
           <div class="text-sm-end d-none d-sm-block">
             Crafted with
