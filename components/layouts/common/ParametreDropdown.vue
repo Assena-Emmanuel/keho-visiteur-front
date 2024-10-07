@@ -14,7 +14,7 @@
         </BRow>
       </div>
       
-      <div  data-simplebar>
+      <div  data-simplebar style="width: 300px;">
         <nuxt-link to="/login" class="text-reset notification-item">
             <div class="media d-flex">
             <div class="media-body">
