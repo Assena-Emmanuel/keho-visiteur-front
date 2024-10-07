@@ -19,7 +19,7 @@
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">
-                Paramètre 1
+                Gestion des départements 
               </h6>
             </div>
           </div>
@@ -28,7 +28,7 @@
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">
-                Paramètre 2
+                Gestion des services 
               </h6>
             </div>
           </div>
@@ -37,7 +37,16 @@
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">
-                Paramètre 3
+                Gestion des menus
+              </h6>
+            </div>
+          </div>
+        </nuxt-link>
+        <nuxt-link to="/login" class="text-reset notification-item">
+            <div class="media d-flex">
+            <div class="media-body">
+              <h6 class="mt-0 mb-1">
+                Gestion des catégories
               </h6>
             </div>
           </div>
