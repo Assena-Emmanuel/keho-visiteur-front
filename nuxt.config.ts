@@ -6,7 +6,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      htmlAttrs: { dir: "ltr", lang: "en" },
+      htmlAttrs: { dir: "ltr", lang: "fr" },
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
