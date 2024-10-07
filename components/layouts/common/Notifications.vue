@@ -1,5 +1,6 @@
 <template>
-  <BDropdown variant="white" class="dropdown d-inline-block" toggle-class="header-item noti-icon" right menu-class="dropdown-menu-lg dropdown-menu-end p-0">
+  <!-- variant="white" -->
+  <BDropdown variant="white"  class="dropdown d-inline-block" toggle-class="header-item noti-icon" right menu-class="dropdown-menu-lg dropdown-menu-end p-0">
     <template #button-content>
       <i class="uil-bell"></i>
       <span class="badge bg-danger rounded-pill">3</span>

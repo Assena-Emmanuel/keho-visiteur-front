@@ -1,6 +1,7 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import axios from "axios";
 export default {
   setup() {
     return { v$: useVuelidate() };
@@ -28,6 +29,15 @@ export default {
       if (this.v$.$invalid) {
         return;
       } else {
+        axios.get('https://jsonplaceholder.typicode.com/todos/1')
+        .then(function (response) {
+          console.log('data: '+response.data);
+          console.log('status: '+response.status);
+          console.log('statusText: '+response.statusText);
+          console.log('headers: '+response.headers);
+          console.log('config: '+response.config);
+        });
+
         this.isSuccess = true;
         localStorage.setItem('email', this.email)
         this.$router.push({

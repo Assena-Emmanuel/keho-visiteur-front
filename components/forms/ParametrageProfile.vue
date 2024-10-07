@@ -118,6 +118,21 @@ export default {
           return
       }else{
         this.successmsg()
+
+        this.civilite = ""
+        this.nom = ""
+        this.prenom = ""
+        this.email = ""
+        this.mobile1 = ""
+        this.mobile2 = ""
+        this.statut = ""
+        this.photo = ""
+
+        // Info professionnelles
+        this.matricule = ""
+        this.codeVisite = ""
+        this.departement = ""
+        this.service = ""
       }
     }
 
@@ -162,7 +177,7 @@ export default {
                 <BRow class="mt-3 mb-4">
                   <h4 class="text-center font-size-20 mb-5">Informations Personnelles</h4>
                   <BCol sm="3" class="mb-3">
-                    <label for="civilite" style="font-size: 12px;">Civilité</label>
+                    <label for="civilite" style="font-size: 12px; font-weight: bolder">Civilité</label>
                     <div class="input-group">
                       <select v-model="civilite" id="civilite" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': next && v$.civilite.$error
@@ -179,7 +194,7 @@ export default {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="nom" style="font-size: 12px;">Nom</label>
+                    <label for="nom" style="font-size: 12px; font-weight: bolder">Nom</label>
                     <div class="input-group">
                       <input 
                         v-model="nom" 
@@ -196,7 +211,7 @@ export default {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="prenom" style="font-size: 12px;">Prénom</label>
+                    <label for="prenom" style="font-size: 12px; font-weight: bolder">Prénom</label>
                     <div class="input-group">
                       <input 
                         v-model="prenom" 
@@ -213,7 +228,7 @@ export default {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="email" style="font-size: 12px;">E-mail</label>
+                    <label for="email" style="font-size: 12px; font-weight: bolder">E-mail</label>
                     <input v-model="email" type="email" class="form-control border border-black rounded-2" id="email" :class="{
                       'is-invalid': next && v$.email.$error
                     }" />
@@ -226,7 +241,7 @@ export default {
                   
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="mobile1" style="font-size: 12px;">Tel. Mobile</label>
+                    <label for="mobile1" style="font-size: 12px; font-weight: bolder">Tel. Mobile</label>
                     <input v-model="mobile1" 
                       type="tel" 
                       class="form-control border border-black rounded-2" 
@@ -241,7 +256,7 @@ export default {
                   </BCol>
 
                   <BCol sm="3" class="mb-3">
-                    <label for="mobile2" style="font-size: 12px;">Autre Tel. Mobile</label>
+                    <label for="mobile2" style="font-size: 12px; font-weight: bolder">Autre Tel. Mobile</label>
                     <input v-model="mobile2" 
                       type="tel" 
                       class="form-control border border-black rounded-2" 
@@ -251,12 +266,13 @@ export default {
                     />
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="statut" style="font-size: 12px;">Statut</label>
+                    <label for="statut" style="font-size: 12px; font-weight: bolder" >Statut</label>
                     <div class="input-group">
                       <select v-model="statut" id="statut" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': submitted && v$.statut.$error
                       }">
-                        <option value="ACTIF">ACTIF</option>
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="DESACTIVE">DESACTIVE</option>
 
                       </select>
                       <!-- <div v-if="submitted && v$.service.$error" class="invalid-feedback">
@@ -266,7 +282,7 @@ export default {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="photo" style="font-size: 12px;">Photo</label>
+                    <label for="photo" style="font-size: 12px; font-weight: bolder">Photo</label>
                     <input 
                       @change="handleFileUpload" 
                       type="file" 
@@ -294,7 +310,7 @@ export default {
                 <BRow>
                   <h4 class="text-center font-size-20 mb-5">Informations Professionnelles</h4>
                   <BCol sm="3" class="mb-3">
-                    <label for="nom" style="font-size: 12px;">Matricule</label>
+                    <label for="nom" style="font-size: 12px; font-weight: bolder">Matricule</label>
                     <div class="input-group">
                       <input 
                         v-model="matricule" 
@@ -311,7 +327,7 @@ export default {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="nom" style="font-size: 12px;">Code Visite</label>
+                    <label for="nom" style="font-size: 12px; font-weight: bolder">Code Visite</label>
                     <div class="input-group">
                       <input 
                         v-model="codeVisite" 
@@ -328,16 +344,16 @@ export default {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="nom" style="font-size: 12px;">Département</label>
+                    <label for="departement" style="font-size: 12px; font-weight: bolder">Département</label>
                     <div class="input-group">
-                      <input 
-                        v-model="departement" 
-                        id="nom" 
-                        class="form-control border border-black rounded-2" 
-                        type="text"
-                        :class="{
-                        'is-invalid': submitted && v$.departement.$error
-                      }">
+                      <select v-model="departement" id="departement" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
+                        'is-invalid': submitted && v$.departement.$error}"
+                      >
+                        <option value="">Département...</option>
+                        <option value="RH">DEPARTEMENT DES RESSOURCES HUMAINES (RH)</option>
+                        <option value="IT">DEPARTEMENT INFORMATIQUE (IT)</option>
+
+                      </select>
                       <div v-if="submitted && v$.departement.$error" class="invalid-feedback">
                         <span v-if="v$.departement.required.$invalid">Département obligatoire
                         </span>
@@ -345,16 +361,15 @@ export default {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="service" style="font-size: 12px;">Service</label>
+                    <label for="service" style="font-size: 12px; font-weight: bolder">Service</label>
                     <div class="input-group">
-                      <input 
-                        v-model="service" 
-                        id="service" 
-                        class="form-control border border-black rounded-2" 
-                        type="text"
-                        :class="{
-                        'is-invalid': submitted && v$.service.$error
-                      }">
+                      <select v-model="service" id="service" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
+                        'is-invalid': submitted && v$.service.$error}"
+                      >
+                        <option value="">SERVICE...</option>
+                        <option value="RECRUTEMENT">RECRUTEMENT</option>
+                        <option value="SUPPORT TECHNIQUE">SUPPORT TECHNIQUE</option> 
+                      </select>
                       <div v-if="submitted && v$.service.$error" class="invalid-feedback">
                         <span v-if="v$.service.required.$invalid">Service obligatoire
                         </span>

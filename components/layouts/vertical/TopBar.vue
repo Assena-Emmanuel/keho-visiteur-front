@@ -1,49 +1,40 @@
 <script>
-import { LanguagesWithFlag } from "~/components/layouts/utils/topBar.js";
 import HederLogo from "~/components/layouts/common/HeaderLogo.vue";
-import AppSearch from "~/components/layouts/common/AppSearch.vue";
-import MobileAppSearch from "~/components/layouts/common/MobileAppSearch.vue";
-import LanguageDropdown from "~/components/layouts/common/LanguageDropdown.vue";
+// import AppSearch from "~/components/layouts/common/AppSearch.vue";
+// import MobileAppSearch from "~/components/layouts/common/MobileAppSearch.vue";
+// import ParametreDropdown from "../common/ParametreDropdown.vue";
 import AppList from "~/components/layouts/common/AppList.vue";
 import Notifications from "~/components/layouts/common/Notifications.vue";
 import Profile from "~/components/layouts/common/Profile.vue";
 
+
 export default {
   data() {
     return {
-      languages: LanguagesWithFlag,
-      current_language: this.$i18n.locale,
-      text: null,
-      flag: null,
+      parametres: ["Paramètre des Visités, Paramètre des Visiteurs, "],
       value: null,
       config: useRuntimeConfig()
     };
   },
   components: {
     HederLogo,
-    AppSearch,
-    MobileAppSearch,
-    LanguageDropdown,
+    // AppSearch,
+    // MobileAppSearch,
+    // LanguageDropdown,
     AppList,
     Notifications,
     Profile
   },
-  mounted() {
-    this.value = this.languages.find((x) => x.language === this.$i18n.locale);
-    this.text = this.value.title;
-    this.flag = this.value.flag;
-  },
+  // mounted() {
+  //   this.value = this.languages.find((x) => x.language === this.$i18n.locale);
+  //   this.text = this.value.title;
+  //   this.flag = this.value.flag;
+  // },
   methods: {
     toggleMenu() {
       this.$parent.toggleMenu();
     },
-    setLanguage(data) {
-      const { language, country, flag } = data;
-      this.$i18n.locale = language;
-      this.current_language = language;
-      this.text = country;
-      this.flag = flag;
-    },
+    
     initFullScreen() {
       document.body.classList.toggle("fullscreen-enable");
       if (
@@ -97,26 +88,25 @@ export default {
           <BButton variant="white"style="width: 25px;"type="button" class="btn-sm px-1 font-size-16 header-item vertical-menu-btn" @click="toggleMenu">
             <i class="fa fa-fw fa-bars"></i>
           </BButton>
-          <AppSearch />
+          <!-- <AppSearch /> -->
         </div>
 
         <div class="d-flex">
+          
+          <LayoutsCommonParametreDropdown :parametres="parametres" />
+            <!-- <BButton type="button" variant="white"  class="header-item noti-icon right-bar-toggle toggle-right" @click="toggleRightSidebar">
+              <i class="uil-cog toggle-right"></i>
+            </BButton> -->
           <Notifications />
-          <!-- <Profile @logoutUser="logoutUser"  /> -->
            <div class="d-flex align-items-center">
             <button @click="toggleRightSidebar" class="btn btn-outline-secondary "  style="width: 100%; padding: 1px 3px;">
               <img class="rounded-circle header-profile-user" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
               <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">Assena emmanuel</span>
            </button>
            </div>
-           
-         
-          <!-- <div class="dropdown d-inline-block">
-            <button type="button" class="btn header-item noti-icon right-bar-toggle toggle-right" @click="toggleRightSidebar">
-              <i class="uil-cog toggle-right"></i>
-            </button>
-          </div> -->
+
         </div>
+
       </div>
     </header>
   </ClientOnly>
