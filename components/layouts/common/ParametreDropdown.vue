@@ -1,5 +1,5 @@
 <template>
-    <BDropdown variant="white" class=" d-inline-block" toggle-class="header-item noti-icon" right menu-class="dropdown-menu-md dropdown-menu-end p-0">
+    <BDropdown variant="white" class=" d-inline-block" toggle-class="header-item noti-icon" right menu-class="dropdown-menu-lg dropdown-menu-end p-0">
       <template #button-content >
         <i class="uil-cog toggle-right"></i>
       </template>

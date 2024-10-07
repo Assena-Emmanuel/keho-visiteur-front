@@ -5,12 +5,6 @@ export const menuItems = [
     isTitle: true
   },
   {
-    id: 4,
-    label: "MON AGENDA",
-    icon: "uil-calender",
-    link: "/agenda"
-  },
-  {
     id: 2,
     label: "menuitems.dashboard.text",
     icon: "uil-home-alt",
@@ -19,6 +13,12 @@ export const menuItems = [
       text: "menuitems.dashboard.badge"
     },
     link: "/"
+  },
+  {
+    id: 4,
+    label: "MON AGENDA",
+    icon: "uil-calender",
+    link: "/agenda"
   },
   {
     id: 25,
