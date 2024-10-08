@@ -250,6 +250,9 @@ export default {
                       <BButton variant="white" size="sm" class="text-danger" @click="deleteItem(row.item.Code)">
                           <i class="fas fa-trash"></i>
                       </BButton>
+                      <BButton variant="white" size="sm" @click="row.toggleDetails">
+                        <i class="fas fa-eye"></i>
+                    </BButton>
                   </div>
               </template>
               </BTable>
