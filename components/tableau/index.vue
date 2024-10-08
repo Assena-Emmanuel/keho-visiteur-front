@@ -17,10 +17,10 @@ export default {
       filterOn: [],
       sortBy: "age",
       sortDesc: false,
-      libelleDepartement,
-      libelleService,
-      codeDepartement,
-      codeService
+      libelleDepartement: "",
+      libelleService: "",
+      codeDepartement: "",
+      codeService: "",
       
     };
   },
