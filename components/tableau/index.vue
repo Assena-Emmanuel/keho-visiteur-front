@@ -1,13 +1,19 @@
 <script>
 import { tableData } from "~/components/tableau/utils.js";
+import { useVuelidate } from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
 // import FormService from "../forms/FormService.vue";
 
 /**
  * Advanced-table component
  */
 export default {
+  setup() {
+      return { v$: useVuelidate() };
+    },
   data() {
     return {
+      submitted: false,
       tableData,
       totalRows: 1,
       currentPage: 1,
@@ -24,11 +30,26 @@ export default {
       
     };
   },
+  validations: {
+    libelleDepartement: {
+        required,
+      },
+    libelleService: {
+        required,
+      },
+    codeDepartement: {
+        required,
+      },
+    codeService: {
+        required,
+      },
+    },
   props: {
     fields: Array,
     title: String,
     showAddbtn: Boolean,
     typeForme: String,
+    data: Array,
   },
   computed: {
     /**
@@ -43,13 +64,36 @@ export default {
     this.totalRows = this.tableData.length;
   },
   methods: {
-    /**
-     * Search the table data with search input
-     */
+    onSaveDepartement() {
+      this.submitted = true;
+      this.v$.$touch();
+      if (this.v$.libelleDepartement.$error || this.v$.codeDepartement.$error) {
+        return;
+      }
+    },
+    onSaveService() {
+      this.submitted = true;
+      this.v$.$touch();
+      if (this.v$.libelleService.$error || this.v$.codeService.$error) {
+        return;
+      }
+    },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
+    },
+    resetForm() {
+      // Reset all form fields and validation state
+      this.libelleDepartement = '';
+      this.codeDepartement = '';
+      this.libelleService= "";
+      this.codeService= ""
+      this.submitted = false;
+      // Reset validation (if using Vuelidate or similar)
+      if (this.$v) {
+        this.$v.$reset();
+      }
     }
   }
 };
@@ -61,17 +105,32 @@ export default {
       <BCol cols="12">
         <BCard no-body>
           <BCardBody>
-            <BCardTitle>{{title}}</BCardTitle>
-
-            <BButton variant="primary" class="waves-effect waves-light" v-b-modal.modal-sm>
-              <strong>+</strong> Ajouter
-            </BButton>
-            <BModal id="modal-sm" size="sm" title="Small modal" title-class="font-18" hide-footer>
-              <div v-if="typeForme=='service'">
+            <div class="d-flex justify-content-between">
+              <BCardTitle>{{title}}</BCardTitle>
+                <BButton variant="primary" class="waves-effect waves-light btn-sm" v-b-modal.modal-sm>
+                  <strong>+</strong> Ajouter
+                </BButton>
+            </div>
+            
+            <BModal @hide="resetForm" v-if="typeForme=='departement'" id="modal-sm" size="sm" title="Création du département " title-class="font-18" hide-footer>
                 <BForm class="form-vertical" role="form">
                     <div class="mb-3">
                       <label for="departement" style="font-size: 12px;">Libellé</label>
-                      <input v-model="libelleDepartement" type="text" class="form-control border border-black form-control-sm" id="departement" placeholder="" />
+                      <input 
+                        v-model="libelleDepartement" 
+                        type="text" class="form-control form-control-sm" 
+                        id="departement" 
+                        placeholder="" 
+                        :class="{
+                        'is-invalid': submitted && v$.libelleDepartement.$error,
+                        'border border-danger': submitted && v$.libelleDepartement.$error,
+                        'border border-dark': !(submitted && v$.libelleDepartement.$error)
+                        }"
+                      />
+                      <div v-if="submitted && v$.libelleDepartement.$error" class="invalid-feedback">
+                          <span v-if="v$.libelleDepartement.required.$invalid" class="font-size-12">champ obligatoire
+                          </span>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -80,51 +139,85 @@ export default {
                         <input 
                           v-model="codeDepartement" 
                           id="code" 
-                          class="form-control form-control-sm border border-black"  
-                          type="text">
-
+                          class="form-control form-control-sm"  
+                          type="text"
+                          :class="{
+                          'is-invalid': submitted && v$.codeDepartement.$error,
+                          'border border-danger': submitted && v$.codeDepartement.$error,
+                          'border border-dark': !(submitted && v$.codeDepartement.$error)
+                        }">
+                        <div v-if="submitted && v$.codeDepartement.$error" class="invalid-feedback">
+                          <span v-if="v$.codeDepartement.required.$invalid" class="font-size-12">champ obligatoire
+                          </span>
+                        </div>
                       </div>
 
                     </div>
 
                     <div class="mt-4 ">
-                      <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
-                        enregistrer
+                      <BButton @click="onSaveDepartement" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+                      Enregistrer
                       </BButton>
                     </div>
                 </BForm>
-              </div>
 
-              <div v-if="typeForme=='departement'">
+            </BModal>
+            <BModal v-if="typeForme=='service'" id="modal-sm" size="sm" title="Création du Service" title-class="font-18" hide-footer>
                 <BForm>
                   <div class="mb-3">
-                    <label for="departement" style="font-size: 12px;">Nom du Département</label>
-                    <input v-model="libelleService" type="text" class="form-control border border-black form-control-sm" id="departement" placeholder="" />
+                    <label for="service" style="font-size: 12px;">Libellé</label>
+                    <input 
+                      v-model="libelleService" 
+                      type="text" 
+                      class="form-control form-control-sm" 
+                      id="departement" 
+                      :class="{
+                        'is-invalid': submitted && v$.libelleService.$error,
+                        'border border-danger': submitted && v$.libelleService.$error,
+                        'border border-dark': !(submitted && v$.libelleService.$error)
+                        
+                        }" 
+                    />
+                    <div v-if="submitted && v$.libelleService.$error" class="invalid-feedback">
+                      <span v-if="v$.libelleService.required.$invalid" class="font-size-12">champ obligatoire
+                      </span>
+                    </div>
                   </div>
 
                   <div class="mb-3">
-                    <label for="code" style="font-size: 12px;">Code du Département</label>
+                    <label for="code" style="font-size: 12px;">Code</label>
                     <div>
-                      <input v-model="codeService" id="code" class="form-control form-control-sm border border-black" type="text">
+                      <input 
+                        v-model="codeService" 
+                        id="code" 
+                        class="form-control form-control-sm" 
+                        type="text" 
+                        :class="{
+                        'is-invalid': submitted && v$.codeService.$error,
+                        'border border-danger': submitted && v$.codeService.$error,
+                        'border border-dark': !(submitted && v$.codeService.$error)
+                        }">
+                      <div v-if="submitted && v$.codeService.$error" class="invalid-feedback">
+                        <span v-if="v$.codeService.required.$invalid" class="font-size-12">champ obligatoire
+                        </span>
+                      </div>
                     </div>
                   </div>
 
                   <div class="mt-4 ">
-                    <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
-                      enregistrer
+                    <BButton @click="onSaveService" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+                      Enregistrer
                     </BButton>
                   </div>
                 </BForm>
-              </div>
             </BModal>
-
 
             <BRow class="mt-4">
               <BCol sm="12" md="6">
                 <div id="tickets-table_length" class="dataTables_length">
                   <label class="d-inline-flex align-items-center">
-                    Show&nbsp;
-                    <BFormSelect v-model="perPage" size="sm" :options="pageOptions"></BFormSelect>&nbsp;entries
+                    Afficher&nbsp;
+                    <BFormSelect v-model="perPage" size="sm" :options="pageOptions"></BFormSelect>&nbsp;
                   </label>
                   
                 </div>
@@ -132,7 +225,7 @@ export default {
               <BCol sm="12" md="6">
                 <div id="tickets-table_filter" class="dataTables_filter text-md-end">
                   <label class="d-inline-flex align-items-center">
-                    Recherche:
+                    Recherche
                       <BFormInput v-model="filter" type="search" class="form-control border border-black form-control-sm"></BFormInput>
 
                   </label>
@@ -140,18 +233,25 @@ export default {
               </BCol>
             </BRow>
             <div class="table-responsive mb-0">
-              <BTable :items="tableData" 
+              <BTable :items="data" 
                   :fields="fields" 
                   responsive="sm" 
                   :per-page="perPage" 
                   :current-page="currentPage" 
-                  v-model:sort-by.sync="sortBy" 
-                  v-model:sort-desc.sync="sortDesc" 
                   :filter="filter" 
                   :filter-included-fields="filterOn" 
                   @filtered="onFiltered"
               >
-              
+              <template #cell(Actions)="row">
+                  <div class="d-flex gap-3">
+                      <BButton variant="white" size="sm" class="mr-1" @click="editItem(row.item)">
+                          <i class="fas fa-edit"></i>
+                      </BButton>
+                      <BButton variant="white" size="sm" class="text-danger" @click="deleteItem(row.item.Code)">
+                          <i class="fas fa-trash"></i>
+                      </BButton>
+                  </div>
+              </template>
               </BTable>
             </div>
             <BRow>

@@ -122,7 +122,8 @@ export default {
                     placeholder="Votre password" 
                     :type="passwordVisible ? 'text' : 'password'"
                     :class="{
-                    'is-invalid': submitted && v$.password.$error
+                    'is-invalid': submitted && v$.password.$error,
+              
                   }">
                   <span class="input-group-text" @click="togglePasswordVisibility">
                       <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash' "></i>
