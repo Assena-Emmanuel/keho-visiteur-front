@@ -6,7 +6,7 @@ export const menuItems = [
   },
   {
     id: 2,
-    label: "menuitems.dashboard.text",
+    label: "TABLEAU DE BORD",
     icon: "uil-home-alt",
     badge: {
       variant: "primary",
@@ -16,13 +16,13 @@ export const menuItems = [
   },
   {
     id: 4,
-    label: "MON AGENDA",
+    label: "Mon Agenda",
     icon: "uil-calender",
     link: "/agenda"
   },
   {
     id: 4,
-    label: "VISITEUR",
+    label: "Visiteurs",
     icon: "mdi:account-supervisor",
     link: "/dashboard/visiteur"
   },

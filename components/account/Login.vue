@@ -98,7 +98,7 @@ export default {
             <BForm>
               <div class="mb-3">
                 <label for="email" style="font-size: 12px;">Email</label>
-                <input v-model="email" type="text" class="form-control form-control-sm" id="email" placeholder="Votre email" :class="{
+                <input v-model="email" type="text" class="form-control form-control-sm login-input" id="email" placeholder="Votre email" :class="{
                   'is-invalid': submitted && v$.email.$error
                 }" />
                 
@@ -117,7 +117,7 @@ export default {
                   <input 
                     v-model="password" 
                     id="userpassword" 
-                    class="form-control form-control-sm" 
+                    class="form-control form-control-sm login-input" 
                     aria-describedby="passwordHelpBlock" 
                     placeholder="Votre password" 
                     :type="passwordVisible ? 'text' : 'password'"
@@ -164,3 +164,8 @@ export default {
     </BCol>
   </BRow>
 </template>
+<style>
+.login-input{
+  background-color: #f0f5ff;
+}
+</style>
