@@ -17,6 +17,10 @@ export default {
       filterOn: [],
       sortBy: "age",
       sortDesc: false,
+      libelleDepartement,
+      libelleService,
+      codeDepartement,
+      codeService
       
     };
   },
@@ -67,14 +71,14 @@ export default {
                 <BForm class="form-vertical" role="form">
                     <div class="mb-3">
                       <label for="departement" style="font-size: 12px;">Nom du Service</label>
-                      <input v-model="libelle" type="text" class="form-control border border-black form-control-sm" id="departement" placeholder="" />
+                      <input v-model="libelleDepartement" type="text" class="form-control border border-black form-control-sm" id="departement" placeholder="" />
                     </div>
 
                     <div class="mb-3">
                       <label for="code" style="font-size: 12px;">Code du Service</label>
                       <div>
                         <input 
-                          v-model="code" 
+                          v-model="codeDepartement" 
                           id="code" 
                           class="form-control form-control-sm border border-black"  
                           type="text">
@@ -95,13 +99,13 @@ export default {
                 <BForm>
                   <div class="mb-3">
                     <label for="departement" style="font-size: 12px;">Nom du Département</label>
-                    <input v-model="libelle" type="text" class="form-control border border-black form-control-sm" id="departement" placeholder="" />
+                    <input v-model="libelleService" type="text" class="form-control border border-black form-control-sm" id="departement" placeholder="" />
                   </div>
 
                   <div class="mb-3">
                     <label for="code" style="font-size: 12px;">Code du Département</label>
                     <div>
-                      <input v-model="code" id="code" class="form-control form-control-sm border border-black" type="text">
+                      <input v-model="codeService" id="code" class="form-control form-control-sm border border-black" type="text">
                     </div>
                   </div>
 
