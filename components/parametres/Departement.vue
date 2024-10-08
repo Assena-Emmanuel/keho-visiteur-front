@@ -26,5 +26,5 @@
     }
 </script>
 <template>
-    <Tableau :fields="fields" :title="title" :show-addbtn="true" />
+    <Tableau :fields="fields" :title="title" :show-addbtn="true" :typeForme="'departement'" />
 </template>

@@ -1,5 +1,6 @@
 <script>
 import { tableData } from "~/components/tableau/utils.js";
+// import FormService from "../forms/FormService.vue";
 
 /**
  * Advanced-table component
@@ -23,6 +24,7 @@ export default {
     fields: Array,
     title: String,
     showAddbtn: Boolean,
+    typeForme: String,
   },
   computed: {
     /**
@@ -56,7 +58,63 @@ export default {
         <BCard no-body>
           <BCardBody>
             <BCardTitle>{{title}}</BCardTitle>
-            <BButton v-if="showAddbtn"> <strong>+</strong> Ajouter</BButton>
+
+            <BButton variant="primary" class="waves-effect waves-light" v-b-modal.modal-sm>
+              <strong>+</strong> Ajouter
+            </BButton>
+            <BModal id="modal-sm" size="sm" title="Small modal" title-class="font-18" hide-footer>
+              <div v-if="typeForme=='service'">
+                <BForm class="form-vertical" role="form">
+                    <div class="mb-3">
+                      <label for="departement" style="font-size: 12px;">Nom du Service</label>
+                      <input v-model="libelle" type="text" class="form-control border border-black form-control-sm" id="departement" placeholder="" />
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="code" style="font-size: 12px;">Code du Service</label>
+                      <div>
+                        <input 
+                          v-model="code" 
+                          id="code" 
+                          class="form-control form-control-sm border border-black"  
+                          type="text">
+
+                      </div>
+
+                    </div>
+
+                    <div class="mt-4 ">
+                      <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+                        enregistrer
+                      </BButton>
+                    </div>
+                </BForm>
+              </div>
+
+              <div v-if="typeForme=='departement'">
+                <BForm>
+                  <div class="mb-3">
+                    <label for="departement" style="font-size: 12px;">Nom du Département</label>
+                    <input v-model="libelle" type="text" class="form-control border border-black form-control-sm" id="departement" placeholder="" />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="code" style="font-size: 12px;">Code du Département</label>
+                    <div>
+                      <input v-model="code" id="code" class="form-control form-control-sm border border-black" type="text">
+                    </div>
+                  </div>
+
+                  <div class="mt-4 ">
+                    <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+                      enregistrer
+                    </BButton>
+                  </div>
+                </BForm>
+              </div>
+            </BModal>
+
+
             <BRow class="mt-4">
               <BCol sm="12" md="6">
                 <div id="tickets-table_length" class="dataTables_length">
@@ -70,7 +128,7 @@ export default {
               <BCol sm="12" md="6">
                 <div id="tickets-table_filter" class="dataTables_filter text-md-end">
                   <label class="d-inline-flex align-items-center">
-                    Search:
+                    Recherche:
                       <BFormInput v-model="filter" type="search" class="form-control border border-black form-control-sm"></BFormInput>
 
                   </label>
