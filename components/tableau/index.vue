@@ -94,7 +94,30 @@ export default {
       if (this.$v) {
         this.$v.$reset();
       }
-    }
+    },
+    confirmDelete(code) {
+      this.$swal.fire({
+        title: 'Êtes-vous sûr?',
+        text: "Cette action est irréversible!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Oui, supprimer!',
+        cancelButtonText: 'Annuler'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Logique pour supprimer l'élément ici
+          this.deleteItem(code);
+          
+          this.$swal.fire(
+            'Supprimé!',
+            'Votre élément a été supprimé.',
+            'success'
+          );
+        }
+      });
+    },
   }
 };
 </script>
@@ -154,7 +177,7 @@ export default {
 
                     </div>
 
-                    <div class="mt-4 ">
+                    <div class="mt-4 d-flex justify-content-center">
                       <BButton @click="onSaveDepartement" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
                       Enregistrer
                       </BButton>
@@ -204,7 +227,7 @@ export default {
                     </div>
                   </div>
 
-                  <div class="mt-4 ">
+                  <div class="mt-4 d-flex justify-content-center">
                     <BButton @click="onSaveService" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
                       Enregistrer
                     </BButton>
@@ -244,10 +267,10 @@ export default {
               >
               <template #cell(Actions)="row">
                   <div class="d-flex gap-3">
-                      <BButton variant="white" size="sm" class="mr-1" @click="editItem(row.item)">
+                      <BButton variant="white" size="sm" class="mr-1 text-primary" @click="editItel(row.item)">
                           <i class="fas fa-edit"></i>
                       </BButton>
-                      <BButton variant="white" size="sm" class="text-danger" @click="deleteItem(row.item.Code)">
+                      <BButton variant="white" size="sm" class="text-danger" @click="confirmDelete(row.item.Code)">
                           <i class="fas fa-trash"></i>
                       </BButton>
                       <BButton variant="white" size="sm" @click="row.toggleDetails">
