@@ -135,7 +135,7 @@ export default {
                 </div>
                 <div class="col-9 text-start">
                   <div><span class="font-size-12 ">Mon profil</span></div>
-                  <div><span class="font-size-12 text-primary">Parametrage du profile</span></div>
+                  <div><span class="font-size-12 text-primary">Parametrage du profil</span></div>
                 </div>
               </div>
             </button>

@@ -70,12 +70,12 @@ export default {
               <div v-if="typeForme=='service'">
                 <BForm class="form-vertical" role="form">
                     <div class="mb-3">
-                      <label for="departement" style="font-size: 12px;">Nom du Service</label>
+                      <label for="departement" style="font-size: 12px;">Libellé</label>
                       <input v-model="libelleDepartement" type="text" class="form-control border border-black form-control-sm" id="departement" placeholder="" />
                     </div>
 
                     <div class="mb-3">
-                      <label for="code" style="font-size: 12px;">Code du Service</label>
+                      <label for="code" style="font-size: 12px;">Code </label>
                       <div>
                         <input 
                           v-model="codeDepartement" 
