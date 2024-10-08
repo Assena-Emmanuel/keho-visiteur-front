@@ -156,16 +156,42 @@ export default {
     <BCol md="6" cols="xl-3">
       <BCard no-body>
         <BCardBody> 
+          <div class="float-end mt-2">
+            Icone
+          </div>
           <div>
             <p class="text-muted mb-0">Visiteurs</p>
-          </div>
-          <h5 class="mb-1 mt-1">
-            39
-          </h5>
-          <div class="float-end mt-2">
-            Icon
+            <h4 class="mb-1 mt-1">20</h4>
           </div>
           
+        </BCardBody>
+      </BCard>
+    </BCol>
+    <BCol md="6" cols="xl-3">
+      <BCard no-body>
+        <BCardBody>
+          <div class="float-end mt-2">
+            Sur RDV
+          </div>
+          <div>
+            <p class="text-muted mb-0">Inopinées</p>
+            <h4 class="mb-1 mt-1">19</h4>
+          </div>
+          
+        </BCardBody>
+      </BCard>
+    </BCol>
+
+    <BCol md="6" cols="xl-3">
+      <BCard no-body>
+        <BCardBody>
+          <div class="float-end mt-2">
+            Icone
+          </div>
+          <div>
+            <p class="text-muted mb-0">Inopinées</p>
+            <h4 class="mb-1 mt-1">10</h4>
+          </div>
         </BCardBody>
       </BCard>
     </BCol>
@@ -177,53 +203,11 @@ export default {
             Icon
             </div>
             <div>
-              <p class="text-muted mb-0">Visiteurs</p>
-              <h5 class="mb-1 mt-1"> 39 </h5>
+              <p class="text-muted mb-0">Rejetées</p>
+              <h4 class="mb-1 mt-1"> 39 </h4>
             </div>
           </div> 
           
-
-        </BCardBody>
-      </BCard>
-    </BCol>
-
-    <BCol md="6" cols="xl-3">
-      <BCard no-body>
-        <BCardBody>
-          <div class="float-start mt-2">
-            icon
-          </div>
-          <div>
-            <p class="text-muted mb-0">Inopinées</p>
-            <h4 class="mb-1 mt-1">
-            </h4>
-          </div>
-          <p class="text-muted mt-3 mb-0">
-            <span class="text-danger me-1">
-              <i class="mdi mdi-arrow-down-bold me-1"></i>6.24%
-            </span>
-         
-          </p>
-        </BCardBody>
-      </BCard>
-    </BCol>
-    <BCol md="6" cols="xl-3">
-      <BCard no-body>
-        <BCardBody>
-          <div class="float-end mt-2">
-            <apexchart class="apex-charts" dir="ltr" width="70" height="40" :options="growthChartOptions" :series="series"></apexchart>
-          </div>
-          <div>
-            <h4 class="mb-1 mt-1">
-
-            </h4>
-          </div>
-          <p class="text-muted mt-3 mb-0">
-            <span class="text-success me-1">
-              <i class="mdi mdi-arrow-up-bold me-1"></i>10.51%
-            </span>
-            since last week
-          </p>
         </BCardBody>
       </BCard>
     </BCol>

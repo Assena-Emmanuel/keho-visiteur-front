@@ -24,7 +24,7 @@ export const menuItems = [
     id: 4,
     label: "VISITEUR",
     icon: "mdi:account-supervisor",
-    link: "/agenda"
+    link: "/dashboard/visiteur"
   },
   {
     id: 25,
