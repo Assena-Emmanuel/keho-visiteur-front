@@ -13,7 +13,11 @@ export default {
     },
   data() {
     return {
+      preventableModal: false,
       submitted: false,
+      modal: false,
+      titreDetail: "",
+      detailModal: false,
       tableData,
       totalRows: 1,
       currentPage: 1,
@@ -27,7 +31,8 @@ export default {
       libelleService: "",
       codeDepartement: "",
       codeService: "",
-      
+      isEditMode: false,
+      selectDepartement: "",
     };
   },
   validations: {
@@ -41,6 +46,9 @@ export default {
         required,
       },
     codeService: {
+        required,
+      },
+      selectDepartement: {
         required,
       },
     },
@@ -64,6 +72,24 @@ export default {
     this.totalRows = this.tableData.length;
   },
   methods: {
+    showDetailsModal(formType){
+      this.detailModal = true
+    },
+    showModal(isEdit, formType, id) {
+        this.isEditMode = isEdit; 
+  
+        if(formType == "departement"){
+          this.libelleDepartement = this.data[id].Libelle
+          this.codeDepartement = this.data[id].Code
+        }
+        if(formType == "service"){
+          this.libelleService = this.data[id].Libelle
+          this.codeService = this.data[id].Code
+          this.selectDepartement = this.data[id].Département
+        }
+        this.modal = !this.modal;
+      },
+
     onSaveDepartement() {
       this.submitted = true;
       this.v$.$touch();
@@ -103,13 +129,14 @@ export default {
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Oui, supprimer!',
-        cancelButtonText: 'Annuler'
+        confirmButtonText: 'Oui',
+        cancelButtonText: 'Non',
+        reverseButtons: true // Inverser l'ordre des boutons
       }).then((result) => {
         if (result.isConfirmed) {
           // Logique pour supprimer l'élément ici
           this.deleteItem(code);
-          
+
           this.$swal.fire(
             'Supprimé!',
             'Votre élément a été supprimé.',
@@ -118,6 +145,8 @@ export default {
         }
       });
     },
+
+
   }
 };
 </script>
@@ -130,63 +159,83 @@ export default {
           <BCardBody>
             <div class="d-flex justify-content-between">
               <BCardTitle>{{title}}</BCardTitle>
-                <BButton variant="primary" class="waves-effect waves-light btn-sm" v-b-modal.modal-sm>
+                <!-- <BButton v-if="typeForme=='departement' || typeForme=='service'" variant="primary" class="waves-effect waves-light btn-sm" v-b-modal.modal-sm>
                   <strong>+</strong> Ajouter
-                </BButton>
-            </div>
-            
-            <BModal @hide="resetForm" v-if="typeForme=='departement'" id="modal-sm" size="sm" title="Création du département " title-class="font-18" hide-footer>
-                <BForm class="form-vertical" role="form">
-                    <div class="mb-3">
-                      <label for="departement" style="font-size: 12px;">Libellé</label>
-                      <input 
-                        v-model="libelleDepartement" 
-                        type="text" class="form-control form-control-sm" 
-                        id="departement" 
-                        placeholder="" 
-                        :class="{
-                        'is-invalid': submitted && v$.libelleDepartement.$error,
-                        'border border-danger': submitted && v$.libelleDepartement.$error,
-                        'border border-dark': !(submitted && v$.libelleDepartement.$error)
-                        }"
-                      />
-                      <div v-if="submitted && v$.libelleDepartement.$error" class="invalid-feedback">
-                          <span v-if="v$.libelleDepartement.required.$invalid" class="font-size-12">champ obligatoire
-                          </span>
-                        </div>
-                    </div>
+                </BButton> -->
+                <BButton variant="primary" @click="modal = !modal" > <strong>+</strong> Ajouter  </BButton>
+              </div>
 
-                    <div class="mb-3">
-                      <label for="code" style="font-size: 12px;">Code </label>
-                      <div>
+
+            
+              <BModal 
+                @hide="resetForm" 
+                v-model="modal" 
+                v-if="typeForme=='departement'" size="md"
+                :title="isEditMode ? 'Modifier le département' : 'Création du département'" 
+                title-class="font-18" 
+                hide-footer
+              > 
+
+                <BForm class="form-vertical" role="form">
+                      <div class="mb-3">
+                        <label for="departement" style="font-size: 12px;">Libellé</label>
                         <input 
-                          v-model="codeDepartement" 
-                          id="code" 
-                          class="form-control form-control-sm"  
-                          type="text"
+                          v-model="libelleDepartement" 
+                          type="text" class="form-control form-control-sm" 
+                          id="departement" 
+                          placeholder="" 
                           :class="{
-                          'is-invalid': submitted && v$.codeDepartement.$error,
-                          'border border-danger': submitted && v$.codeDepartement.$error,
-                          'border border-dark': !(submitted && v$.codeDepartement.$error)
-                        }">
-                        <div v-if="submitted && v$.codeDepartement.$error" class="invalid-feedback">
-                          <span v-if="v$.codeDepartement.required.$invalid" class="font-size-12">champ obligatoire
-                          </span>
-                        </div>
+                          'is-invalid': submitted && v$.libelleDepartement.$error,
+                          'border border-danger': submitted && v$.libelleDepartement.$error,
+                          'border border-dark': !(submitted && v$.libelleDepartement.$error)
+                          }"
+                        />
+                        <div v-if="submitted && v$.libelleDepartement.$error" class="invalid-feedback">
+                            <span v-if="v$.libelleDepartement.required.$invalid" class="font-size-12">champ obligatoire
+                            </span>
+                          </div>
                       </div>
 
-                    </div>
+                      <div class="mb-3">
+                        <label for="code" style="font-size: 12px;">Code </label>
+                        <div>
+                          <input 
+                            v-model="codeDepartement" 
+                            id="code" 
+                            class="form-control form-control-sm"  
+                            type="text"
+                            :class="{
+                            'is-invalid': submitted && v$.codeDepartement.$error,
+                            'border border-danger': submitted && v$.codeDepartement.$error,
+                            'border border-dark': !(submitted && v$.codeDepartement.$error)
+                          }">
+                          <div v-if="submitted && v$.codeDepartement.$error" class="invalid-feedback">
+                            <span v-if="v$.codeDepartement.required.$invalid" class="font-size-12">champ obligatoire
+                            </span>
+                          </div>
+                        </div>
 
-                    <div class="mt-4 d-flex justify-content-center">
-                      <BButton @click="onSaveDepartement" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
-                      Enregistrer
-                      </BButton>
-                    </div>
+                      </div>
+
+                      <div class="mt-4 d-flex justify-content-center">
+                        <BButton @click="onSaveDepartement" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+                        Enregistrer
+                        </BButton>
+                      </div>
                 </BForm>
+              
+              </BModal>
 
-            </BModal>
-            <BModal v-if="typeForme=='service'" id="modal-sm" size="sm" title="Création du Service" title-class="font-18" hide-footer>
-                <BForm>
+              <BModal 
+                @hide="resetForm" 
+                v-model="modal" 
+                v-if="typeForme=='service'" size="md"
+                :title="isEditMode ? 'Modifier le Service' : 'Création du Service'"
+                title-class="font-18" 
+                hide-footer
+              > 
+
+              <BForm>
                   <div class="mb-3">
                     <label for="service" style="font-size: 12px;">Libellé</label>
                     <input 
@@ -226,6 +275,30 @@ export default {
                       </div>
                     </div>
                   </div>
+                  <div class="mb-3">
+                    <label for="selectDepartement" style="font-size: 12px">Département</label>
+                    <div class="input-group">
+                      <select 
+                        v-model="selectDepartement" 
+                        id="selectDepartement" 
+                        class="form-select form-select-sm border border-black rounded-2" 
+                        aria-label="Default select example" 
+                        :class="{
+                        'is-invalid': submitted && v$.selectDepartement.$error,
+                        'border border-danger': submitted && v$.selectDepartement.$error,
+                        'border border-dark': !(submitted && v$.selectDepartement.$error)
+                      }">
+                        <option value="" selected>Département...</option>
+                        <option value="Informatique">Informatique</option>
+                        <option value="RH">RH</option>
+                        <option value="Marketing">Marketing</option>
+                      </select>
+                      <div v-if="submitted && v$.selectDepartement.$error" class="invalid-feedback">
+                        <span v-if="v$.selectDepartement.required.$invalid">champ obligatoire
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
                   <div class="mt-4 d-flex justify-content-center">
                     <BButton @click="onSaveService" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
@@ -233,6 +306,12 @@ export default {
                     </BButton>
                   </div>
                 </BForm>
+
+            </BModal>
+            
+            <!-- Modal détail -->
+            <BModal v-model="detailModal" :title="`Détail ${typeForme === 'departement' ? 'Département' : 'Service'}`" hide-footer>
+              
             </BModal>
 
             <BRow class="mt-4">
@@ -266,14 +345,14 @@ export default {
                   @filtered="onFiltered"
               >
               <template #cell(Actions)="row">
-                  <div class="d-flex gap-3">
-                      <BButton variant="white" size="sm" class="mr-1 text-primary" @click="editItel(row.item)">
-                          <i class="fas fa-edit"></i>
+                  <div class="d-flex gap-2">
+                      <BButton variant="white" size="sm" class="mr-1 text-primary" @click="showModal(true, typeForme, row.index)">
+                          <i class="fas fa-edit" ></i>
                       </BButton>
                       <BButton variant="white" size="sm" class="text-danger" @click="confirmDelete(row.item.Code)">
                           <i class="fas fa-trash"></i>
                       </BButton>
-                      <BButton variant="white" size="sm" @click="row.toggleDetails">
+                      <BButton variant="white" size="sm" @click="showDetailsModal(row.item.Libelle)">
                         <i class="fas fa-eye"></i>
                     </BButton>
                   </div>

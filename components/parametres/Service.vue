@@ -4,21 +4,11 @@
             return{
             title: 'Liste des Services',
             data: [
-                {
-                    Code: 'S001',
-                    Libelle: 'Service de Consultation',
-                    "Ajouté le": '2024-10-01',
-                },
-                {
-                    Code: 'S002',
-                    Libelle: 'Service de Livraison',
-                    "Ajouté le": '2024-10-02',
-                },
-                {
-                    Code: 'S003',
-                    Libelle: 'Service d’Assistance',
-                    "Ajouté le": '2024-10-03',
-                },
+                { Code: 'DEP001', Libelle: 'Informatique', Département: 'Technologie', 'Ajouté le': '2024-01-10', Actions: 'Modifier/Supprimer' },
+                { Code: 'DEP002', Libelle: 'Ressources Humaines', Département: 'Administration', 'Ajouté le': '2024-02-15', Actions: 'Modifier/Supprimer' },
+                { Code: 'DEP003', Libelle: 'Marketing', Département: 'Commercial', 'Ajouté le': '2024-03-22', Actions: 'Modifier/Supprimer' },
+                { Code: 'DEP004', Libelle: 'Comptabilité', Département: 'Finance', 'Ajouté le': '2024-04-05', Actions: 'Modifier/Supprimer' },
+                { Code: 'DEP005', Libelle: 'Développement', Département: 'Technologie', 'Ajouté le': '2024-05-18', Actions: 'Modifier/Supprimer' }
             ],
             fields: [
                 {
@@ -26,6 +16,9 @@
                 },
                 {
                 key: "Libelle",
+
+                },{
+                key: "Département",
 
                 },
                 {
