@@ -72,6 +72,12 @@ export default {
     this.totalRows = this.tableData.length;
   },
   methods: {
+    onUpdateDepartement(){
+
+    },
+    onUpdateService(){
+
+    },
     showDetailsModal(formType){
       this.detailModal = true
     },
@@ -170,7 +176,7 @@ export default {
               <BModal 
                 @hide="resetForm" 
                 v-model="modal" 
-                v-if="typeForme=='departement'" size="md"
+                v-if="typeForme=='departement'" size="sm"
                 :title="isEditMode ? 'Modifier le département' : 'Création du département'" 
                 title-class="font-18" 
                 hide-footer
@@ -218,8 +224,11 @@ export default {
                       </div>
 
                       <div class="mt-4 d-flex justify-content-center">
-                        <BButton @click="onSaveDepartement" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
-                        Enregistrer
+                        <BButton v-if="!isEditMode" @click="onSaveDepartement" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+                          Enregistrer
+                        </BButton>
+                        <BButton v-if="isEditMode" @click="onUpdateDepartement" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+                          Modifier
                         </BButton>
                       </div>
                 </BForm>
@@ -229,7 +238,7 @@ export default {
               <BModal 
                 @hide="resetForm" 
                 v-model="modal" 
-                v-if="typeForme=='service'" size="md"
+                v-if="typeForme=='service'" size="sm"
                 :title="isEditMode ? 'Modifier le Service' : 'Création du Service'"
                 title-class="font-18" 
                 hide-footer
@@ -301,8 +310,11 @@ export default {
                   </div>
 
                   <div class="mt-4 d-flex justify-content-center">
-                    <BButton @click="onSaveService" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+                    <BButton v-if="!isEditMode" @click="onSaveService" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
                       Enregistrer
+                    </BButton>
+                    <BButton v-if="isEditMode" @click="onUpdateService" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+                      Modifier
                     </BButton>
                   </div>
                 </BForm>
