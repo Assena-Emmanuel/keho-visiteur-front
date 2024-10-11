@@ -23,7 +23,7 @@ export const menuItems = [
   {
     id: 4,
     label: "Visiteurs",
-    icon: "mdi:account-supervisor",
+    icon: "uil-users-alt",
     link: "/dashboard/visiteur"
   },
   {

@@ -1,8 +1,15 @@
 <script>
+import { useVuelidate } from "@vuelidate/core";
     export default{
+        setup() {
+            return { v$: useVuelidate() };
+        },
         data(){
             return{
             title: 'Liste des Services',
+            isEditMode: false,
+            dataUpdate: null,
+            modal: false,
             data: [
                 { Code: 'DEP001', Libelle: 'Informatique', Département: 'Technologie', 'Ajouté le': '2024-01-10', Actions: 'Modifier/Supprimer' },
                 { Code: 'DEP002', Libelle: 'Ressources Humaines', Département: 'Administration', 'Ajouté le': '2024-02-15', Actions: 'Modifier/Supprimer' },
@@ -31,9 +38,46 @@
                 },
             ]
             }
+        },
+        mounted() {
+        },
+        props:{
+            typeForme: String,
+        },
+        methods:{
+            openModal(isEditMode, data) {
+            this.isEditMode = isEditMode;
+            this.dataUpdate = data;
+            this.modal = true;  // Ouvre la modale
+        },
+        
+        openAddModal(){
+            this.modal = !this.modal
+            this.isEditMode = false
         }
+    }
     }
 </script>
 <template>
-    <Tableau :fields="fields" :data="data" :title="title" :show-addbtn="true" :typeForme="'service'" />
+    <div>
+        <div class="d-flex justify-content-between">
+            <div class="mb-0">{{ title }}</div>
+            <BButton variant="primary" @click="openAddModal" class="btn-sm mb-3"> <strong>+</strong> Ajouter </BButton>
+            <FormsFormService 
+                :modelValue="modal"
+                @update:modelValue="modal = $event"
+                :isEditMode="isEditMode"
+                :dataUpdate="dataUpdate" 
+            />
+        </div>
+
+        <Tableau 
+            :fields="fields" 
+            :data="data" 
+            :title="title" 
+            :show-addbtn="true" 
+            :typeForme=typeForme 
+            @edit="openModal(true, $event.data)"
+        />
+    </div>
 </template>

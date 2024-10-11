@@ -84,6 +84,7 @@ export default {
     <BCol md="8" lg="6" cols="xl-5" style="width: 400px; height: 700;">
       <BCard no-body>
         <BCardBody class="">
+          
           <div class="text-center">
             <!-- <img src="/images/logo_keho.jpg" alt="logo-dark" height="70" /> -->
              <h5 class="text-primary">Keho-Visiteur</h5>

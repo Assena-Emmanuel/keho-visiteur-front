@@ -10,6 +10,6 @@ export default {
 </script>
 <template>
   <Head>
-    <Title> {{ title }} | Nuxtjs Responsive Bootstrap 5 Admin Dashboard  </Title>
+    <Title>Visiteur | {{ title }}</Title>
   </Head>
 </template>
