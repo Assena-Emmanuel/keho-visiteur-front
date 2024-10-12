@@ -80,21 +80,14 @@ export default {
 </script>
 
 <template>
-      <BCard no-body class="auth-card d-flex justify-content-between" style="width: 370px; height: 700;">
+  <BForm>
+      <BCard no-body class="auth-card">
         <BCardBody class="">
-          
-          <!-- <div class="text-center">
-            
-             <h5 class="text-primary">Keho-Visiteur</h5>
-            <p class="text-muted">Se connecter a son compte</p>
-          </div> -->
-          <div class="p-2 mt-2">
-            
+          <div>
             <div v-if="showAlert" class="alert alert-success alert-dismissible fade show font-size-13">
                 Mot de passe réinitialisé avec succes!
                 <button type="button" class="btn-close" @click="dismissAlert"></button>
             </div>
-            <BForm>
               <div class="mb-3">
                 <label for="email" style="font-size: 12px;">Email</label>
                 <input v-model="email" type="text" class="form-control form-control-sm login-input" id="email" placeholder="Votre email" :class="{
@@ -136,11 +129,7 @@ export default {
 
 
               <div class="mt-3 text-danger">{{ errorMsg }}</div>
-              <div class="mt-4 text-center">
-                <BButton :loading="processing ? true : false" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" :disabled="processing" @click="onLogin">
-                  Se connecter
-                </BButton>
-              </div>
+              
 
               <div class="d-flex justify-content-center mt-4">
                 <div class="btn btn-outline-info btn-sm">
@@ -149,11 +138,20 @@ export default {
                 </div>
                 
               </div>
-            </BForm>
           </div>
         </BCardBody>
       </BCard>
-
+      <div class="mt-4 text-center">
+        <BButton 
+          :loading="processing" 
+          loading-text="Chargement" 
+          :class="['btn-bg', processing ? 'btn-loading' : '']"  
+          :disabled="processing" 
+          @click="onLogin">
+          Se connecter
+        </BButton>
+      </div>
+    </BForm>
 </template>
 <style>
 .login-input{
@@ -162,6 +160,22 @@ export default {
 .auth-card{
   background-color: #194698;
   border: none;
-  border-radius: 10px
+  border-radius: 30px;
+  min-width: 400px;
+  height: 700;
+}
+.btn-bg{
+  background-color: #3DA92A;
+  border: none;
+  width: 150px;
+  padding: 10px 0;
+  border-radius: 20px
+}
+.btn-bg:hover{
+  background-color: #8ed581;
+}
+.btn-loading {
+  background-color: #28a745 !important; /* Vert durant le chargement */
+  color: white;
 }
 </style>
