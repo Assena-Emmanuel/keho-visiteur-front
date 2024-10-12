@@ -80,16 +80,14 @@ export default {
 </script>
 
 <template>
-  <BRow class="align-items-center justify-content-center">
-    <BCol md="8" lg="6" cols="xl-5" style="width: 400px; height: 700;">
-      <BCard no-body>
+      <BCard no-body class="auth-card d-flex justify-content-between" style="width: 370px; height: 700;">
         <BCardBody class="">
           
-          <div class="text-center">
-            <!-- <img src="/images/logo_keho.jpg" alt="logo-dark" height="70" /> -->
+          <!-- <div class="text-center">
+            
              <h5 class="text-primary">Keho-Visiteur</h5>
             <p class="text-muted">Se connecter a son compte</p>
-          </div>
+          </div> -->
           <div class="p-2 mt-2">
             
             <div v-if="showAlert" class="alert alert-success alert-dismissible fade show font-size-13">
@@ -156,17 +154,14 @@ export default {
         </BCardBody>
       </BCard>
 
-      <!-- <div class="mt-5 text-center">
-        <p>
-          © {{ new Date().getFullYear() }} Minible. Crafted with
-          <i class="mdi mdi-heart text-danger"></i> by Themesbrand
-        </p>
-      </div> -->
-    </BCol>
-  </BRow>
 </template>
 <style>
 .login-input{
   background-color: #f0f5ff;
+}
+.auth-card{
+  background-color: #194698;
+  border: none;
+  border-radius: 10px
 }
 </style>

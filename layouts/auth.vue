@@ -8,21 +8,34 @@ export default {
 
 <template>
   <div>
-    <div class="account-pages my-5">
+    <div class="background d-flex justify-content-between align-items-center">
       <BContainer>
-        <BRow class="d-flex justify-content-center">
-          <BCol cols="12">
-            <nuxt-link to="/" class="mb-3 d-block auth-logo">
-              <div class="text-center">
-                <img src="/images/logo_keho.jpg" alt="" width="70" height="70" class="rounded" />
-              </div>
-              <!-- <img src="/images/logo_keho.jpg" alt="" height="100" class="logo logo-dark img-thumbnail" />
-              <img src="/images/logo_keho.jpg" alt="" height="100" class="logo logo-light" /> -->
-            </nuxt-link>
+        <BRow >
+          <BCol cols="4" md="6" class="d-flex justify-content-between" >
+            <div class="text-center" style="margin-top: 110px; margin-left: 140px;">
+              <img src="/images/total-sans-arriere-plan.png" alt="" width="230" height="230" />
+            </div>
+
+          </BCol>
+          <BCol cols="12" md="6" class="">
+            <slot />
           </BCol>
         </BRow>
-        <slot />
+        
       </BContainer>
     </div>
   </div>
 </template>
+<style>
+.background {
+  background-image: linear-gradient(rgba(255, 254, 254, 0.8), rgba(255, 255, 255, 0.8)),url("/images/total1.jpg");
+  background-repeat: no-repeat;
+  background-size: contain; 
+  background-position: center;
+  block-size: 100%;
+  height: 90vh;
+  inline-size: 100%;
+} 
+</style>
+
+
