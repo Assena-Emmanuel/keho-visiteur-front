@@ -183,7 +183,7 @@ export default {
   
   @media (max-width: 576px) { /* Pour les téléphones */
     .card-auth {
-    max-width: 300px;
+    max-width: 200px;
     height: 250px; 
   } 
   }
