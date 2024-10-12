@@ -81,8 +81,8 @@ export default {
 
 <template>
   <BForm>
-      <BCard no-body class="auth-card">
-        <BCardBody class="">
+      <BCard class="card-auth">
+        <BCardBody>
           <div>
             <div v-if="showAlert" class="alert alert-success alert-dismissible fade show font-size-13">
                 Mot de passe réinitialisé avec succes!
@@ -157,13 +157,13 @@ export default {
 .login-input{
   background-color: #f0f5ff;
 }
-.auth-card{
-  background-color: #194698;
-  border: none;
-  border-radius: 30px;
-  min-width: 400px;
-  height: 700;
-}
+.card-auth {
+    background-color: #194698;
+    border: none;
+    border-radius: 30px;
+    min-width: 400px;
+    height: 250px; 
+  } 
 .btn-bg{
   background-color: #3DA92A;
   border: none;
@@ -171,11 +171,20 @@ export default {
   padding: 10px 0;
   border-radius: 20px
 }
-.btn-bg:hover{
-  background-color: #8ed581;
-}
+
 .btn-loading {
   background-color: #28a745 !important; /* Vert durant le chargement */
   color: white;
 }
+
+/* @media (max-width: 768px) {  Pour les tablettes 
+  
+  } */
+  
+  @media (max-width: 576px) { /* Pour les téléphones */
+    .card-auth {
+    min-width: 300px;
+    height: 250px; 
+  } 
+  }
 </style>

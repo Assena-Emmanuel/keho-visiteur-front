@@ -28,6 +28,7 @@
     height: 90vh;
     inline-size: 100%;
   }
+
   
   .custom-img-size {
     width: 100%;
@@ -56,6 +57,10 @@
     .custom-img-size {
       max-width: 100px;
     }
+
+    .auth-card{
+        min-width: 200px;
+      }
   }
   
 
