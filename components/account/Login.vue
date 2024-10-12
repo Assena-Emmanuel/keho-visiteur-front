@@ -89,7 +89,7 @@ export default {
                 <button type="button" class="btn-close" @click="dismissAlert"></button>
             </div>
               <div class="mb-3">
-                <label for="email" style="font-size: 12px;">Email</label>
+                <label for="email" class="font-size-12 text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
                 <input v-model="email" type="text" class="form-control form-control-sm login-input" id="email" placeholder="Votre email" :class="{
                   'is-invalid': submitted && v$.email.$error
                 }" />
@@ -104,7 +104,7 @@ export default {
               </div>
 
               <div class="mb-3">
-                <label for="userpassword" style="font-size: 12px;">Mot de passe</label>
+                <label for="userpassword" class="font-size-12 text-light">Mot de passe <span class="text-danger"><strong>*</strong></span> </label>
                 <div class="input-group">
                   <input 
                     v-model="password" 
@@ -132,8 +132,8 @@ export default {
               
 
               <div class="d-flex justify-content-center mt-4">
-                <div class="btn btn-outline-info btn-sm">
-                  <nuxt-link to="/forgot-password" >
+                <div>
+                  <nuxt-link to="/forgot-password" class="text-danger" >
                     Mot de passe oublié?</nuxt-link>
                 </div>
                 
