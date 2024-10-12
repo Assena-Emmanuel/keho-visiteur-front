@@ -80,7 +80,7 @@ export default{
     <div>
     <div class="d-flex justify-content-between">
         <div class="mb-0">Gestion des Départements</div>
-        <BButton variant="primary" @click="openAddModal" class="btn-sm mb-3"> <strong>+</strong> Ajouter  </BButton>
+        <BButton variant="primary" @click="openAddModal" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
         <FormsFormDepartement 
             :modelValue="modal"
             @update:modelValue="modal = $event"
