@@ -137,7 +137,7 @@ export default {
       <BCol cols="12">
         <BCard no-body>
           <BCardBody>
-
+            <BCardTitle>{{ title }}</BCardTitle>
             <BModal v-model="detailModal" :title="`Détail ${capitalize(typeForme)}`" hide-footer>
               <div v-if="typeForme === 'service'" class="p-4 bg-light rounded border">
                 <!-- En-tête du service -->
@@ -194,14 +194,13 @@ export default {
                
             </BModal>
 
+            <BRow>
+              <BCol sm="12" md="6" class=""></BCol>
+            </BRow>
             
             <BRow class="mt-4">
-              <BCol sm="12" md="6" class="bg-info">
-                <!-- <div id="tickets-table_filter" class="dataTables_filter text-md-end">
-                  <label class="d-inline-flex align-items-center">
-                    <BFormInput placeholder="Rechercher" v-model="filter" type="search" class="form-control border border-black form-control-sm"></BFormInput>
-                  </label>
-                </div> -->
+              <BCol sm="12" md="6" class="">
+               
               </BCol>
               <BCol sm="12" md="6">
                 <div id="tickets-table_filter" class="dataTables_filter text-md-end">

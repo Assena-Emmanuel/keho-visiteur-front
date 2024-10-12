@@ -61,7 +61,7 @@ import { useVuelidate } from "@vuelidate/core";
 <template>
     <div>
         <div class="d-flex justify-content-between">
-            <div class="mb-0">{{ title }}</div>
+            <div class="mb-0">Gestion des Services</div>
             <BButton variant="primary" @click="openAddModal" class="btn-sm mb-3"> <strong>+</strong> Ajouter </BButton>
             <FormsFormService 
                 :modelValue="modal"
