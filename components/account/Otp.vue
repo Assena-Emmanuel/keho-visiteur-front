@@ -51,15 +51,17 @@ export default {
 </script>
 
 <template>
-  <BRow class="justify-content-center">
-    <BCol md="8" lg="6" cols="xl-5" style="width: 400px">
-      <BCard no-body>
-        <BCardBody class="p-4">
-          <div class="text-center mt-2">
-            <h3 class="text-primary">Vérification du code</h3>
+  <BForm>
+      <BCard class="card-auth">
+        <BCardBody>
+          <div class="text-center">
+            <h3 class="text-light">Vérification du code</h3>
           </div>
-          <div class="p-2 mt-4">
-            <div class="border-end-primary alert-info text-center mb-4" role="alert">
+          <div class="">
+            <div class="border-end-primary alert-info text-center mb-2 d-none d-md-block" role="alert">
+                Veuillez saisir le code de vérification envoyé à votre adresse email 
+            </div>
+            <div class="text-center text-light mb-2 d-block d-md-none font-size-10" role="alert">
                 Veuillez saisir le code de vérification envoyé à votre adresse email 
             </div>
             <div v-if="showAlert" class="alert alert-danger alert-dismissible fade show">
@@ -69,7 +71,6 @@ export default {
             <!-- <div v-if="msgError" class="alert alert-danger text-center mb-4" role="alert">
               {{ msgError }}
             </div> -->
-            <BForm>
                 <div class="otp-container">
                     <input
                     v-for="(digit, index) in otp"
@@ -83,31 +84,28 @@ export default {
                     ref="otpField"
                     />
                 </div>
-
-              <div class="mt-3 text-center">
-                <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" @click="verifyOtp">
-                  Vérifier
-                </BButton>
-              </div>
-
-              <div class="mt-4 text-center">
-                <p class="mb-0">
-                  <nuxt-link to="/forgot-password" class="fw-medium text-primary"><i class="uil-arrow-left"></i>Retour</nuxt-link>
-                </p>
-              </div>
-              <div class="mt-4 text-center">
-                <p class="mb-0" style="font-size: 10px;">
-                  Vous avez déjà un compte ?
-                  <nuxt-link to="/login" class="fw-medium text-primary">Connectez-vous</nuxt-link>
-                </p>
-              </div>
-            </BForm>
+           
           </div>
         </BCardBody>
       </BCard>
-      
-    </BCol>
-  </BRow>
+      <div class="mt-3 text-center">
+        <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" @click="verifyOtp">
+          Vérifier
+        </BButton>
+      </div>
+
+      <div class="mt-4 text-center">
+        <p class="mb-0">
+          <nuxt-link to="/forgot-password" class="fw-medium text-primary"><i class="uil-arrow-left"></i>Retour</nuxt-link>
+        </p>
+      </div>
+      <div class="mt-4 text-center">
+        <p class="mb-0" style="font-size: 10px;">
+          Vous avez déjà un compte ?
+          <nuxt-link to="/login" class="fw-medium text-primary">Connectez-vous</nuxt-link>
+        </p>
+      </div>
+</BForm>
 </template>
 <style scoped>
 /* Style de conteneur pour resserrer les champs */
@@ -136,4 +134,45 @@ export default {
   border-color: #007bff; /* Couleur de bordure active */
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
+
+.card-auth {
+    background-color: #194698;
+    border: none;
+    border-radius: 30px;
+    width: 400px;
+  } 
+.btn-bg{
+  background-color: #3DA92A;
+  border: none;
+  width: 150px;
+  padding: 10px 0;
+  border-radius: 20px
+}
+
+.btn-loading {
+  background-color: #28a745 !important; /* Vert durant le chargement */
+  color: white;
+}
+
+@media (max-width: 768px) {  Pour les tablettes 
+  .card-auth {
+    max-width: 200px;
+    background-color:  #194698;
+  } 
+  }
+  
+  @media (max-width: 576px) { /* Pour les téléphones */
+  .card-auth {
+    max-width: 400px !important; /* Forcer la largeur */
+    background-color: #194698;
+  }
+  .otp-input {
+  width: 2.5rem;
+  height: 2.5rem; /* Forme carrée en définissant la hauteur et la largeur égales */
+  text-align: center;
+  font-size: 1.5rem;
+  border-radius: 4px; /* Coins légèrement arrondis, tu peux ajuster selon ton besoin */
+  
+}
+  }
 </style>
