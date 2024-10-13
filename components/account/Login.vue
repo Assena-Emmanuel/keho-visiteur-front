@@ -187,7 +187,7 @@ export default {
   
   @media (max-width: 576px) { /* Pour les téléphones */
   .card-auth-login {
-    max-width: 400px !important; /* Forcer la largeur */
+    max-width: 350px !important; /* Forcer la largeur */
     background-color: #194698;
   }
   }
