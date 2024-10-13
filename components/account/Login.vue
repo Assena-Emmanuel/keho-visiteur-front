@@ -186,7 +186,7 @@ export default {
   
   @media (max-width: 576px) { /* Pour les téléphones */
   .card-auth {
-    max-width: 300px !important; /* Forcer la largeur */
+    width: 300px !important; /* Forcer la largeur */
     background-color: #194698;
   }
   }

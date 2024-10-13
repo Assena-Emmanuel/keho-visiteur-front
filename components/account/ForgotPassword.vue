@@ -99,7 +99,6 @@ export default {
     border: none;
     border-radius: 30px;
     width: 400px;
-    height: 250px; 
   } 
 .btn-bg{
   background-color: #3DA92A;
@@ -123,7 +122,7 @@ export default {
   
   @media (max-width: 576px) { /* Pour les téléphones */
   .card-auth {
-    ma-width: 200px !important; /* Forcer la largeur */
+    max-width: 200px !important; /* Forcer la largeur */
     background-color: #194698;
   }
   }
