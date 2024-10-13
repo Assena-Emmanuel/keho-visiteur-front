@@ -7,7 +7,7 @@ import Otp from "~/components/account/Otp.vue";
 export default {
   data() {
     return {
-      title: "verify-otp-code"
+      title: "verify Otp code"
     };
   },
   components: {

@@ -6,7 +6,7 @@ definePageMeta({
 export default {
   data() {
     return {
-      title: "Recoverpwd"
+      title: "Forgot Password"
     };
   },
   components: {

@@ -15,7 +15,7 @@ export default defineNuxtConfig({
         },
         { name: "author", content: "Themesbrand" }
       ],
-      link: [{ rel: "icon", type: "image/ico", href: "/images/logo_keho.jpg" }]
+      link: [{ rel: "icon", type: "image/ico", href: "/images/total-sans-arriere-plan.png" }]
     }
   },
 

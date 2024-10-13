@@ -7,7 +7,7 @@ import ResetPassword from "~/components/account/ResetPassword.vue";
 export default {
   data() {
     return {
-      title: "reset-password"
+      title: "Reset password"
     };
   },
   components: {
