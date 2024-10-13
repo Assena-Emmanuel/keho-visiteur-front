@@ -52,44 +52,40 @@ export default {
 
 <template>
   <BForm>
-      <BCard class="card-auth">
+      <BCard class="card-auth-otp">
         <BCardBody>
           <div class="text-center">
             <h3 class="text-light">Vérification du code</h3>
           </div>
           <div class="">
-            <div class="border-end-primary alert-info text-center mb-2 d-none d-md-block" role="alert">
+            <div class="text-light alert-info text-center mb-3 d-none d-md-block" role="alert">
                 Veuillez saisir le code de vérification envoyé à votre adresse email 
             </div>
-            <div class="text-center text-light mb-2 d-block d-md-none font-size-10" role="alert">
+            <div class="text-center text-light mb-3 d-block d-md-none" role="alert">
                 Veuillez saisir le code de vérification envoyé à votre adresse email 
             </div>
-            <div v-if="showAlert" class="alert alert-danger alert-dismissible fade show">
-                {{ msgError }}
-                <button type="button" class="btn-close" @click="showAlert = !showAlert"></button>
-            </div>
-            <!-- <div v-if="msgError" class="alert alert-danger text-center mb-4" role="alert">
-              {{ msgError }}
-            </div> -->
-                <div class="otp-container">
-                    <input
-                    v-for="(digit, index) in otp"
-                    :key="index"
-                    type="text"
-                    class="form-control otp-input"
-                    maxlength="1"
-                    v-model="otp[index]"
-                    @keydown="validateInput"
-                    @input="moveToNext(index)"
-                    ref="otpField"
-                    />
-                </div>
-           
+            <div class="otp-container">
+                <input
+                v-for="(digit, index) in otp"
+                :key="index"
+                type="text"
+                class="form-control otp-input"
+                
+                maxlength="1"
+                v-model="otp[index]"
+                @keydown="validateInput"
+                @input="moveToNext(index)"
+                ref="otpField"
+                />
+            </div>    
           </div>
+          <div v-if="showAlert" class="text-danger text-center">
+                {{ msgError }}
+            </div>
         </BCardBody>
       </BCard>
       <div class="mt-3 text-center">
-        <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" @click="verifyOtp">
+        <BButton variant="success" class="btn-bg w-sm waves-effect waves-light btn btn-sm" @click="verifyOtp">
           Vérifier
         </BButton>
       </div>
@@ -100,7 +96,7 @@ export default {
         </p>
       </div>
       <div class="mt-4 text-center">
-        <p class="mb-0" style="font-size: 10px;">
+        <p class="mb-0" style="font-size: 12px;">
           Vous avez déjà un compte ?
           <nuxt-link to="/login" class="fw-medium text-primary">Connectez-vous</nuxt-link>
         </p>
@@ -135,11 +131,12 @@ export default {
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-.card-auth {
+.card-auth-otp {
     background-color: #194698;
     border: none;
     border-radius: 30px;
-    width: 400px;
+    width: 500px;
+    height: auto;
   } 
 .btn-bg{
   background-color: #3DA92A;
@@ -155,15 +152,16 @@ export default {
 }
 
 @media (max-width: 768px) {  Pour les tablettes 
-  .card-auth {
-    max-width: 200px;
+  .card-auth-otp {
+    width: 100%;
     background-color:  #194698;
   } 
   }
   
   @media (max-width: 576px) { /* Pour les téléphones */
-  .card-auth {
-    max-width: 400px !important; /* Forcer la largeur */
+  .card-auth-otp {
+    margin-top: 3em;
+    width: 100% !important; /* Forcer la largeur */
     background-color: #194698;
   }
   .otp-input {

@@ -81,7 +81,7 @@ export default {
 
 <template>
   <BForm>
-      <BCard class="card-auth">
+      <BCard class="card-auth-login">
         <BCardBody>
           <div>
             <div v-if="showAlert" class="alert alert-success alert-dismissible fade show font-size-13">
@@ -157,12 +157,12 @@ export default {
 .login-input{
   background-color: #f0f5ff;
 }
-.card-auth {
+.card-auth-login {
     background-color: #194698;
     border: none;
     border-radius: 30px;
-    max-width: 400px;
-    height: 250px; 
+    width: 500px;
+    height: auto 
   } 
 .btn-bg{
   background-color: #3DA92A;
@@ -178,15 +178,15 @@ export default {
 }
 
 @media (max-width: 768px) {  Pour les tablettes 
-  .card-auth {
-    max-width: 200px;
+  .card-auth-login {
+    width: 100%;
     background-color:  #194698;
   } 
   }
   
   @media (max-width: 576px) { /* Pour les téléphones */
-  .card-auth {
-    width: 300px !important; /* Forcer la largeur */
+  .card-auth-login {
+    width: 100% !important; /* Forcer la largeur */
     background-color: #194698;
   }
   }

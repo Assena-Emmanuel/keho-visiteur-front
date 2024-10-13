@@ -11,7 +11,7 @@ export default {
     <div class="background">
       <BContainer>
         <BRow >
-          <BCol cols="12" md="6" class="d-flex justify-content-center align-items-center mt-3" >
+          <BCol cols="12" md="6" class="d-flex justify-content-center align-items-center mt-5" >
             <div class="text-center">
               <img src="/images/total-sans-arriere-plan.png" class="custom-img-size" alt="" />
             </div>

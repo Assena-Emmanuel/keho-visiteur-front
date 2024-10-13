@@ -51,9 +51,9 @@ export default {
 
 <template>
   <BForm>
-    <BCard class="card-auth">
+    <BCard class="card-auth-pwd">
         <BCardBody class="">
-          <div class="text-center">
+          <div class="text-center mb-3">
             <h5 class="text-light">Réinitialiser votre mot de passe</h5>
           </div>
           <div>
@@ -97,11 +97,12 @@ export default {
 
 </template>
 <style>
-.card-auth {
+.card-auth-pwd {
     background-color: #194698;
     border: none;
     border-radius: 30px;
-    width: 400px;
+    width: 500px;
+    height: auto;
   } 
 .btn-bg{
   background-color: #3DA92A;
@@ -117,15 +118,16 @@ export default {
 }
 
 @media (max-width: 768px) {  Pour les tablettes 
-  .card-auth {
-    max-width: 200px;
+  .card-auth-pwd {
+    width: 100%;
     background-color:  #194698;
   } 
   }
   
   @media (max-width: 576px) { /* Pour les téléphones */
-  .card-auth {
-    max-width: 400px !important; /* Forcer la largeur */
+  .card-auth-pwd {
+    margin-top: 3em;
+    width: 100% !important; /* Forcer la largeur */
     background-color: #194698;
   }
   }
