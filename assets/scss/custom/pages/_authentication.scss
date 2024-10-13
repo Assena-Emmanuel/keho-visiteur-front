@@ -40,6 +40,7 @@
         flex-direction: column; /* Empile verticalement en mode téléphone */
         align-items: flex-start; /* Aligner les éléments en haut */
         justify-content: flex-start;
+        height: 90vh;
       }
 
     .custom-img-size {
@@ -52,6 +53,7 @@
       flex-direction: column; /* Empile verticalement en mode téléphone */
       align-items: flex-start; /* Aligner les éléments en haut */
       justify-content: flex-start;
+      height: 50vh;
     }
   
     .custom-img-size {

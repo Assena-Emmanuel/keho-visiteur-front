@@ -50,23 +50,21 @@ export default {
 </script>
 
 <template>
-  <BRow class="justify-content-center">
-    <BCol md="8" lg="6" cols="xl-5" style="width: 400px;">
-      <BCard no-body>
+  <BForm>
+    <BCard class="card-auth">
         <BCardBody class="p-4">
-          <div class="text-center mt-2">
-            <h5 class="text-primary">Réinitialiser votre mot de passe</h5>
+          <div class="text-center">
+            <h5 class="text-light">Réinitialiser votre mot de passe</h5>
           </div>
-          <div class="p-2 mt-4">
-            <div class="alert alert-info text-center mb-4" role="alert">
+          <div class="p-2 ">
+            <div class="alert alert-info text-center mb-2" role="alert">
               Entrez votre adresse <span class="fw-bold">Email</span> pour la reinitialisation du mot de passe!
             </div>
             <!-- <div v-if="isSuccess" class="alert alert-success text-center mb-4" role="alert">
               Reset link are sended to your mailbox, check there first
             </div> -->
-            <BForm>
               <div class="mb-3">
-                <label for="useremail">Email</label>
+                <label for="useremail" class="text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
                 <input v-model="email" type="email" class="form-control form-control-sm" id="useremail" placeholder="Enter email" :class="{
                   'is-invalid': v$.email.$error
                 }" />
@@ -77,24 +75,56 @@ export default {
                   </span>
                 </div>
               </div>
-
-              <div class="mt-3 text-center">
-                <BButton variant="primary" class="w-sm waves-effect waves-light btn btn-sm" @click="onReset">
-                  Envoyer
-                </BButton>
-              </div>
-
-              <div class="mt-4 text-center">
-                <p class="mb-0" style="font-size: 10px;">
-                  Vous avez déjà un compte ?
-                  <nuxt-link to="/login" class="fw-medium text-primary">Connectez-vous</nuxt-link>
-                </p>
-              </div>
-            </BForm>
           </div>
         </BCardBody>
       </BCard>
-      
-    </BCol>
-  </BRow>
+      <div class="mt-3 text-center">
+        <BButton variant="primary" class="btn-bg w-sm waves-effect waves-light btn btn-sm" @click="onReset">
+          Envoyer
+        </BButton>
+      </div>
+
+      <div class="mt-4 text-center">
+        <p class="mb-0" style="font-size: 10px;">
+          Vous avez déjà un compte ?
+          <nuxt-link to="/login" class="fw-medium text-primary">Connectez-vous</nuxt-link>
+        </p>
+      </div>
+    </BForm>
+
 </template>
+<style>
+.card-auth {
+    background-color: #194698;
+    border: none;
+    border-radius: 30px;
+    width: 400px;
+    height: 250px; 
+  } 
+.btn-bg{
+  background-color: #3DA92A;
+  border: none;
+  width: 150px;
+  padding: 10px 0;
+  border-radius: 20px
+}
+
+.btn-loading {
+  background-color: #28a745 !important; /* Vert durant le chargement */
+  color: white;
+}
+
+@media (max-width: 768px) {  Pour les tablettes 
+  .card-auth {
+    max-width: 200px;
+    background-color:  #194698;
+  } 
+  }
+  
+  @media (max-width: 576px) { /* Pour les téléphones */
+  .card-auth {
+    ma-width: 200px !important; /* Forcer la largeur */
+    background-color: #194698;
+  }
+  }
+</style>
