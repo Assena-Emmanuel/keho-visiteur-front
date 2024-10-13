@@ -177,14 +177,19 @@ export default {
   color: white;
 }
 
-/* @media (max-width: 768px) {  Pour les tablettes 
-  
-  } */
-  
-  @media (max-width: 576px) { /* Pour les téléphones */
-    .card-auth {
+@media (max-width: 768px) {  Pour les tablettes 
+  .card-auth {
     max-width: 200px;
     height: 250px; 
+    background-color: #981963;
   } 
+  }
+  
+  @media (max-width: 576px) { /* Pour les téléphones */
+  .card-auth {
+    width: 200px !important; /* Forcer la largeur */
+    height: 250px !important;
+    background-color: #199867;
+  }
   }
 </style>

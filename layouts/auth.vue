@@ -17,7 +17,7 @@ export default {
             </div>
 
           </BCol>
-          <BCol cols="12" md="6" class="d-flex justify-content-center align-items-center">
+          <BCol cols="12" md="6" class="d-flex justify-content-center align-items-center mt-3">
             <slot />
           </BCol>
         </BRow>
