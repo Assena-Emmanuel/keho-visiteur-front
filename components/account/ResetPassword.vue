@@ -161,7 +161,7 @@ export default {
   
   @media (max-width: 576px) { /* Pour les téléphones */
   .card-auth {
-    width: 400px !important; /* Forcer la largeur */
+    max-width: 400px !important; /* Forcer la largeur */
     background-color: #194698;
   }
   .otp-input {
