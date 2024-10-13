@@ -68,7 +68,7 @@ export default {
                 <input
                 v-for="(digit, index) in otp"
                 :key="index"
-                type="text"
+                type="nuber"
                 class="form-control otp-input"
                 
                 maxlength="1"
@@ -160,7 +160,7 @@ export default {
   
   @media (max-width: 576px) { /* Pour les téléphones */
   .card-auth-otp {
-    margin-top: 3em;
+
     width: 100% !important; /* Forcer la largeur */
     background-color: #194698;
   }

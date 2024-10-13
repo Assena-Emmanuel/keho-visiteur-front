@@ -143,6 +143,7 @@ export default {
       </BCard>
       <div class="mt-4 text-center">
         <BButton 
+          variant="success"
           :loading="processing" 
           loading-text="Chargement" 
           :class="['btn-bg', processing ? 'btn-loading' : '']"  
@@ -186,7 +187,7 @@ export default {
   
   @media (max-width: 576px) { /* Pour les téléphones */
   .card-auth-login {
-    width: 100% !important; /* Forcer la largeur */
+    width: 400px !important; /* Forcer la largeur */
     background-color: #194698;
   }
   }

@@ -13,6 +13,7 @@ export default {
       isSuccess: false,
       isDif: false,
       passwordVisible: false,
+      passwordCfVisible: false,
     };
   },
   validations: {
@@ -26,6 +27,9 @@ export default {
   methods: {
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
+    },
+    togglePasswordCfVisibility() {
+      this.passwordCfVisible = !this.passwordCfVisible;
     },
     onReset() {
       this.submitted = true;
@@ -54,8 +58,8 @@ export default {
    <BForm>
       <BCard class="card-auth">
         <BCardBody>
-          <div class="text-center mt-2">
-            <h3 class="text-light">Nouveau mot de passe</h3>
+          <div class="text-center">
+            <h5 class="text-light">Nouveau mot de passe</h5>
             <!-- <p class="text-muted">Reset Password with Minible.</p> -->
           </div>
           <div class="p-2 mt-4">
@@ -72,14 +76,17 @@ export default {
                         class="form-control" 
                         id="userpassword" 
                         placeholder="Mot de passe"
-                        :class="{ 'is-invalid': submitted && v$.password.$error }" 
+                        :class="{ 'is-invalid': (submitted || isDif) && v$.password.$error }"
                     />
                     <span class="input-group-text" @click="togglePasswordVisibility">
                         <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                     </span>
                 </div>
-                <div v-if="submitted && v$.password.$error" class="invalid-feedback">
-                    <span v-if="v$.password.required.$invalid">Ce champ est obligatoire</span>
+                <div v-if="submitted && v$.password.$error" class="invalid-feedback bg-info">
+                  <!-- <span v-if="v$.email.email.$invalid">Email invalide
+                  </span> -->
+                  <span class="text-danger">Cet champ est obligatoire
+                  </span>
                 </div>
             </div>
 
@@ -88,18 +95,18 @@ export default {
                     <div class="input-group">
                       <input 
                         v-model="confirmPassword" 
-                        :type="passwordVisible ? 'text' : 'password'" 
+                        :type="passwordCfVisible ? 'text' : 'password'" 
                         class="form-control" 
                         id="usercpassword" 
                         placeholder="Confirmez le mot de passe" 
                         :class="{'is-invalid': submitted && v$.password.$error }" 
                       />
-                      <span class="input-group-text" @click="togglePasswordVisibility">
-                        <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
+                      <span class="input-group-text" @click="togglePasswordCfVisibility">
+                        <i :class="passwordCfVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                       </span>
                   </div>
                     <div v-if="submitted && v$.password.$error" class="invalid-feedback">
-                      <span v-if="v$.confirmPassword.required.$invalid">Cet champ est obligatoire
+                      <span v-if="v$.confirmPassword.required.$invalid" class="text-danger">Cet champ est obligatoire
                       </span>
                     </div>
                 </div>
@@ -154,8 +161,7 @@ export default {
   
   @media (max-width: 576px) { /* Pour les téléphones */
   .card-auth {
-    margin-top: 3em;
-    width: 100% !important; /* Forcer la largeur */
+    width: 400px !important; /* Forcer la largeur */
     background-color: #194698;
   }
   .otp-input {

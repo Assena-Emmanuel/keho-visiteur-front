@@ -82,7 +82,7 @@ export default {
         </BCardBody>
       </BCard>
       <div class="mt-3 text-center">
-        <BButton variant="primary" class="btn-bg w-sm waves-effect waves-light btn btn-sm" @click="onReset">
+        <BButton variant="success" class="btn-bg w-sm waves-effect waves-light btn btn-sm" @click="onReset">
           Envoyer
         </BButton>
       </div>
@@ -126,7 +126,6 @@ export default {
   
   @media (max-width: 576px) { /* Pour les téléphones */
   .card-auth-pwd {
-    margin-top: 3em;
     width: 100% !important; /* Forcer la largeur */
     background-color: #194698;
   }
