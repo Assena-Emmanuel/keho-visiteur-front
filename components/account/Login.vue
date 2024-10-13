@@ -180,16 +180,14 @@ export default {
 @media (max-width: 768px) {  Pour les tablettes 
   .card-auth {
     max-width: 200px;
-    height: 250px; 
-    background-color: #981963;
+    background-color:  #194698;
   } 
   }
   
   @media (max-width: 576px) { /* Pour les téléphones */
   .card-auth {
-    width: 200px !important; /* Forcer la largeur */
-    height: 250px !important;
-    background-color: #199867;
+    ma-width: 200px !important; /* Forcer la largeur */
+    background-color: #194698;
   }
   }
 </style>

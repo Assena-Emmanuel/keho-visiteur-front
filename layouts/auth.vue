@@ -24,6 +24,7 @@ export default {
         
       </BContainer>
     </div>
+    <div><p class="text-center">By Keho Groupe</p></div>
   </div>
 </template>
 <style>
