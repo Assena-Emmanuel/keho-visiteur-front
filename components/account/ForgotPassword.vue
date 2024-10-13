@@ -52,17 +52,20 @@ export default {
 <template>
   <BForm>
     <BCard class="card-auth">
-        <BCardBody class="p-4">
+        <BCardBody class="">
           <div class="text-center">
             <h5 class="text-light">Réinitialiser votre mot de passe</h5>
           </div>
-          <div class="p-2 ">
-            <div class="alert alert-info text-center mb-2" role="alert">
-              Entrez votre adresse <span class="fw-bold">Email</span> pour la reinitialisation du mot de passe!
+          <div>
+            <div class="alert-container">
+              <div class="alert alert-info text-center mb-2 d-none d-md-block " role="alert">
+                Entrez votre adresse <span class="fw-bold">Email</span> pour la reinitialisation du mot de passe!
+              </div>
+              <div class="text-light d-block d-md-none text-center mb-2 font-size-12">
+                Entrez votre adresse <span class="fw-bold">Email</span> pour la reinitialisation du mot de passe!
+              </div>
             </div>
-            <!-- <div v-if="isSuccess" class="alert alert-success text-center mb-4" role="alert">
-              Reset link are sended to your mailbox, check there first
-            </div> -->
+
               <div class="mb-3">
                 <label for="useremail" class="text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
                 <input v-model="email" type="email" class="form-control form-control-sm" id="useremail" placeholder="Enter email" :class="{
@@ -122,7 +125,7 @@ export default {
   
   @media (max-width: 576px) { /* Pour les téléphones */
   .card-auth {
-    max-width: 200px !important; /* Forcer la largeur */
+    max-width: 400px !important; /* Forcer la largeur */
     background-color: #194698;
   }
   }
