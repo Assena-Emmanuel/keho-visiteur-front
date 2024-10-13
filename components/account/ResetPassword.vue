@@ -25,6 +25,10 @@ export default {
     }
   },
   methods: {
+    closeAlert(){
+      this.isDif = !this.isDif
+      this.submitted = false
+    },
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
     },
@@ -62,12 +66,12 @@ export default {
             <h5 class="text-light">Nouveau mot de passe</h5>
             <!-- <p class="text-muted">Reset Password with Minible.</p> -->
           </div>
-          <div class="p-2 mt-4">
-            <div v-if="isDif" class="alert alert-danger alert-dismissible fade show">
+          <div class="mt-3">
+            <div v-if="isDif" class="alert text-center alert-danger alert-dismissible fade show font-size-11">
                 Mot de passe non identique
-                <button type="button" class="btn-close" @click="isDif = !isDif"></button>
+                <button type="button" class="btn-close" @click="closeAlert"></button>
             </div>
-              <div class="mb-3">
+              <div class="mb-2">
                 <label for="userpassword" class="text-light font-size-12 ">Nouveau Mot de passe</label>
                 <div class="input-group">
                     <input 
@@ -76,21 +80,19 @@ export default {
                         class="form-control" 
                         id="userpassword" 
                         placeholder="Mot de passe"
-                        :class="{ 'is-invalid': (submitted || isDif) && v$.password.$error }"
+                        :class="{ 'is-invalid': submitted || isDif && v$.password.$error }"
                     />
                     <span class="input-group-text" @click="togglePasswordVisibility">
                         <i :class="passwordVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                     </span>
                 </div>
-                <div v-if="submitted && v$.password.$error" class="invalid-feedback bg-info">
-                  <!-- <span v-if="v$.email.email.$invalid">Email invalide
-                  </span> -->
-                  <span class="text-danger">Cet champ est obligatoire
-                  </span>
-                </div>
+                <span class="text-danger font-size-12" v-if="submitted && v$.password.$error && v$.password.required.$invalid">
+                  Cet champ est obligatoire
+                </span>
+                
             </div>
 
-                <div class="mb-3">
+                <div class="mb-1">
                     <label for="usercpassword" class="font-size-12 text-light">Confirmation du Mot de passe</label>
                     <div class="input-group">
                       <input 
@@ -99,16 +101,16 @@ export default {
                         class="form-control" 
                         id="usercpassword" 
                         placeholder="Confirmez le mot de passe" 
-                        :class="{'is-invalid': submitted && v$.password.$error }" 
+                        :class="{'is-invalid': submitted || isDif && v$.password.$error }" 
                       />
                       <span class="input-group-text" @click="togglePasswordCfVisibility">
                         <i :class="passwordCfVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
                       </span>
                   </div>
-                    <div v-if="submitted && v$.password.$error" class="invalid-feedback">
-                      <span v-if="v$.confirmPassword.required.$invalid" class="text-danger">Cet champ est obligatoire
-                      </span>
-                    </div>
+                  <span class="text-danger font-size-12" v-if="submitted && v$.confirmPassword.$error && v$.confirmPassword.required.$invalid">
+                    Cet champ est obligatoire
+                  </span>
+                  
                 </div>
 
       
