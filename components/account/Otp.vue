@@ -135,7 +135,7 @@ export default {
     background-color: #194698;
     border: none;
     border-radius: 30px;
-    width: 500px;
+    width: 400px;
     height: auto;
   } 
 .btn-bg{

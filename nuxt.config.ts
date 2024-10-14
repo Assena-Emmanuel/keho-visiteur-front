@@ -1,7 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   plugins: [
-    '~/plugins/sweetalert.ts'
+    '~/plugins/sweetalert.ts',
+    '~/plugins/qrcode-reader.js'
   ],
 
   app: {

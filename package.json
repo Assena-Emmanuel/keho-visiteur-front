@@ -46,6 +46,7 @@
     "nuxt-storage": "^1.2.2",
     "nuxt-sweetalert2": "^1.0.0",
     "pinia": "^2.2.2",
+    "qrcode-reader-vue3": "^3.1.2",
     "sass": "^1.66.1",
     "sass-loader": "^13.3.3",
     "simplebar": "^6.2.5",
