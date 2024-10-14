@@ -1,5 +1,5 @@
 <template>
-    <BDropdown variant="white" class=" d-inline-block" toggle-class="header-item noti-icon" right menu-class="dropdown-menu-lg dropdown-menu-end p-0">
+    <BDropdown variant="white"  class="dropdown d-inline-block " toggle-class="header-item noti-icon" right menu-class="dropdown-menu-lg dropdown-menu-end p-0">
       <template #button-content >
         <i class="uil-cog toggle-right"></i>
       </template>
@@ -14,7 +14,7 @@
         </BRow>
       </div>
       
-      <div  data-simplebar>
+      <div style="max-height: 230px" data-simplebar>
         <nuxt-link to="/parametre-departement" class="text-reset notification-item">
             <div class="media d-flex">
             <div class="media-body">
@@ -82,6 +82,7 @@
       </div>
     </BDropdown>
   </template>
+
   
   <script>
   export default {
