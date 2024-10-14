@@ -51,6 +51,33 @@
             </div>
           </div>
         </nuxt-link>
+        <nuxt-link to="/login" class="text-reset notification-item">
+            <div class="media d-flex">
+            <div class="media-body">
+              <h6 class="mt-0 mb-1">
+                Gestion des profils
+              </h6>
+            </div>
+          </div>
+        </nuxt-link>
+        <nuxt-link to="/login" class="text-reset notification-item">
+            <div class="media d-flex">
+            <div class="media-body">
+              <h6 class="mt-0 mb-1">
+                Gestion des utilisateurs
+              </h6>
+            </div>
+          </div>
+        </nuxt-link>
+        <nuxt-link to="/login" class="text-reset notification-item">
+            <div class="media d-flex">
+            <div class="media-body">
+              <h6 class="mt-0 mb-1">
+                Gestion des agences
+              </h6>
+            </div>
+          </div>
+        </nuxt-link>
         
       </div>
     </BDropdown>
