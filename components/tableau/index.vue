@@ -16,6 +16,7 @@ export default {
     return {
       preventableModal: false,
       submitted: false,
+      dataDetail: {},
       titreDetail: "",
       detailModal: false,
       localModal: this.modal,
@@ -79,11 +80,13 @@ export default {
     }
   },
   methods: {
-    showDetailsModal(libelle, formType, code, departement){
-      this.code = code
-      this.libelle = libelle
+    showDetailsModal(id, data, typeForm){
       this.detailModal = true
-      this.departementService = departement
+      this.dataDetail = {
+        id: id,
+        data: data,
+        formType: typeForm,
+      }
     },
     handleEdit(index, data) {
         this.$emit('edit', { index, data });
@@ -139,59 +142,7 @@ export default {
           <BCardBody>
             <BCardTitle>{{ title }}</BCardTitle>
             <BModal v-model="detailModal" :title="`Détail ${capitalize(typeForme)}`" hide-footer>
-              <div v-if="typeForme === 'service'" class="p-4 bg-light rounded border">
-                <!-- En-tête du service -->
-                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                  <div class=" h5">
-                    Service : <span class="fw-bold text-primary">{{ libelle }}</span>
-                  </div>
-                  <div class=" h5">
-                    Département : <span class="fw-bold text-primary">{{ departementService }}</span>
-                  </div>
-                </div>
-
-                <!-- Titre des autres services du département -->
-                <h6 class="mb-3">Autres <strong>Services</strong> du département</h6>
-
-                <!-- Liste des autres services -->
-                <ul class="list-group">
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong>Développement</strong>
-                    <span class="badge bg-secondary">DEP001</span>
-                  </li>
-                  <!-- Ajouter d'autres services ici si nécessaire -->
-                </ul>
-              </div>
-
-              <div v-if="typeForme === 'departement'" class="p-4 bg-light rounded border">
-                <!-- En-tête du département -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                  <div class="text-primary h5">
-                    Département: <span class="fw-bold">{{ libelle }}</span>
-                  </div>
-                  <div class="text-primary h5">
-                    Code: <span class="fw-bold">{{ code }}</span>
-                  </div>
-                </div>
-
-                <!-- Titre des services -->
-                <h5 class="border-bottom pb-3 mb-3">Services du département <strong>{{ libelle }}</strong></h5>
-
-                <!-- Liste des services -->
-                <ul class="list-group">
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong>Informatique</strong>
-                    <span class="badge bg-secondary">SEV003</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong>Développement</strong>
-                    <span class="badge bg-secondary">SEV005</span>
-                  </li>
-                  <!-- Ajoutez d'autres services ici si nécessaire -->
-                </ul>
-              </div>
-
-               
+                <TableauDetail :data="dataDetail" />
             </BModal>
 
             <BRow>
@@ -228,7 +179,7 @@ export default {
                       <BButton variant="white" size="sm" class="px-2 text-danger" @click="confirmDelete(row.item.Code)">
                         <i class="uil uil-trash-alt font-size-18"></i>
                       </BButton>
-                      <BButton variant="white" size="sm" @click="showDetailsModal(row.item.Libelle, typeForme, row.item.Code, row.item.Département)">
+                      <BButton variant="white" size="sm" @click="showDetailsModal(row.index, data, typeForme)">
                         <i class="fas fa-eye"></i>
                     </BButton>
                   </div>

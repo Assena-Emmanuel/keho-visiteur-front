@@ -174,10 +174,10 @@ export default {
     <div class="navbar-brand-box ">
       <nuxt-link to="/" class="logo logo-dark" style="padding-left: 27%;">
         <span class="logo-sm" >
-          <img src="/images/logo_keho.jpg" alt height="22" />
+          <img src="/images/total.jpg" alt height="22" />
         </span>
         <span class="logo-lg">
-          <img src="/images/logo_keho.jpg" alt height="70" />
+          <img src="/images/total.jpg" alt height="70" />
         </span>
       </nuxt-link>
     </div>
