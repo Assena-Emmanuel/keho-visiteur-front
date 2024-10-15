@@ -2,13 +2,12 @@
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 
-
-export default{
+export default {
   setup() {
     return { v$: useVuelidate() };
   },
-  data(){
-    return{
+  data() {
+    return {
       libelleProfil: "",
       codeProfil: "",
       description: "",
@@ -17,37 +16,25 @@ export default{
       titre: "",
       pageOptions: [5, 10, 15, 20],
       items: [
-            { menu: 'Dashboard', voir: true, modifier: true, supprimer: false, ajouter: false },
-            { menu: 'Utilisateurs', voir: true, modifier: false, supprimer: false, ajouter: true },
-            { menu: 'Produits', voir: true, modifier: true, supprimer: true, ajouter: true },
-            { menu: 'Commandes', voir: true, modifier: false, supprimer: false, ajouter: false },
-            { menu: 'Rapports', voir: true, modifier: true, supprimer: true, ajouter: false },
-            { menu: 'Paramètres', voir: false, modifier: false, supprimer: false, ajouter: false },
-            { menu: 'Notifications', voir: true, modifier: true, supprimer: true, ajouter: true },
-            { menu: 'Factures', voir: true, modifier: false, supprimer: true, ajouter: true },
-            { menu: 'Catégories', voir: false, modifier: true, supprimer: false, ajouter: false },
-            { menu: 'Logs', voir: true, modifier: false, supprimer: true, ajouter: false }
-        ],
-
+        { menu: 'Dashboard', voir: true, modifier: true, supprimer: false, ajouter: false },
+        { menu: 'Utilisateurs', voir: true, modifier: false, supprimer: false, ajouter: true },
+        // Other items...
+      ],
       fields: [
         { key: 'menu', label: 'Menu', sortable: true },
         { key: 'voir', label: 'Voir' },
         { key: 'modifier', label: 'Modifier' },
         { key: 'supprimer', label: 'Supprimer' },
-        { key: 'ajouter', label: 'Ajouter'},
-        { key: 'accepter', label: 'Accepter'},
-        { key: 'rejeter', label: 'Rejeter'},
-      ],
-      fieldsList:[
-        'menu', 'voir', 'modifier', 'supprimer', 'ajouter', 'accepter', 'rejeter'
+        { key: 'ajouter', label: 'Ajouter' },
+        { key: 'accepter', label: 'Accepter' },
+        { key: 'rejeter', label: 'Rejeter' },
       ],
       currentPage: 1,
       perPage: 5,
       totalRows: 0,
       filter: null,
       filterOn: ['menu']
-
-    }
+    };
   },
   validations: {
     libelleProfil: {
@@ -56,81 +43,66 @@ export default{
     codeProfil: {
       required,
     },
+    description: {
+      required,
+    }
   },
-
   props: {
     modelValue: Boolean,
     isEditMode: Boolean,
     isDetailMode: Boolean,
-    selectedIndex: Number,  // L'index de l'élément à éditer
+    selectedIndex: Number,
     formData: Object,
-  
   },
   mounted() {
     this.totalRows = this.items.length;
-
-    this.libelleProfil = this.formData["Libelle"]
-    this.codeProfil = this.formData["Code profil"]
-    this.description = this.formData["Description"]
-    
   },
-  methods:{
+  methods: {
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length;
-    },
-    onCheckboxChange(item) {
-      // Gérer les modifications sur les cases à cocher
-      console.log('Changement des permissions :', item);
     },
     onSaveprofil() {
       this.submitted = true;
       this.v$.$touch();
-      if (this.v$.libelleProfil.$error || this.v$.codeProfil.$error) {
+      if (this.v$.libelleProfil.$error || this.v$.codeProfil.$error || this.v$.description.$error) {
         return;
       }
+      // Handle the profile save here
     },
     resetForm() {
-      // Reset all form fields and validation state
       this.libelleProfil = '';
       this.codeProfil = '';
+      this.description = '';
       this.submitted = false;
-
-
-      // Reset validation (if using Vuelidate or similar)
-      if (this.$v) {
-        this.$v.$reset();
-      }
+      this.v$.$reset();
     },
-
     saveMenus() {
-      // Crée un tableau d'items avec les habilitations sélectionnées
       const menusWithPermissions = this.items.map(item => ({
         menu: item.menu,
         voir: item.voir,
         modifier: item.modifier,
         supprimer: item.supprimer,
-        ajouter: item.ajouter
+        ajouter: item.ajouter,
       }));
     },
-
-    // Méthode pour gérer le changement dans les checkboxes
     onCheckboxChange(item) {
       console.log('Permissions modifiées pour:', item);
     },
-    getTitle(){
-        if(this.isDetailMode){
-        this.titre = "Modification du profil"
-
-        }else if(this.isDetailMode){
-            this.titre = "Consultation du profil"
-        }else{
-            this.titre = 'Création du profil'
-        }
-        return this.titre
+    getTitle() {
+      if (this.isDetailMode) {
+        this.titre = "Consultation du profil";
+      } else if (this.isEditMode) {
+        this.titre = "Modification du profil";
+      } else if(!this.isDetailMode && !this.isEditMode) {
+        this.titre = "Création du profil";
+      }
+      return this.titre;
     }
+
   }
-}
+};
 </script>
+
 <template>
   <BModal 
       @hide="resetForm" 
@@ -141,6 +113,12 @@ export default{
       title-class="font-18" 
       hide-footer
   >
+  <template #modal-title>
+      <!-- Gestion du titre selon les modes -->
+      <div v-if="isEditMode">Modifier le profil</div>
+      <div v-else-if="isDetailMode">Détails du profil</div>
+      <div v-else>Créer un profil</div>
+    </template>
   <BForm class="form-vertical" role="form">
 
     <BRow>
