@@ -96,7 +96,7 @@ export default {
       } else if(!this.isDetailMode && !this.isEditMode) {
         this.titre = "Création du profil";
       }
-      return this.titre;
+      return this.titre
     }
 
   }
