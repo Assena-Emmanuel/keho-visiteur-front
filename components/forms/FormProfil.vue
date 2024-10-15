@@ -97,7 +97,12 @@ export default {
         this.titre = "Création du profil";
       }
       return this.titre
-    }
+    },
+    handleHide() {
+      // Émettre l'événement pour informer le parent de la fermeture
+      this.$emit('update:modelValue', false); // Réinitialiser la modal à fermée
+      this.resetForm(); // Réinitialiser les données du formulaire
+    },
 
   }
 };
@@ -105,7 +110,7 @@ export default {
 
 <template>
   <BModal 
-      @hide="resetForm" 
+      @hide="handleHide"
       :modelValue="modelValue" 
       @update:modelValue="$emit('update:modelValue', $event)"
       size="lg"
@@ -170,7 +175,7 @@ export default {
                     type="text"
                     class="form-control border border-secondary" 
                     id="description" 
-                    placeholder="MDescription"
+                    placeholder="Description"
                     :class="{ 'is-invalid': submitted && v$.description.$error }" 
                 />
                 <div v-if="submitted && v$.description.$error" class="invalid-feedback">

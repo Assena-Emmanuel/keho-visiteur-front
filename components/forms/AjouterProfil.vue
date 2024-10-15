@@ -121,7 +121,7 @@ export default {
                               type="text"
                               class="form-control border border-black" 
                               id="description" 
-                              placeholder="MDescription"
+                              placeholder="Description"
                               :class="{ 'is-invalid': submitted && v$.description.$error }" 
                           />
                           <div v-if="submitted && v$.description.$error" class="invalid-feedback">
