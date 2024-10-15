@@ -7,24 +7,24 @@ export default{
     },
     data(){
         return{
-        title: 'Liste des Départements',
+        title: 'Liste des Profils',
         modal: false,
         isEditMode: false,  // Mode de modification ou ajout
         selectedIndex: null,  // Index de l'élément sélectionné pour la modification
         data: [
             {
-                "Code profil": "UI/DES",
-                Libelle: "UI/UX DESIGNER",
+                "Code profil": "ADMIN",
+                Libelle: "ADMINISTRATEUR",
                 "Ajouté le": "2024-09-30",
             },
             {
-                "Code profil": "TRE",
-                Libelle: "TRESORIER",
+                "Code profil": "EMPLO",
+                Libelle: "EMPLOYE",
                 "Ajouté le": "2024-10-01",
             },
             {
-                "Code profil": "SUP",
-                Libelle: "SUPERVISEUR",
+                "Code profil": "ASSIS",
+                Libelle: "ASSISTANTE",
                 "Ajouté le": "2024-10-05",
             }
         ],
@@ -80,7 +80,7 @@ export default{
     <div>
     <div class="d-flex justify-content-between">
         <div class="mb-0">Gestion des Profils</div>
-        <BButton variant="primary" @click="openAddModal" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
+        <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
         <FormsFormProfil 
             :modelValue="modal"
             @update:modelValue="modal = $event"

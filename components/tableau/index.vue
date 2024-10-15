@@ -23,8 +23,8 @@ export default {
       tableData,
       totalRows: 1,
       currentPage: 1,
-      perPage: 10,
-      pageOptions: [10, 25, 50, 100],
+      perPage: 5,
+      pageOptions: [5, 10, 15, 20],
       filter: null,
       filterOn: [],
       sortBy: "age",
@@ -84,7 +84,7 @@ export default {
       this.detailModal = true
       this.dataDetail = {
         id: id,
-        data: data,
+        data: data[id],
         formType: typeForm,
       }
     },
@@ -141,6 +141,8 @@ export default {
         <BCard no-body>
           <BCardBody>
             <BCardTitle>{{ title }}</BCardTitle>
+
+            <!-- Modal Détail -->
             <BModal v-model="detailModal" :title="`Détail ${capitalize(typeForme)}`" hide-footer>
                 <TableauDetail :data="dataDetail" />
             </BModal>
@@ -151,7 +153,13 @@ export default {
             
             <BRow class="mt-4">
               <BCol sm="12" md="6" class="">
-               
+                <div id="tickets-table_length" class="dataTables_length">
+                    <label class="d-inline-flex align-items-center">
+                      Afficher&nbsp;
+                      <BFormSelect v-model="perPage" size="sm" :options="pageOptions"></BFormSelect>éléments&nbsp;
+                      
+                    </label>
+                  </div>
               </BCol>
               <BCol sm="12" md="6">
                 <div id="tickets-table_filter" class="dataTables_filter text-md-end">
@@ -171,17 +179,29 @@ export default {
                   :filter-included-fields="filterOn" 
                   @filtered="onFiltered"
               >
+              <template #cell(Statut)="row">
+                  <!-- <div class="d-flex gap-2">
+                    <div :class="row.item.Statut ? 'text-success' : 'text-danger'">
+                      <i class="mdi mdi-circle align-middle font-size-10 ms-1" ></i>
+                    </div>
+                    
+                  </div> -->
+                  <span v-if="row.item.Statut" class="badge rounded-pill text-bg-success">activé</span>
+                  <span v-if="!row.item.Statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
+                  
+              </template>
+
               <template #cell(Actions)="row">
-                  <div class="d-flex gap-2">
-                      <BButton variant="white" size="sm" class="mr-1 text-primary" @click="handleEdit(row.index, data[row.index])">
+                  <div class="d-flex gap-1">
+                      <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 text-primary d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data[row.index])">
                           <i class="fas fa-edit" ></i>
                       </BButton>
-                      <BButton variant="white" size="sm" class="px-2 text-danger" @click="confirmDelete(row.item.Code)">
-                        <i class="uil uil-trash-alt font-size-18"></i>
+                      <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
+                        <i class="uil uil-trash-alt font-size-15"></i>
                       </BButton>
-                      <BButton variant="white" size="sm" @click="showDetailsModal(row.index, data, typeForme)">
+                      <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex justify-content-center align-items-center" @click="showDetailsModal(row.index, data, typeForme)">
                         <i class="fas fa-eye"></i>
-                    </BButton>
+                      </BButton>
                   </div>
               </template>
               </BTable>
@@ -191,17 +211,19 @@ export default {
                 <div class="dataTables_paginate paging_simple_numbers d-flex justify-content-between">
                   <div id="tickets-table_length" class="dataTables_length">
                     <label class="d-inline-flex align-items-center">
-                      Afficher&nbsp;
-                      <BFormSelect v-model="perPage" size="sm" :options="pageOptions"></BFormSelect>éléments&nbsp;
+                      Afficher de 1 à {{ perPage }} sur {{ totalRows }} éléments
                       
                     </label>
                   </div>
                   <ul class="pagination pagination-rounded mb-0">
-                    <BPagination v-model="currentPage" :total-rows="rows" :per-page="perPage" />
+                    <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" />
                   </ul>
                 </div>
               </BCol>
             </BRow>
+            
+
+
           </BCardBody>
         </BCard>
       </BCol>
@@ -209,9 +231,6 @@ export default {
   </div>
 </template>
 <style>
-.custom-header {
-  background-color: #4caf50; /* Couleur de fond verte */
-  color: white; /* Couleur du texte */
-}
+
 
 </style>
