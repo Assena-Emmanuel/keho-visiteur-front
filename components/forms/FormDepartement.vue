@@ -58,12 +58,12 @@ export default{
       @hide="resetForm" 
       :modelValue="modelValue" 
       @update:modelValue="$emit('update:modelValue', $event)"
-      size="sm"
+      size="md"
       :title="isEditMode ? `Modifier le département ` : 'Création du département'" 
       title-class="font-18" 
       hide-footer
   >
-  <BForm class="form-vertical" role="form">
+  <BForm class="form-vertical px-3" role="form">
     <div class="mb-3">
       <label for="departement" style="font-size: 12px;">Libellé</label>
       <input 

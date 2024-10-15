@@ -61,7 +61,7 @@ export default{
       @hide="resetForm" 
       :modelValue="modelValue" 
       @update:modelValue="$emit('update:modelValue', $event)"
-      :title="isEditMode ? `Modifier l'Agence` : 'Création de l\'Agence'" 
+      :title="isEditMode ? `Modification de la Catégorie` : 'Création de la Catégorie'" 
       title-class="font-18" 
       hide-footer
       size="lg"

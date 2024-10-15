@@ -64,6 +64,51 @@ export default{
         </div>
 
 
+        <!-- Détail Menu -->
+        <div>
+          <!-- Détail Page -->
+          <div v-if="data.formType === 'menu'" class="p-4 bg-light rounded border">
+            
+            <!-- En-tête de la page -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="text-primary h5">
+                Target: <span class="fw-bold">{{ data.data.Target }}</span>
+              </div>
+              <div class="text-primary h5">
+                Position: <span class="fw-bold">{{ data.data.Position }}</span>
+              </div>
+            </div>
+
+            <!-- Informations détaillées de la page -->
+            <h5 class="border-bottom pb-3 mb-3">Détails de la page <strong>{{ data.data.Name }}</strong></h5>
+
+            <ul class="list-group">
+              <!-- Libellé -->
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>Libellé</strong>
+                <span>{{ data.data.Libelle }}</span>
+              </li>
+              <!-- Type -->
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>Type</strong>
+                <span>{{ data.data.Type }}</span>
+              </li>
+              <!-- Icone -->
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>Icône</strong>
+                <span>{{ data.data.Icon }}</span>
+              </li>
+              <!-- Menu -->
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>Menu</strong>
+                <span>{{ data.data.Menu }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+
+
         <!-- Détail Profil -->
         <div v-if="data.formType === 'profil'" class="p-4 bg-light rounded border">
                 <!-- En-tête du département -->
@@ -76,6 +121,79 @@ export default{
                 </div>
             </div>
         </div>
+
+        <!-- Détail Agence -->
+          <!-- Détail Section -->
+        <div v-if="data.formType === 'agence'" class="p-4 bg-light rounded border">
+          
+          <!-- En-tête de la section -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="text-primary h5">
+              Slug: <span class="fw-bold">{{ data.data.Slug }}</span>
+            </div>
+            <div class="text-primary h5">
+              Position: <span class="fw-bold">{{ data.data.Position }}</span>
+            </div>
+          </div>
+
+          <!-- Informations détaillées de la section -->
+          <h5 class="border-bottom pb-3 mb-3">Détails de la section <strong>{{ data.data.Libellé }}</strong></h5>
+
+          <ul class="list-group">
+            <!-- Code -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <strong>Code</strong>
+              <span>{{ data.data.Code }}</span>
+            </li>
+            <!-- Catégorie -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <strong>Catégorie</strong>
+              <span>{{ data.data.Catégorie }}</span>
+            </li>
+            <!-- Statut -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <strong>Statut</strong>
+              <span>{{ data.data.Statut }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Détail Catégorie -->
+        <div v-if="data.formType === 'categorie'" class="p-4 bg-light rounded border">
+          
+          <!-- En-tête de la section -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="text-primary h5">
+              Slug: <span class="fw-bold">{{ data.data.Slug }}</span>
+            </div>
+            <div class="text-primary h5">
+              Position: <span class="fw-bold">{{ data.data.Position }}</span>
+            </div>
+          </div>
+
+          <!-- Informations détaillées de la section -->
+          <h5 class="border-bottom pb-3 mb-3">Détails de la section <strong>{{ data.data.Libellé }}</strong></h5>
+
+          <ul class="list-group">
+            <!-- Code -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <strong>Code</strong>
+              <span>{{ data.data.Code }}</span>
+            </li>
+            <!-- Catégorie -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <strong>Catégorie</strong>
+              <span>{{ data.data.Catégorie }}</span>
+            </li>
+            <!-- Statut -->
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <strong>Statut</strong>
+              <span>{{ data.data.Statut }}</span>
+            </li>
+          </ul>
+        </div>
+
+
 
         <!-- Détail User -->
         <div v-if="data.formType === 'utilisateur'" class="p-4 bg-light rounded">

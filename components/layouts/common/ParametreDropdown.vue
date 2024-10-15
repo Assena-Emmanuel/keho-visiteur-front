@@ -60,7 +60,7 @@
             </div>
           </div>
         </nuxt-link>
-        <nuxt-link to="//parametres/menus" class="text-reset notification-item">
+        <nuxt-link to="parametre-menu" class="text-reset notification-item">
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">
@@ -69,7 +69,7 @@
             </div>
           </div>
         </nuxt-link>
-        <nuxt-link to="/login" class="text-reset notification-item">
+        <nuxt-link to="/parametre-categorie" class="text-reset notification-item">
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">

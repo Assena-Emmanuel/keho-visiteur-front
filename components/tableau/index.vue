@@ -67,12 +67,12 @@ export default {
      * Total no. of records
      */
     rows() {
-      return this.tableData.length;
+      return this.data.length;
     }
   },
   mounted() {
     // Set the initial number of items
-    this.totalRows = this.tableData.length;
+    this.totalRows = this.data.length;
   },
   watch: {
     modal(newVal) {

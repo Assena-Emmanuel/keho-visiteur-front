@@ -7,7 +7,7 @@ export default{
     },
     data(){
         return{
-        title: 'Liste des Départements',
+        title: 'Liste des Catégories',
         modal: false,
         isEditMode: false,  // Mode de modification ou ajout
         selectedIndex: null,  // Index de l'élément sélectionné pour la modification
@@ -97,9 +97,9 @@ export default{
 <template>
     <div>
     <div class="d-flex justify-content-between">
-        <div class="mb-0">Gestion des Agences</div>
+        <div class="mb-0">Gestion des Catégories</div>
         <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
-        <FormsFormAgence 
+        <FormsFormCategorie 
             :modelValue="modal"
             @update:modelValue="modal = $event"
             :isEditMode="isEditMode"
@@ -114,7 +114,7 @@ export default{
         :data="data" 
         :title="title" 
         :show-addbtn="true" 
-        :typeForme="'agence'" 
+        :typeForme="'categorie'" 
         @edit="openModal(true, $event.index, $event.type)"
     />
 </div>
