@@ -218,29 +218,29 @@ export default {
     >
 
         <template #cell(voir)="row">
-            <BFormCheckbox class="border border-secondary" v-model="row.item.modifier" @change="onCheckboxChange(row.item)">
+            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.modifier" @change="onCheckboxChange(row.item)">
             </BFormCheckbox>
         </template>
 
         <template #cell(supprimer)="row">
-            <BFormCheckbox class="border border-secondary" v-model="row.item.supprimer" @change="onCheckboxChange(row.item)">
+            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.supprimer" @change="onCheckboxChange(row.item)">
             </BFormCheckbox>
         </template>
         <template #cell(modifier)="row">
-            <BFormCheckbox class="border border-secondary" v-model="row.item.modifier" @change="onCheckboxChange(row.item)">
+            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.modifier" @change="onCheckboxChange(row.item)">
             </BFormCheckbox>
         </template>
 
         <template #cell(ajouter)="row">
-            <BFormCheckbox class="border border-secondary" v-model="row.item.ajouter" @change="onCheckboxChange(row.item)">
+            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.ajouter" @change="onCheckboxChange(row.item)">
             </BFormCheckbox>
         </template>
         <template #cell(accepter)="row">
-            <BFormCheckbox class="border border-secondary" v-model="row.item.accepter" @change="onCheckboxChange(row.item)">
+            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.accepter" @change="onCheckboxChange(row.item)">
             </BFormCheckbox>
         </template>
         <template #cell(rejeter)="row">
-            <BFormCheckbox class="border border-secondary" v-model="row.item.rejeter" @change="onCheckboxChange(row.item)">
+            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.rejeter" @change="onCheckboxChange(row.item)">
             </BFormCheckbox>
         </template>
 

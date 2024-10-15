@@ -118,7 +118,7 @@ export default{
       title-class="font-18" 
       hide-footer
   >
-  <BForm class="form-vertical" role="form">
+  <BForm class="form-vertical p" role="form">
 
     <div class="d-flex justify-content-center">
         <span class="wizard-step">
