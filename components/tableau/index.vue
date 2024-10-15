@@ -81,15 +81,20 @@ export default {
   },
   methods: {
     showDetailsModal(id, data, typeForm){
-      this.detailModal = true
-      this.dataDetail = {
-        id: id,
-        data: data[id],
-        formType: typeForm,
+      if(typeForm === "profil"){
+        this.$emit('detail', data[id]);
+      }else{
+        this.detailModal = true
+        this.dataDetail = {
+          id: id,
+          data: data[id],
+          formType: typeForm,
+        }
       }
+      
     },
     handleEdit(index, data) {
-        this.$emit('edit', { index, data });
+        this.$emit('edit', data[index], );
 
       },
 
@@ -193,7 +198,7 @@ export default {
 
               <template #cell(Actions)="row">
                   <div class="d-flex gap-1">
-                      <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 text-primary d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data[row.index])">
+                      <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 text-primary d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)">
                           <i class="fas fa-edit" ></i>
                       </BButton>
                       <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">

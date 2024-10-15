@@ -4,6 +4,7 @@ import Service from '~/components/parametres/Service.vue';
 import Departement from '~/components/parametres/Departement.vue';
 import Profil from '~/components/parametres/Profil.vue';
 import Utilisateur from '~/components/parametres/Utilisateur.vue'
+import Agence from '~/components/parametres/Agence.vue';
 
 const route = useRoute();
 const title = route.params.slug;
@@ -18,4 +19,5 @@ const typeForm = route.params.slug;
   <Departement v-if="typeForm == 'departement'" />
   <Profil v-if="typeForm == 'profil'" />
   <Utilisateur v-if="typeForm == 'utilisateur'" />
+  <Agence v-if="typeForm == 'agence'" />
 </template>

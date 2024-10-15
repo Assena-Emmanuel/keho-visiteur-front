@@ -11,8 +11,10 @@ export default{
     return{
       libelleProfil: "",
       codeProfil: "",
+      description: "",
       submitted: false,
       isEditMode: false,
+      titre: "",
       pageOptions: [5, 10, 15, 20],
       items: [
             { menu: 'Dashboard', voir: true, modifier: true, supprimer: false, ajouter: false },
@@ -59,12 +61,18 @@ export default{
   props: {
     modelValue: Boolean,
     isEditMode: Boolean,
+    isDetailMode: Boolean,
     selectedIndex: Number,  // L'index de l'élément à éditer
-    data: Array,
+    formData: Object,
   
   },
   mounted() {
     this.totalRows = this.items.length;
+
+    this.libelleProfil = this.formData["Libelle"]
+    this.codeProfil = this.formData["Code profil"]
+    this.description = this.formData["Description"]
+    
   },
   methods:{
     onFiltered(filteredItems) {
@@ -86,6 +94,8 @@ export default{
       this.libelleProfil = '';
       this.codeProfil = '';
       this.submitted = false;
+
+
       // Reset validation (if using Vuelidate or similar)
       if (this.$v) {
         this.$v.$reset();
@@ -106,6 +116,17 @@ export default{
     // Méthode pour gérer le changement dans les checkboxes
     onCheckboxChange(item) {
       console.log('Permissions modifiées pour:', item);
+    },
+    getTitle(){
+        if(this.isDetailMode){
+        this.titre = "Modification du profil"
+
+        }else if(this.isDetailMode){
+            this.titre = "Consultation du profil"
+        }else{
+            this.titre = 'Création du profil'
+        }
+        return this.titre
     }
   }
 }
@@ -116,12 +137,11 @@ export default{
       :modelValue="modelValue" 
       @update:modelValue="$emit('update:modelValue', $event)"
       size="lg"
-      :title="isEditMode ? `Modifier le profil ${selectedIndex}` : 'Création du profil'" 
+      :title="getTitle()" 
       title-class="font-18" 
       hide-footer
   >
   <BForm class="form-vertical" role="form">
-    <div class="mb-3 fw-bold font-size-15">Création du profil</div>
 
     <BRow>
         <BCol md="4" sm="4">
@@ -129,7 +149,7 @@ export default{
             <label for="code" style="font-size: 12px;">Code Profil <span class="fw-bool text-danger">*</span></label>
             <div class="input-group">
                 <input 
-                    v-model="code" 
+                    v-model="codeProfil" 
                     type="text" 
                     class="form-control border border-secondary" 
                     id="code" 
@@ -148,15 +168,15 @@ export default{
             <label for="libelle" style="font-size: 12px;">Libellé <span class="fw-bool">*</span></label>
             <div class="input-group">
                 <input 
-                v-model="libelle" 
+                v-model="libelleProfil" 
                 type="text" 
                 class="form-control border border-secondary" 
                 id="libelle" 
                 placeholder="Libellé" 
-                :class="{'is-invalid': submitted && v$.libelle.$error }" 
+                :class="{'is-invalid': submitted && v$.libelleProfil.$error }" 
                 />
-                <div v-if="submitted && v$.libelle.$error" class="invalid-feedback">
-                <span v-if="v$.libelle.required.$invalid">Cet champ est obligatoire
+                <div v-if="submitted && v$.libelleProfil.$error" class="invalid-feedback">
+                <span v-if="v$.libelleProfil.required.$invalid">Cet champ est obligatoire
                 </span>
                 </div>
             </div>
@@ -214,16 +234,7 @@ export default{
       @filtered="onFiltered"
     >
 
-        <!-- Itération à partir du deuxième élément dans fields -->
-        <template #cell([field.key])="row" v-for="(field, index) in fields.slice(1)" :key="index" >
-            <!-- Création dynamique des checkboxes pour chaque champ -->
-            <BFormCheckbox
-
-            >
-            </BFormCheckbox>
-        </template>
-
-        <!-- <template #cell(modifier)="row">
+        <template #cell(voir)="row">
             <BFormCheckbox class="border border-secondary" v-model="row.item.modifier" @change="onCheckboxChange(row.item)">
             </BFormCheckbox>
         </template>
@@ -231,9 +242,22 @@ export default{
         <template #cell(supprimer)="row">
             <BFormCheckbox class="border border-secondary" v-model="row.item.supprimer" @change="onCheckboxChange(row.item)">
             </BFormCheckbox>
-        </template> -->
-        <template #cell(accepter)="row">
+        </template>
+        <template #cell(modifier)="row">
+            <BFormCheckbox class="border border-secondary" v-model="row.item.modifier" @change="onCheckboxChange(row.item)">
+            </BFormCheckbox>
+        </template>
+
+        <template #cell(ajouter)="row">
             <BFormCheckbox class="border border-secondary" v-model="row.item.ajouter" @change="onCheckboxChange(row.item)">
+            </BFormCheckbox>
+        </template>
+        <template #cell(accepter)="row">
+            <BFormCheckbox class="border border-secondary" v-model="row.item.accepter" @change="onCheckboxChange(row.item)">
+            </BFormCheckbox>
+        </template>
+        <template #cell(rejeter)="row">
+            <BFormCheckbox class="border border-secondary" v-model="row.item.rejeter" @change="onCheckboxChange(row.item)">
             </BFormCheckbox>
         </template>
 
@@ -256,7 +280,7 @@ export default{
     </div>
     </div>
 
-    <div class="mt-4 d-flex justify-content-center">
+    <div v-if="!isDetailMode" class="mt-4 d-flex justify-content-center">
       <BButton v-if="!isEditMode" @click="onSaveprofil" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
         Enregistrer
       </BButton>

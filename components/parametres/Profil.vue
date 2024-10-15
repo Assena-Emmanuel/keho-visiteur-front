@@ -8,7 +8,9 @@ export default{
     data(){
         return{
         title: 'Liste des Profils',
+        formData: "",
         modal: false,
+        isDetailMode: false,
         isEditMode: false,  // Mode de modification ou ajout
         selectedIndex: null,  // Index de l'élément sélectionné pour la modification
         data: [
@@ -16,16 +18,19 @@ export default{
                 "Code profil": "ADMIN",
                 Libelle: "ADMINISTRATEUR",
                 "Ajouté le": "2024-09-30",
+                Description: "Description 1"
             },
             {
                 "Code profil": "EMPLO",
                 Libelle: "EMPLOYE",
                 "Ajouté le": "2024-10-01",
+                Description: "Description 2"
             },
             {
                 "Code profil": "ASSIS",
                 Libelle: "ASSISTANTE",
                 "Ajouté le": "2024-10-05",
+                Description: "Description 3"
             }
         ],
         fields: [
@@ -66,6 +71,13 @@ export default{
             this.modal = true; 
             this.typeForme = type
         },
+        openModalDetail(isDetailMode, data) {
+            console.log(data)
+            this.isEditMode = false;
+            this.isDetailMode = isDetailMode
+            this.modal = true; 
+            this.formData = data
+        },
 
         openAddModal(){
             this.modal = !this.modal
@@ -85,7 +97,8 @@ export default{
             :modelValue="modal"
             @update:modelValue="modal = $event"
             :isEditMode="isEditMode"
-            :selectedIndex="selectedIndex" 
+            :isDetailMode="isDetailMode"
+            :formData="formData"
         />
 
     </div>
@@ -97,7 +110,8 @@ export default{
         :title="title" 
         :show-addbtn="true" 
         :typeForme="'profil'" 
-        @edit="openModal(true, $event.index, $event.type)"
+        @edit="openModal(true, $event)"
+        @detail="openModalDetail(true, $event)"
     />
 </div>
 </template>

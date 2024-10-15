@@ -9,8 +9,8 @@ export default{
   },
   data(){
     return{
-      libelleDepartement: "",
-      codeDepartement: "",
+      libelleDepartement: this.formData.Libelle || "",
+      codeDepartement: this.formData.Code ||  "",
       submitted: false,
       isEditMode: false
     }
@@ -28,7 +28,7 @@ export default{
     modelValue: Boolean,
     isEditMode: Boolean,
     selectedIndex: Number,  // L'index de l'élément à éditer
-    data: Array,
+    formData: Object,
   
   },
 
@@ -59,7 +59,7 @@ export default{
       :modelValue="modelValue" 
       @update:modelValue="$emit('update:modelValue', $event)"
       size="sm"
-      :title="isEditMode ? `Modifier le département ${selectedIndex}` : 'Création du département'" 
+      :title="isEditMode ? `Modifier le département ` : 'Création du département'" 
       title-class="font-18" 
       hide-footer
   >

@@ -51,7 +51,7 @@
             </div>
           </div>
         </nuxt-link>
-        <nuxt-link to="/login" class="text-reset notification-item">
+        <nuxt-link to="/parametre-agence" class="text-reset notification-item">
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">

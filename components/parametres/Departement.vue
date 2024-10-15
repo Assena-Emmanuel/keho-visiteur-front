@@ -9,6 +9,7 @@ export default{
         return{
         title: 'Liste des Départements',
         modal: false,
+        formData: {},
         isEditMode: false,  // Mode de modification ou ajout
         selectedIndex: null,  // Index de l'élément sélectionné pour la modification
         data: [
@@ -29,21 +30,10 @@ export default{
             }
         ],
         fields: [
-            {
-            key: "Code",
-            },
-            {
-            key: "Libelle",
-
-            },
-            {
-            key: "Ajouté le",
-
-            },
-            {
-            key: "Actions",
-
-            },
+            {key: "Code"},
+            {key: "Libelle" },
+            {key: "Ajouté le"},
+            {key: "Actions"},
         ]
     }
     },
@@ -60,11 +50,10 @@ export default{
         },
     },
     methods: {
-        openModal(isEditMode, index = null, type) {
+        openModal(isEditMode, data) {
             this.isEditMode = isEditMode;
-            this.selectedIndex = index;
             this.modal = true; 
-            this.typeForme = type
+            this.formData = data
         },
 
         openAddModal(){
@@ -85,7 +74,7 @@ export default{
             :modelValue="modal"
             @update:modelValue="modal = $event"
             :isEditMode="isEditMode"
-            :selectedIndex="selectedIndex" 
+            :formData="formData" 
         />
 
     </div>
@@ -97,7 +86,7 @@ export default{
         :title="title" 
         :show-addbtn="true" 
         :typeForme="'departement'" 
-        @edit="openModal(true, $event.index, $event.type)"
+        @edit="openModal(true, $event)"
     />
 </div>
 </template>
