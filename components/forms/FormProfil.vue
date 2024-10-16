@@ -124,7 +124,7 @@ export default {
       <div v-else-if="isDetailMode">Détails du profil</div>
       <div v-else>Créer un profil</div>
     </template>
-  <BForm class="form-vertical" role="form">
+  <BForm class="form-vertical px-3" role="form">
 
     <BRow>
         <BCol md="4" sm="4">
