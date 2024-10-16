@@ -17,10 +17,8 @@ export default {
       preventableModal: false,
       submitted: false,
       dataDetail: {},
-      titreDetail: "",
       detailModal: false,
       localModal: this.modal,
-      tableData,
       totalRows: 1,
       currentPage: 1,
       perPage: 5,
@@ -29,31 +27,10 @@ export default {
       filterOn: [],
       sortBy: "age",
       sortDesc: false,
-      libelle: "",
-      code: "",
-      departement: "",
-      isEditMode: false,
-      selectDepartement: "",
-      departementService: ''
+    
     };
   },
-  validations: {
-    libelleDepartement: {
-        required,
-      },
-    libelleService: {
-        required,
-      },
-    codeDepartement: {
-        required,
-      },
-    codeService: {
-        required,
-      },
-      selectDepartement: {
-        required,
-      },
-    },
+
   props: {
     fields: Array,
     title: String,
@@ -64,10 +41,32 @@ export default {
   },
   computed: {
     /**
+     * Dynamically generate filterOn based on fields
+     */
+     filterOn() {
+      // Return an array of keys from fields
+      return this.fields.map(field => field.key);
+    },
+
+    /**
      * Total no. of records
      */
     rows() {
-      return this.data.length;
+      return this.filteredData.length;
+    },
+
+    /**
+     * Filtered data based on search input
+     */
+     filteredData() {
+      if (this.filter) {
+        return this.data.filter(item =>
+          this.filterOn.some(key =>
+            String(item[key]).toLowerCase().includes(this.filter.toLowerCase())
+          )
+        );
+      }
+      return this.data;
     }
   },
   mounted() {
@@ -169,28 +168,26 @@ export default {
               <BCol sm="12" md="6">
                 <div id="tickets-table_filter" class="dataTables_filter text-md-end">
                   <label class="d-inline-flex align-items-center">
-                    <BFormInput placeholder="Rechercher" v-model="filter" type="search" class="form-control border border-black form-control-sm"></BFormInput>
+                    <BFormInput 
+                      placeholder="Rechercher" 
+                      v-model="filter" 
+                      type="search" 
+                      class="form-control border border-black form-control-sm">
+                    </BFormInput>
                   </label>
                 </div>
               </BCol>
             </BRow>
             <div class="table-responsive mb-0">
-              <BTable :items="data" 
+              <BTable 
+                  :items="filteredData" 
                   :fields="fields" 
                   responsive="sm" 
                   :per-page="perPage" 
-                  :current-page="currentPage" 
-                  :filter="filter" 
-                  :filter-included-fields="filterOn" 
+                  :current-page="currentPage"  
                   @filtered="onFiltered"
               >
               <template #cell(Statut)="row">
-                  <!-- <div class="d-flex gap-2">
-                    <div :class="row.item.Statut ? 'text-success' : 'text-danger'">
-                      <i class="mdi mdi-circle align-middle font-size-10 ms-1" ></i>
-                    </div>
-                    
-                  </div> -->
                   <span v-if="row.item.Statut" class="badge rounded-pill text-bg-success">activé</span>
                   <span v-if="!row.item.Statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
                   
