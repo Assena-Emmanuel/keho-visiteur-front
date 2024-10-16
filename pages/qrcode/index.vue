@@ -1,8 +1,7 @@
 <template>
-  <div class="qr-container">
-    <div class="camera-box">
-      <QrcodeStream @decode="onDecode" @init="onInit" />
-    </div>
+  <div>
+    <QrcodeStream @decode="onDecode" @init="onInit" />
+    <!-- Autres composants QR code si nécessaires -->
   </div>
 </template>
 
@@ -31,6 +30,12 @@ export default {
   }
 };
 </script>
+
+
+
+<style>
+/* Ajoute le style nécessaire si besoin */
+</style>
 
 <!-- <style>
 .qr-container {
