@@ -1,27 +1,36 @@
 <template>
-    <div>
-      <qrcode-stream @decode="onDecode" @init="onInit"></qrcode-stream>
-      <p>Résultat du QR Code : {{ decodedResult }}</p>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        decodedResult: ''
-      }
+  <div>
+    <QrcodeStream @decode="onDecode" @init="onInit" />
+    <!-- Autres composants QR code si nécessaires -->
+  </div>
+</template>
+
+<script>
+import { QrcodeStream, QrcodeDropZone, QrcodeCapture } from 'vue-qrcode-reader';
+
+export default {
+  components: {
+    QrcodeStream,
+    QrcodeDropZone,
+    QrcodeCapture,
+  },
+  methods: {
+    onDecode(result) {
+      console.log(result);
     },
-    methods: {
-      onDecode(result) {
-        this.decodedResult = result
-      },
-      onInit(promise) {
-        promise.catch(error => {
-          console.error(error)
-          alert('Impossible d’accéder à la caméra.')
+    onInit(promise) {
+      promise
+        .then(() => {
+          console.log('Successfully initialized!');
         })
-      }
+        .catch(error => {
+          console.error(error);
+        });
     }
   }
-  </script>
+};
+</script>
+
+<style>
+/* Ajoute le style nécessaire si besoin */
+</style>
