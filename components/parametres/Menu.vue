@@ -16,7 +16,7 @@ export default{
         {
             "Target": "Homepage",
             "Libelle": "Accueil",
-            "Type": "Page",
+            "Type": "Paramètres",
             "Icon": "home",
             "Position": 1,
             "Name": "Home",
@@ -25,7 +25,7 @@ export default{
         {
             "Target": "Settings",
             "Libelle": "Paramètres",
-            "Type": "Page",
+            "Type": "SideBar",
             "Icon": "settings",
             "Position": 2,
             "Name": "Settings",
@@ -34,7 +34,7 @@ export default{
         {
             "Target": "Profile",
             "Libelle": "Profil",
-            "Type": "Page",
+            "Type": "Paramètres",
             "Icon": "user",
             "Position": 3,
             "Name": "Profile",

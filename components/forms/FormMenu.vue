@@ -146,21 +146,11 @@ export default{
         <BCol md="6">
             <div class="mb-3">
                 <label for="type" style="font-size: 12px;">Type </label>
-                <div>
-                    <input 
-                    v-model="type" 
-                    id="type" 
-                    class="form-control form-control-sm"  
-                    type="text"
-                    :class="{
-                    'is-invalid': submitted && v$.type.$error,
-                    'border border-danger': submitted && v$.type.$error,
-                    'border border-secondary': !(submitted && v$.type.$error)
-                    }">
-                    <div v-if="submitted && v$.type.$error" class="invalid-feedback">
-                    <span v-if="v$.type.required.$invalid" class="font-size-12">champ obligatoire
-                    </span>
-                    </div>
+                <div class="input-group">
+                    <select v-model="type" id="type" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example">
+                        <option value="PARA">PARAMETRES</option>
+                        <option value="SIDE">SIDEBAR</option>
+                    </select>
                 </div>
             </div>
         </BCol>

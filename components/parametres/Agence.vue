@@ -13,35 +13,23 @@ export default{
         selectedIndex: null,  // Index de l'élément sélectionné pour la modification
         data: [
   {
-    "Slug": "homepage",
     "Code": "HP001",
     "Libellé": "Accueil",
-    "Catégorie": "Page",
-    "Position": 1,
     "Statut": "Actif"
   },
   {
-    "Slug": "about-us",
     "Code": "AB002",
     "Libellé": "À propos",
-    "Catégorie": "Page",
-    "Position": 2,
     "Statut": "Actif"
   },
   {
-    "Slug": "contact",
     "Code": "CT003",
     "Libellé": "Contact",
-    "Catégorie": "Page",
-    "Position": 3,
     "Statut": "Inactif"
   },
   {
-    "Slug": "services",
     "Code": "SV004",
     "Libellé": "Services",
-    "Catégorie": "Section",
-    "Position": 4,
     "Statut": "Actif"
   },
   {
@@ -53,21 +41,15 @@ export default{
     "Statut": "Inactif"
   },
   {
-    "Slug": "careers",
     "Code": "CR006",
     "Libellé": "Carrières",
-    "Catégorie": "Section",
-    "Position": 6,
     "Statut": "Actif"
   }
 ]
 ,
         fields: [
-            {key: "Slug"},
             {key: "Code"},
             {key: "Libellé"},
-            {key: "Catégorie"},
-            {key: "Position"},
             {key: "Statut"},
             {key: "Actions"},
         ]

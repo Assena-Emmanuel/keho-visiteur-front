@@ -12,7 +12,6 @@ export default{
         libelle: "",
         code: "",
         libelle: "",
-        position: "",
         statut: "ACTIVE",
         submitted: false,
         isEditMode: false
@@ -69,26 +68,6 @@ export default{
   <BForm class="form-vertical px-3" role="form">
     <BRow>
       <BCol md="6" class="mb-2">
-      <div class="mb-2">
-        <label for="slug" style="font-size: 12px;">Slug</label>
-        <input 
-          v-model="libelle" 
-          type="text" class="form-control form-control-sm" 
-          id="slug" 
-          placeholder="" 
-          :class="{
-          'is-invalid': submitted && v$.libelle.$error,
-          'border border-danger': submitted && v$.libelle.$error,
-          'border border-dark': !(submitted && v$.libelle.$error)
-          }"
-        />
-        <div v-if="submitted && v$.libelle.$error" class="invalid-feedback">
-            <span v-if="v$.libelle.required.$invalid" class="font-size-12">champ obligatoire
-            </span>
-          </div>
-      </div>
-      </BCol>
-      <BCol md="6" class="mb-2">
         <div class="mb-2">
           <label for="code" style="font-size: 12px;">Code </label>
           <div>
@@ -131,27 +110,7 @@ export default{
           </div>
         </div>
       </BCol>
-      <BCol md="6" class="mb-2">
-        <div class="mb-2">
-          <label for="position" style="font-size: 12px;">Position </label>
-          <div>
-            <input 
-              v-model="position" 
-              id="position" 
-              class="form-control form-control-sm"  
-              type="text"
-              :class="{
-              'is-invalid': submitted && v$.position.$error,
-              'border border-danger': submitted && v$.position.$error,
-              'border border-dark': !(submitted && v$.position.$error)
-            }">
-            <div v-if="submitted && v$.position.$error" class="invalid-feedback">
-              <span v-if="v$.position.required.$invalid" class="font-size-12">champ obligatoire
-              </span>
-            </div>
-          </div>
-        </div>
-      </BCol>
+
       <BCol md="6" class="mb-2">
         <div class="mb-2">
             <label for="statut" style="font-size: 12px; font-weight: bolder" >Statut</label>
@@ -164,28 +123,6 @@ export default{
 
                 </select>
             </div>
-        </div>
-      </BCol>
-
-      <BCol md="6" class="mb-2">
-        <div class="mb-2">
-          <label for="position" style="font-size: 12px;">Position </label>
-          <div>
-            <input 
-              v-model="position" 
-              id="position" 
-              class="form-control form-control-sm"  
-              type="text"
-              :class="{
-              'is-invalid': submitted && v$.position.$error,
-              'border border-danger': submitted && v$.position.$error,
-              'border border-dark': !(submitted && v$.position.$error)
-            }">
-            <div v-if="submitted && v$.position.$error" class="invalid-feedback">
-              <span v-if="v$.position.required.$invalid" class="font-size-12">champ obligatoire
-              </span>
-            </div>
-          </div>
         </div>
       </BCol>
 
