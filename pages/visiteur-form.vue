@@ -285,7 +285,7 @@
 
 @media (max-width: 576px) {
   #qr-topbar{
-    margin-top: 14em;
+    margin-top: 25em;
   }
 }
 
