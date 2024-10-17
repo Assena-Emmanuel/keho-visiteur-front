@@ -50,7 +50,8 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      auth: "fakebackend"
+      auth: "fakebackend",
+      API_URL: "https://keho-visitors.local/api"
     }
   },
 

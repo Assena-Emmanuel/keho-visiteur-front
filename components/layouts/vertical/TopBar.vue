@@ -89,7 +89,7 @@ export default {
           </BButton>
           <!-- <AppSearch /> -->
         </div>
-
+    
         <div class="d-flex gap-3">
           <LayoutsCommonParametreDropdown/>
           <Notifications />
