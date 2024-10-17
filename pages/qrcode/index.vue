@@ -1,23 +1,10 @@
 <template>
-  <!-- <div>
-    <p class="decode-result">
-      Last result: <b>{{ result }}</b>
-    </p>
-
-    <div>
-      <qrcode-stream
-        :constraints="selectedConstraints"
-        :track="trackFunctionSelected.value"
-        :formats="selectedBarcodeFormats"
-        @error="onError"
-        @detect="onDetect"
-        @camera-on="onCameraReady"
-      />
-    </div>
-  </div> -->
   <div class="qr-page">
     <div class="text-center instruction">
       Veuillez scanner le QR-Code en maintenant l'image au centre
+      <BAlert  variant="danger" v-if="error" v-model="dismissibleAlert" dismissible>
+        {{ error }}
+      </BAlert>
     </div>
     <div class="qr-container">
       <div class="camera-box">
@@ -44,13 +31,19 @@ definePageMeta({
 });
 
 const result = ref('')
+const dismissibleAlert = ref(true)
 
 function onDetect(detectedCodes) {
   console.log(detectedCodes)
   result.value = JSON.stringify(detectedCodes.map((code) => code.rawValue))
   if (result.value.length > 0) {
+    if(result.value.includes("keho-visiteur")){
       // Redirige vers le premier lien
       window.location.href = result.value.slice(2, -2)
+    }else{
+      error.value = "Veuillez scanner le bon QR Code"
+    }
+      
   }
 }
 
