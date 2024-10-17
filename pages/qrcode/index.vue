@@ -5,7 +5,7 @@
     </div>
     <div class="qr-container">
       <div class="camera-box">
-        <QrcodeStream @decode="onDecode" @init="onInit" />
+        <qrcode-stream ref="qrcodeStream" @detect="onDetect" @error="onError"></qrcode-stream>
       </div>
     </div>
   </div>
@@ -17,27 +17,62 @@ definePageMeta({
   layout: "utility"
 });
 export default {
+  data(){
+    return{
+      result: null,  // initialisé à null
+      error: null,   // initialisé à null
+    }
+  },
   components: {
     QrcodeStream,
     QrcodeDropZone,
     QrcodeCapture,
   },
   methods: {
-    onDecode(result) {
-      console.log(result);
+    paintBoundingBox(detectedCodes, ctx) {
+      for (const detectedCode of detectedCodes) {
+        const {
+          boundingBox: { x, y, width, height }
+        } = detectedCode;
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#007bff';
+        ctx.strokeRect(x, y, width, height);
+      }
     },
-    onInit(promise) {
-      promise
-        .then(() => {
-          console.log('Successfully initialized!');
-        })
-        .catch(error => {
-          console.error(error);
-        });
+    onError(err) {
+      this.error = `[${err.name}]: `;
+
+      if (err.name === 'NotAllowedError') {
+        this.error += 'you need to grant camera access permission';
+      } else if (err.name === 'NotFoundError') {
+        this.error += 'no camera on this device';
+      } else if (err.name === 'NotSupportedError') {
+        this.error += 'secure context required (HTTPS, localhost)';
+      } else if (err.name === 'NotReadableError') {
+        this.error += 'is the camera already in use?';
+      } else if (err.name === 'OverconstrainedError') {
+        this.error += 'installed cameras are not suitable';
+      } else if (err.name === 'StreamApiNotSupportedError') {
+        this.error += 'Stream API is not supported in this browser';
+      } else if (err.name === 'InsecureContextError') {
+        this.error += 'Camera access is only permitted in secure context. Use HTTPS or localhost rather than HTTP.';
+      } else {
+        this.error += err.message;
+      }
+    },
+    onDetect(detectedCodes) {
+      const canvas = this.$refs.qrcodeStream.$el.querySelector('canvas');
+      const ctx = canvas.getContext('2d');
+      this.paintBoundingBox(detectedCodes, ctx);
+      this.result = JSON.stringify(
+        detectedCodes.map(code => code.rawValue)
+      );
     }
   }
 };
 </script>
+
 
 <style scoped>
 .qr-page {

@@ -12,7 +12,7 @@
             <hr>
             <BForm class="form-vertical  px-3" role="form">
                 <BRow>
-                    <BCol md="6">
+                    <BCol md="4">
                         <div class="mb-3">
                         <label for="nom" class="fw-bold text-black" style="font-size: 12px;">Nom</label>
                         <input 
@@ -33,7 +33,7 @@
                         </div>
                     </BCol>
 
-                    <BCol md="6">
+                    <BCol md="4">
                         <div class="mb-3">
                             <label for="prenom" class="fw-bold text-black" style="font-size: 12px;">Prénoms </label>
                             <div>
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                     </BCol>
-                    <BCol md="6">
+                    <BCol md="4">
                         <div class="mb-3">
                             <label for="entreprise" class="fw-bold text-black" style="font-size: 12px;">Entreprise </label>
                             <div>
@@ -76,7 +76,7 @@
                         </div>
                     </BCol>
 
-                    <BCol md="6">
+                    <BCol md="4">
                         <div class="mb-3">
                             <label for="telephone" class="fw-bold text-black" style="font-size: 12px;">Téléphone </label>
                             <div>
@@ -98,9 +98,9 @@
                         </div>
                     </BCol>
 
-                    <BCol md="6">
+                    <BCol md="4">
                         <div class="mb-3">
-                            <label for="typePiece" class="fw-bold text-black" style="font-size: 12px;">Pièce </label>
+                            <label for="typePiece" class="fw-bold text-black" style="font-size: 12px;">Type de Pièce </label>
                             <div class="input-group">
                                 <select v-model="typePiece" id="typePiece" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example">
                                     <option value="CNI">Carte Nationale d'Identité (CNI)</option>
@@ -109,7 +109,7 @@
                             </div>
                         </div>
                     </BCol>
-                    <BCol md="6">
+                    <BCol md="4">
                         <div class="mb-3">
                             <label for="numPiece" class="fw-bold text-black" style="font-size: 12px;">N° Pièce </label>
                             <div>
@@ -131,7 +131,7 @@
                         </div>
                     </BCol>
 
-                    <BCol md="6">
+                    <BCol md="4">
                         <div class="mb-3">
                             <label for="visite" class="fw-bold text-black" style="font-size: 12px;">Visite </label>
                             <div>
@@ -152,6 +152,29 @@
                             </div>
                         </div>
                     </BCol>
+
+                    <BCol md="4">
+                        <div class="mb-3">
+                            <label for="codeVisite" class="fw-bold text-black" style="font-size: 12px;">Code Visite </label>
+                            <div>
+                                <input 
+                                v-model="codeVisite" 
+                                id="codeVisite" 
+                                class="form-control form-control-sm"  
+                                typePiece="text"
+                                :class="{
+                                'is-invalid': submitted && v$.codeVisite.$error,
+                                'border border-danger': submitted && v$.codeVisite.$error,
+                                'border border-secondary': !(submitted && v$.codeVisite.$error)
+                                }">
+                                <div v-if="submitted && v$.codeVisite.$error" class="invalid-feedback">
+                                <span v-if="v$.codeVisite.required.$invalid" class="font-size-12">champ obligatoire
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </BCol>
+
                     <BCol md="6">
                         <BCol md="2">
                             <BFormCheckbox
@@ -197,27 +220,7 @@
                     
                     
 
-                    <BCol md="6">
-                        <div class="mb-3">
-                            <label for="codeVisite" class="fw-bold text-black" style="font-size: 12px;">Code Visite </label>
-                            <div>
-                                <input 
-                                v-model="codeVisite" 
-                                id="codeVisite" 
-                                class="form-control form-control-sm"  
-                                typePiece="text"
-                                :class="{
-                                'is-invalid': submitted && v$.codeVisite.$error,
-                                'border border-danger': submitted && v$.codeVisite.$error,
-                                'border border-secondary': !(submitted && v$.codeVisite.$error)
-                                }">
-                                <div v-if="submitted && v$.codeVisite.$error" class="invalid-feedback">
-                                <span v-if="v$.codeVisite.required.$invalid" class="font-size-12">champ obligatoire
-                                </span>
-                                </div>
-                            </div>
-                        </div>
-                    </BCol>
+                    
                     <!-- <BCol md="6">
                         <div class="mb-3">
                             <PhotoCamera @photo-captured="handlePhoto" />
