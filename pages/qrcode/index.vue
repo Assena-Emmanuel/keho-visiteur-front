@@ -58,15 +58,15 @@ export default {
   }
 
   @media (max-width: 768px) {
-    font-size: 2.5rem;
+    font-size: 1.5rem;
   }
 
   @media (max-width: 480px) {
-    font-size: 2rem;
+    font-size: 25px;
   }
 
   @media (max-width: 320px) {
-    font-size: 1.3rem;
+    font-size: 25px;
 }
 }
 
@@ -83,6 +83,21 @@ export default {
   border: 4px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(172, 171, 171, 0.1); /* Slight shadow for depth */
+
+  @media (max-width: 768px) {
+    width: 220px;
+    height: 220px;
+  }
+
+  @media (max-width: 480px) {
+    width: 200px;
+    height: 200px;
+  }
+
+  @media (max-width: 320px) {
+    width: 200px;
+    height: 200px;
+}
 }
 
 
