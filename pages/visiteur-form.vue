@@ -285,13 +285,13 @@
 
 @media (max-width: 576px) {
   #qr-topbar{
-    margin-top: 22em;
+    margin-top: 4em;
   }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
   #qr-topbar{
-    margin-top: 6em;
+    margin-top: 4em;
   }
 }
 

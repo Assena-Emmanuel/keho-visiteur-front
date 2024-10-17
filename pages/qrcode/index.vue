@@ -41,14 +41,14 @@ export default {
 
 <style scoped>
 .qr-page {
-  height: 100vh;
   display: flex;
+  height: 100vh;
   flex-direction: column;
   
 }
 
 .instruction {
-  margin-top: 4em;
+  margin-top: 3em;
   font-size: 2.5rem;
   color: white;
 
@@ -71,38 +71,36 @@ export default {
 
 .qr-container {
   display: flex;
-  position: relative;
+  justify-content: center;
 }
 
 .camera-box {
-  position: absolute;
-  top: 10em;
   width: 300px;
   height: 300px;
   display: flex;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
   border: 4px solid #ccc;
+  margin-top: 3em;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(172, 171, 171, 0.1); /* Slight shadow for depth */
 
   @media (max-width: 768px) {
     width: 220px;
     height: 220px;
+    margin-top: 4em;
   }
 
   @media (max-width: 480px) {
     width: 200px;
     height: 200px;
-    top: 8em;
-    
+    margin-top: 6em;
   }
 
-  @media (max-width: 320px) {
+  /* @media (max-width: 320px) {
     width: 200px;
     height: 200px;
-    top: 7em;
-}
+    margin-top: 3em;
+} */
 }
 
 

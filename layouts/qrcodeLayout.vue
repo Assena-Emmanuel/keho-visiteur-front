@@ -1,11 +1,14 @@
 <script>
+import TopBarQrCode from '~/components/layouts/vertical/TopBarQrCode.vue';
 export default {
   mounted() {
     document.body.classList.add("authentication-bg");
   },
+  components: {
+    TopBarQrCode
+  }
 };
 
-import TopBarQrCode from '~/components/layouts/vertical/TopBarQrCode.vue';
 </script>
 
 <template>
@@ -22,9 +25,13 @@ import TopBarQrCode from '~/components/layouts/vertical/TopBarQrCode.vue';
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-image: url('/images/bg-qrcode.png'); 
+  height: 100%;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/images/bg-qrcode.png');
   background-position: center;
 }
+
+
+
+
 
 </style>

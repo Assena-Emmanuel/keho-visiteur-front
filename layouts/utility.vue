@@ -24,8 +24,7 @@ export default {
 .qr-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
+  height: 100%;
   background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/images/bg-qrcode.png');
   background-position: center;
 }
