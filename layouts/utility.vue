@@ -30,4 +30,8 @@ export default {
   background-position: center;
 }
 
+
+
+
+
 </style>

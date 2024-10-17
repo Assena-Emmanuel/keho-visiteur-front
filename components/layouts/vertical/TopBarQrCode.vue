@@ -22,12 +22,21 @@ export default {
         <div class="d-flex justify-content-end gap-3">
           <div class="navbar-brand-box-qr">
             <div>
-              <span class="logo-sm d-md-none d-sm-block">
-                <img src="/images/total.jpg" alt="logo-sm" height="32" />
-              </span>
-              <span class="logo-lg d-md-block d-sm-none">
-                <img src="/images/total.jpg" alt="logo-dark" height="70" />
-              </span>
+                <span class="logo-sm d-block d-md-none">
+                    <!-- Logo pour petit écran (mobile) -->
+                    <img src="/images/total.jpg" alt="logo-sm" height="22" />
+                </span>
+
+                <span class="logo-md d-none d-md-block d-lg-none">
+                    <!-- Logo pour écran moyen (tablette) -->
+                    <img src="/images/total.jpg" alt="logo-md" height="50" />
+                </span>
+
+                <span class="logo-lg d-none d-lg-block">
+                    <!-- Logo pour grand écran (ordinateur) -->
+                    <img src="/images/total.jpg" alt="logo-lg" height="70" />
+                </span>
+
             </div>
           </div>
         </div>

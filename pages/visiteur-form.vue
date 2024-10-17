@@ -1,9 +1,10 @@
 <template>
     <BCard
         no-body 
-        class="mx-5"
+        class="mx-3"
         title="Je m'identifie"
         style="background-color: rgba(128, 128, 128, 0.9);"
+        id="qr-topbar"
     >
         
         <BCardBody>
@@ -217,8 +218,13 @@
                             </div>
                         </div>
                     </BCol>
+                    <!-- <BCol md="6">
+                        <div class="mb-3">
+                            <PhotoCamera @photo-captured="handlePhoto" />
+                        </div>
+                    </BCol> -->
                     
-                    
+            
                 </BRow>
 
                 <div class="mt-4 d-flex justify-content-center">
@@ -237,7 +243,11 @@
         layout: "utility"
     });
 
+    import PhotoCamera from '~/components/camera/PhotoCamera.vue';
     export default {
+        components: {
+            PhotoCamera
+        },
         data(){
             return{
                 nom: "",
@@ -257,8 +267,10 @@
             }
         },
         methods: {
-        
-        }
+            handlePhoto(photo) {
+                this.form.photo = photo;
+            },
+        },
     };
 
 </script>
@@ -266,6 +278,25 @@
 <style>
 .bg-card {
     background-color: rgba(128, 128, 128, 0.5); /* Gris avec 50% de transparence */
+}
+#qr-topbar{
+    margin-top: 8em;
+  }
+
+@media (max-width: 576px) {
+  #qr-topbar{
+    margin-top: 14em;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  #qr-topbar{
+    margin-top: 6em;
+  }
+}
+
+@media (min-width: 992px) {
+ 
 }
 
 </style>
