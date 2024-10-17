@@ -42,7 +42,6 @@ export default {
 <style scoped>
 .qr-page {
   height: 100vh;
-  position: relative;
   display: flex;
   flex-direction: column;
   
@@ -72,9 +71,13 @@ export default {
 
 .qr-container {
   display: flex;
+  background-color: aqua;
+  position: relative;
 }
 
 .camera-box {
+  position: absolute;
+  top: 10em;
   width: 300px;
   height: 300px;
   display: flex;
@@ -92,6 +95,7 @@ export default {
   @media (max-width: 480px) {
     width: 200px;
     height: 200px;
+    
   }
 
   @media (max-width: 320px) {
