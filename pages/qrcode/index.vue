@@ -42,9 +42,9 @@ function onDetect(detectedCodes) {
       window.location.href = result.value.slice(2, -2)
     }else{
       error.value = "Veuillez scanner le bon QR Code"
-    }
-      
+    }  
   }
+  error.value = "Aucune donnée trouvée"
 }
 
 /*** select camera ***/
