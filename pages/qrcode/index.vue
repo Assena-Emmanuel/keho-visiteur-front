@@ -71,7 +71,6 @@ export default {
 
 .qr-container {
   display: flex;
-  background-color: aqua;
   position: relative;
 }
 
@@ -95,12 +94,14 @@ export default {
   @media (max-width: 480px) {
     width: 200px;
     height: 200px;
+    top: 8em;
     
   }
 
   @media (max-width: 320px) {
     width: 200px;
     height: 200px;
+    top: 7em;
 }
 }
 
