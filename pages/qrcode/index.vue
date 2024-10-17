@@ -40,7 +40,7 @@ export default {
 
         // Configuration du style de la bordure
         ctx.lineWidth = 2;
-        ctx.strokeStyle = '#007bff'; // Couleur de la bordure
+        ctx.strokeStyle = '#E4080A'; // Couleur de la bordure
         ctx.strokeRect(x, y, width, height); // Dessiner le rectangle
       }
     },

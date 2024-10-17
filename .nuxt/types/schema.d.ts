@@ -268,6 +268,8 @@ declare module 'nuxt/schema' {
   interface PublicRuntimeConfig {
    auth: string,
 
+   API_URL: string,
+
    mdc: {
       components: {
          prose: boolean,
