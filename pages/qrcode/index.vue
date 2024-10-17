@@ -52,6 +52,22 @@ export default {
   margin-top: 4em;
   font-size: 2.5rem;
   color: white;
+
+  @media (max-width: 1200px) {
+    font-size: 2.5rem; 
+  }
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 2rem;
+  }
+
+  @media (max-width: 320px) {
+    font-size: 1.3rem;
+}
 }
 
 .qr-container {
@@ -64,8 +80,12 @@ export default {
   display: flex;
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+  border: 4px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+  box-shadow: 0 4px 8px rgba(172, 171, 171, 0.1); /* Slight shadow for depth */
 }
+
+
+
 
 </style>
