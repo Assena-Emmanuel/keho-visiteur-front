@@ -1,14 +1,11 @@
 <script>
-import TopBarQrCode from '~/components/layouts/vertical/TopBarQrCode.vue';
 export default {
   mounted() {
     document.body.classList.add("authentication-bg");
   },
-  components: {
-    TopBarQrCode
-  }
 };
 
+import TopBarQrCode from '~/components/layouts/vertical/TopBarQrCode.vue';
 </script>
 
 <template>

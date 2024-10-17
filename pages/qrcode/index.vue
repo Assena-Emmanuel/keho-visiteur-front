@@ -8,6 +8,10 @@
 <script>
 import { QrcodeStream, QrcodeDropZone, QrcodeCapture } from 'vue-qrcode-reader';
 
+definePageMeta({
+  layout: "utility"
+});
+
 export default {
   components: {
     QrcodeStream,
