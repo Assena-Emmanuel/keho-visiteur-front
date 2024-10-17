@@ -5,7 +5,7 @@
     </div>
     <div class="qr-container">
       <div class="camera-box">
-        <QrcodeStream  @detect =" onDetect " />
+        <QrcodeStream ref="qrcodeStream" @detect="onDetect" />
       </div>
     </div>
   </div>
@@ -13,15 +13,17 @@
 
 <script>
 import { QrcodeStream, QrcodeDropZone, QrcodeCapture } from 'vue-qrcode-reader';
+
 definePageMeta({
   layout: "utility"
 });
+
 export default {
-  data(){
-    return{
+  data() {
+    return {
       result: null,  // initialisé à null
       error: null,   // initialisé à null
-    }
+    };
   },
   components: {
     QrcodeStream,
@@ -29,50 +31,40 @@ export default {
     QrcodeCapture,
   },
   methods: {
+    // Méthode pour dessiner les bordures
     paintBoundingBox(detectedCodes, ctx) {
       for (const detectedCode of detectedCodes) {
         const {
           boundingBox: { x, y, width, height }
         } = detectedCode;
 
+        // Configuration du style de la bordure
         ctx.lineWidth = 2;
-        ctx.strokeStyle = '#007bff';
-        ctx.strokeRect(x, y, width, height);
+        ctx.strokeStyle = '#007bff'; // Couleur de la bordure
+        ctx.strokeRect(x, y, width, height); // Dessiner le rectangle
       }
     },
-    // onError(err) {
-    //   this.error = `[${err.name}]: `;
 
-    //   if (err.name === 'NotAllowedError') {
-    //     this.error += 'you need to grant camera access permission';
-    //   } else if (err.name === 'NotFoundError') {
-    //     this.error += 'no camera on this device';
-    //   } else if (err.name === 'NotSupportedError') {
-    //     this.error += 'secure context required (HTTPS, localhost)';
-    //   } else if (err.name === 'NotReadableError') {
-    //     this.error += 'is the camera already in use?';
-    //   } else if (err.name === 'OverconstrainedError') {
-    //     this.error += 'installed cameras are not suitable';
-    //   } else if (err.name === 'StreamApiNotSupportedError') {
-    //     this.error += 'Stream API is not supported in this browser';
-    //   } else if (err.name === 'InsecureContextError') {
-    //     this.error += 'Camera access is only permitted in secure context. Use HTTPS or localhost rather than HTTP.';
-    //   } else {
-    //     this.error += err.message;
-    //   }
-    // },
     onDetect(detectedCodes) {
-      alert()
+      // Accéder au canvas de l'élément qrcodeStream
       const canvas = this.$refs.qrcodeStream.$el.querySelector('canvas');
-      const ctx = canvas.getContext('2d');
-      this.paintBoundingBox(detectedCodes, ctx);
-      this.result = JSON.stringify(
-        detectedCodes.map(code => code.rawValue)
-      );
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Effacer le canvas pour éviter que les bordures précédentes restent affichées
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          // Dessiner les bordures autour des QR codes détectés
+          this.paintBoundingBox(detectedCodes, ctx);
+        }
+      }
+      
+      // Pour tester : afficher les codes détectés dans la console
+      console.log(detectedCodes);
     }
   }
 };
 </script>
+
 
 
 <style scoped>
