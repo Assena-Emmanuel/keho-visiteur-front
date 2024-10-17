@@ -13,7 +13,9 @@
 
 <script>
 import { QrcodeStream, QrcodeDropZone, QrcodeCapture } from 'vue-qrcode-reader';
-
+definePageMeta({
+  layout: "utility"
+});
 export default {
   components: {
     QrcodeStream,
@@ -47,17 +49,13 @@ export default {
 }
 
 .instruction {
-  position: absolute;
-  top: 20em;
-  font-size: 1.2rem;
-  color: rgb(219, 17, 17);
-  margin-bottom: 20px;
+  margin-top: 4em;
+  font-size: 2.5rem;
+  color: white;
 }
 
 .qr-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .camera-box {
@@ -65,7 +63,6 @@ export default {
   height: 300px;
   display: flex;
   justify-content: center;
-  align-items: center;
   background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
