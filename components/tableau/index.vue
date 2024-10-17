@@ -160,7 +160,7 @@ export default {
               <BCol sm="12" md="6">
                 <div id="tickets-table_filter" class="dataTables_filter text-md-end">
                   <label class="d-inline-flex align-items-center">
-                    Search:
+                    Recherche:
                     <BFormInput v-model="filter" type="search" class="form-control border border-secondary form-control-sm ms-2"></BFormInput>
                   </label>
                 </div>

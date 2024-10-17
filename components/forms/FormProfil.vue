@@ -54,12 +54,46 @@ export default {
     selectedIndex: Number,
     formData: Object,
   },
+
+  computed: {
+    /**
+     * Dynamically generate filterOn based on fields
+     */
+    filterOn() {
+      // Return an array of keys from fields
+      return this.fields.map(field => field.key);
+    },
+
+    /**
+     * Total no. of records
+     */
+    rows() {
+      return this.filteredData.length;
+    },
+
+    /**
+     * Filtered data based on search input
+     */
+    filteredData() {
+      if (this.filter) {
+        return this.items.filter(item =>
+          this.filterOn.some(key =>
+            String(item[key]).toLowerCase().includes(this.filter.toLowerCase())
+          )
+        );
+      }
+      return this.items;
+    }
+  },
+
   mounted() {
     this.totalRows = this.items.length;
   },
   methods: {
     onFiltered(filteredItems) {
+      // Update totalRows and reset to first page after filtering
       this.totalRows = filteredItems.length;
+      this.currentPage = 1;
     },
     onSaveprofil() {
       this.submitted = true;
@@ -209,12 +243,14 @@ export default {
     </BRow>
     <div class="table-responsive mb-0 my-3">
     <BTable
-      :items="items"
-      :fields="fields"
-      responsive="sm"
-      :per-page="perPage"
-      :current-page="currentPage"
-      @filtered="onFiltered"
+      :items="filteredData" 
+      :fields="fields" 
+      responsive="sm" 
+      :per-page="perPage" 
+      :current-page="currentPage" 
+      v-model:sort-by.sync="sortBy" 
+      v-model:sort-desc.sync="sortDesc" 
+      @filtered="onFiltered" 
     >
 
         <template #cell(voir)="row">

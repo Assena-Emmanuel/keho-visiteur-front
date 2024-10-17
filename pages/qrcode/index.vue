@@ -1,18 +1,18 @@
 <template>
-  <div class="qr-container">
-    <div class="camera-box">
-      <QrcodeStream @decode="onDecode" @init="onInit" />
+  <div class="qr-page">
+    <div class="text-center instruction">
+      Veuillez scanner le QR-Code en maintenant l'image au centre
     </div>
-    <!-- Autres composants QR code si nécessaires -->
+    <div class="qr-container">
+      <div class="camera-box">
+        <QrcodeStream @decode="onDecode" @init="onInit" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { QrcodeStream, QrcodeDropZone, QrcodeCapture } from 'vue-qrcode-reader';
-
-definePageMeta({
-  layout: "utility"
-});
 
 export default {
   components: {
@@ -38,24 +38,37 @@ export default {
 </script>
 
 <style scoped>
-/* Container for the QR code scanner */
+.qr-page {
+  height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.instruction {
+  position: absolute;
+  top: 20em;
+  font-size: 1.2rem;
+  color: rgb(219, 17, 17);
+  margin-bottom: 20px;
+}
+
 .qr-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-position: center;
 }
 
-/* Styling the camera box where the QR scanner appears */
 .camera-box {
   width: 300px;
   height: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.8); /* Couleur de fond semi-transparente */
+  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre pour effet 3D */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
 }
+
 </style>

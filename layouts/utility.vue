@@ -26,7 +26,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-image: url('/images/bg-qrcode.png'); 
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/images/bg-qrcode.png');
   background-position: center;
 }
 

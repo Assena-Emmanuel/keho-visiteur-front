@@ -1,9 +1,9 @@
 <template>
     <BCard
         no-body 
-        class="mx-3"
+        class="mx-3 border-0"
         title="Je m'identifie"
-        style="background-color: rgba(128, 128, 128, 0.9);"
+        style="background-color: rgba(204, 200, 200, 0.5);"
         id="qr-topbar"
     >
         
@@ -277,7 +277,7 @@
 
 <style>
 .bg-card {
-    background-color: rgba(128, 128, 128, 0.5); /* Gris avec 50% de transparence */
+    background-color: rgba(204, 200, 200, 0.5); /* Gris avec 50% de transparence */
 }
 #qr-topbar{
     margin-top: 8em;
@@ -285,7 +285,7 @@
 
 @media (max-width: 576px) {
   #qr-topbar{
-    margin-top: 25em;
+    margin-top: 22em;
   }
 }
 
