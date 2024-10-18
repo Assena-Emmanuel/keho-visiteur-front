@@ -17,7 +17,7 @@
                         <label for="nom" class="fw-bold text-black" style="font-size: 12px;">Nom</label>
                         <input 
                             v-model="nom" 
-                            typePiece="text" class="form-control form-control-sm" 
+                            type="text" class="form-control form-control-sm" 
                             id="departement" 
                             placeholder="" 
                             :class="{
@@ -41,7 +41,7 @@
                                 v-model="prenom" 
                                 id="prenom" 
                                 class="form-control form-control-sm"  
-                                typePiece="text"
+                                type="text"
                                 :class="{
                                 'is-invalid': submitted && v$.prenom.$error,
                                 'border border-danger': submitted && v$.prenom.$error,
@@ -62,7 +62,7 @@
                                 v-model="entreprise" 
                                 id="entreprise" 
                                 class="form-control form-control-sm"  
-                                typePiece="text"
+                                type="text"
                                 :class="{
                                 'is-invalid': submitted && v$.entreprise.$error,
                                 'border border-danger': submitted && v$.entreprise.$error,
@@ -84,7 +84,9 @@
                                 v-model="telephone" 
                                 id="telephone" 
                                 class="form-control form-control-sm"  
-                                typePiece="text"
+                                type="tel"
+                                maxlength="10" 
+                                @input="telephone = $event.target.value.replace(/\D/g, '')" 
                                 :class="{
                                 'is-invalid': submitted && v$.telephone.$error,
                                 'border border-danger': submitted && v$.telephone.$error,
@@ -103,6 +105,7 @@
                             <label for="typePiece" class="fw-bold text-black" style="font-size: 12px;">Type de Pièce </label>
                             <div class="input-group">
                                 <select v-model="typePiece" id="typePiece" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example">
+                                    <option value="">SÉLECTIONNER LE TYPE DE PIÈCE...</option>
                                     <option value="CNI">Carte Nationale d'Identité (CNI)</option>
                                     <option value="PASSPORT">PASSPORT</option>
                                 </select>
@@ -133,21 +136,26 @@
 
                     <BCol md="4">
                         <div class="mb-3">
-                            <label for="visite" class="fw-bold text-black" style="font-size: 12px;">Visite </label>
-                            <div>
-                                <input 
-                                v-model="visite" 
-                                id="visite" 
-                                class="form-control form-control-sm"  
-                                typePiece="text"
-                                :class="{
-                                'is-invalid': submitted && v$.visite.$error,
-                                'border border-danger': submitted && v$.visite.$error,
-                                'border border-secondary': !(submitted && v$.visite.$error)
-                                }">
+                            <label for="visite" class="fw-bold text-black" style="font-size: 12px;">Type de Visite </label>
+                            <div class="input-group">
+                                <select 
+                                    v-model="typePiece" 
+                                    id="visite" 
+                                    class="form-select form-select-sm border border-secondary rounded-2" 
+                                    aria-label="Default select example"
+                                    :class="{
+                                    'is-invalid': submitted && v$.visite.$error,
+                                    'border border-danger': submitted && v$.visite.$error,
+                                    'border border-secondary': !(submitted && v$.visite.$error)
+                                }"
+                                >
+                                    <option value="">SÉLECTIONNER LE TYPE DE VISITE...</option>
+                                    <option value="RDV">SUR RENDEZ-VOUS</option>
+                                    <option value="INOPINEE">INOPINÉE</option>
+                                </select>
                                 <div v-if="submitted && v$.visite.$error" class="invalid-feedback">
-                                <span v-if="v$.visite.required.$invalid" class="font-size-12">champ obligatoire
-                                </span>
+                                    <span v-if="v$.visite.required.$invalid" class="font-size-12">champ obligatoire
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -155,7 +163,7 @@
 
                     <BCol md="4">
                         <div class="mb-3">
-                            <label for="codeVisite" class="fw-bold text-black" style="font-size: 12px;">Code Visite </label>
+                            <label for="codeVisite" class="fw-bold text-black" style="font-size: 12px;">Code de Visite </label>
                             <div>
                                 <input 
                                 v-model="codeVisite" 
@@ -175,22 +183,8 @@
                         </div>
                     </BCol>
 
-                    <BCol md="6">
-                        <BCol md="2">
-                            <BFormCheckbox
-                                id="chefEquipe"
-                                v-model="chefEquipe"
-                                name="chefEquipe"
-                                value="true"
-                                unchecked-value="false"
-                                class="border border-secondary"
-                            
-                            >
-                                <label for="chefEquipe" class="fw-bold text-black">Chef d'Equipe</label>
-                            </BFormCheckbox>
-                        </BCol>
-                        <BCol md="2">
-                            <BFormCheckbox
+                    <BCol md="4">
+                        <BFormCheckbox
                                 id="delegation"
                                 v-model="delegation"
                                 name="delegation"
@@ -198,24 +192,59 @@
                                 unchecked-value="false"
                                 class="border border-secondary"
                             >
-                                
-                                <label for="delegation" class="fw-bold text-black">Délégation</label>
-                            </BFormCheckbox>
-                        </BCol>
-                        <BCol md="2">
-                            <BFormCheckbox
-                                id="vehicule"
-                                v-model="vehicule"
-                                name="vehicule"
-                                value="true"
-                                unchecked-value="false"
-                                class="border border-secondary"
-                                
-                            >
-                                
-                                <label for="vehicule" class="fw-bold text-black">Véhicule</label>
-                            </BFormCheckbox>
-                        </BCol>
+                            <label for="delegation" class="fw-bold text-black">Délégation</label>
+                        </BFormCheckbox>
+                    </BCol>
+                    <BCol md="4">
+                        <BFormCheckbox
+                            id="chefEquipe"
+                            v-model="chefEquipe"
+                            name="chefEquipe"
+                            value="true"
+                            unchecked-value="false"
+                            class="border border-secondary"
+                        
+                        >
+                            <label for="chefEquipe" class="fw-bold text-black">Chef d'Equipe</label>
+                        </BFormCheckbox>
+                    </BCol>
+                    <BCol md="4">
+                        <BRow>
+                            <BCol>
+                                <BFormCheckbox
+                                    id="vehicule"
+                                    v-model="vehicule"
+                                    name="vehicule"
+                                    unchecked-value="false"
+                                    class="border border-secondary"
+                                    
+                                >
+                                    <label for="vehicule" class="fw-bold text-black">Véhicule </label>
+                                </BFormCheckbox>
+                            </BCol>
+                            <BCol v-if="vehicule" md="12">
+                                <div  class="mb-3">
+                                    <label for="immatricule" class="fw-bold text-black" style="font-size: 12px;">Immatricule</label>
+                                    <div>
+                                        <input 
+                                        v-model="immatricule" 
+                                        id="immatricule" 
+                                        class="form-control form-control-sm"  
+                                        type="text"
+                                        placeholder="IMMATRICULATION DU VÉHICULE"
+                                        :class="{
+                                        'is-invalid': submitted && v$.immatricule.$error,
+                                        'border border-danger': submitted && v$.immatricule.$error,
+                                        'border border-secondary': !(submitted && v$.immatricule.$error)
+                                        }">
+                                        <div v-if="submitted && v$.immatricule.$error" class="invalid-feedback">
+                                        <span v-if="v$.immatricule.required.$invalid" class="font-size-12">champ obligatoire
+                                        </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </BCol>
+                        </BRow>
                     </BCol>
                     
                     
