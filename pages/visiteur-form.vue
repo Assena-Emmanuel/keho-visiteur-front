@@ -184,29 +184,33 @@
                     </BCol>
 
                     <BCol md="4">
-                        <BFormCheckbox
-                                id="delegation"
-                                v-model="delegation"
-                                name="delegation"
-                                value="true"
-                                unchecked-value="false"
-                                class="border border-secondary"
-                            >
-                            <label for="delegation" class="fw-bold text-black">Délégation</label>
-                        </BFormCheckbox>
-                    </BCol>
-                    <BCol md="4">
-                        <BFormCheckbox
-                            id="chefEquipe"
-                            v-model="chefEquipe"
-                            name="chefEquipe"
-                            value="true"
-                            unchecked-value="false"
-                            class="border border-secondary"
-                        
-                        >
-                            <label for="chefEquipe" class="fw-bold text-black">Chef d'Equipe</label>
-                        </BFormCheckbox>
+                        <BRow>
+                            <BCol>
+                                <BFormCheckbox
+                                    id="delegation"
+                                    v-model="delegation"
+                                    name="delegation"
+                                    value="true"
+                                    unchecked-value="false"
+                                    class="border border-secondary"
+                                >
+                                    <label for="delegation" class="fw-bold text-black">Délégation</label>
+                                </BFormCheckbox>
+                            </BCol>
+                            <BCol md="4" v-if="delegation">
+                                <BFormCheckbox
+                                    id="chefEquipe"
+                                    v-model="chefEquipe"
+                                    name="chefEquipe"
+                                    value="true"
+                                    unchecked-value="false"
+                                    class="border border-secondary"
+                                
+                                >
+                                    <label for="chefEquipe" class="fw-bold text-black">Chef d'Equipe</label>
+                                </BFormCheckbox>
+                            </BCol>
+                        </BRow>
                     </BCol>
                     <BCol md="4">
                         <BRow>

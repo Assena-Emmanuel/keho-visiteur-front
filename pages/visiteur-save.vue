@@ -11,11 +11,11 @@
             
             <div class="d-flex justify-content-center">
                 <div>
-                    <img src="/images/total.jpg" alt="logo-light" height="70" />
+                    <img src="/images/total.jpg" alt="logo-light" height="150" />
                 </div>
             </div>
-            <div class="text-center" style="margin: 3em 0 4em 0;">
-                <h5>Bienvenue chez nous!</h5>
+            <div class="text-center text-secondary" style="margin: 2em 0 5em 0;">
+                <h3 class="text-secondary">Bienvenue chez nous!</h3>
                 <div style="margin-top: 3em;">
                     <p>Veuillez patienter, <strong>{{ nomVisite }} </strong> <br>viendra vous chercher sous peu.</p>
                 </div>
@@ -79,25 +79,3 @@
 
 </style>
 
-  <!-- <style>
-  .qr-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-image: url('/path/to/your/background-image.jpg'); 
-    background-position: center;
-  }
-  
-  
-  .camera-box {
-    width: 300px;
-    height: 300px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.8); 
-    border-radius: 8px;
-  }
-  </style> -->
-  
