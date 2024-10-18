@@ -58,7 +58,8 @@
 }
 
 #msg{
-    height: 100vh;
+    height: 80vh;
+
 }
 
 @media (max-width: 576px) {

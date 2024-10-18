@@ -197,7 +197,7 @@
                         </div>
                     </BCol>
 
-                    <BRow>
+                    <BRow class="d-flex flex-wrap">
                     <BCol md="4">
                         <BRow>
                             <BCol md="4">
@@ -207,7 +207,7 @@
                                     name="delegation"
                                     value="true"
                                     @click="delegation=!delegation"
-                                    class="border border-secondary"
+                                    class="border border-secondary me-3"
                                 >
                                     <label for="delegation" class="fw-bold text-black">Délégation</label>
                                 </BFormCheckbox>
