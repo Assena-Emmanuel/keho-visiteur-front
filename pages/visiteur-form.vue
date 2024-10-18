@@ -1,9 +1,9 @@
 <template>
     <BCard
         no-body 
-        class="mx-3 border-0"
+        class="mx-3 border-0 bg-card"
         title="Je m'identifie"
-        style="background-color: rgba(204, 200, 200, 0.5);"
+        
         id="qr-topbar"
     >
         
@@ -14,12 +14,12 @@
                 <BRow>
                     <BCol md="4">
                         <div class="mb-3">
-                        <label for="nom" class="fw-bold text-black" style="font-size: 12px;">Nom</label>
+                        <label for="nom" class="fw-bold text-black" style="font-size: 12px;">Nom <strong class="text-danger">*</strong></label>
                         <input 
                             v-model="nom" 
                             type="text" class="form-control form-control-sm" 
                             id="departement" 
-                            placeholder="" 
+                            placeholder="VOTRE NOM" 
                             :class="{
                             'is-invalid': submitted && v$.nom.$error,
                             'border border-danger': submitted && v$.nom.$error,
@@ -35,11 +35,12 @@
 
                     <BCol md="4">
                         <div class="mb-3">
-                            <label for="prenom" class="fw-bold text-black" style="font-size: 12px;">Prénoms </label>
+                            <label for="prenom" class="fw-bold text-black" style="font-size: 12px;">Prénoms <strong class="text-danger">*</strong></label>
                             <div>
                                 <input 
                                 v-model="prenom" 
                                 id="prenom" 
+                                placeholder="VOTRE PRENOMS"
                                 class="form-control form-control-sm"  
                                 type="text"
                                 :class="{
@@ -59,30 +60,28 @@
                             <label for="entreprise" class="fw-bold text-black" style="font-size: 12px;">Entreprise </label>
                             <div>
                                 <input 
-                                v-model="entreprise" 
-                                id="entreprise" 
-                                class="form-control form-control-sm"  
-                                type="text"
-                                :class="{
-                                'is-invalid': submitted && v$.entreprise.$error,
-                                'border border-danger': submitted && v$.entreprise.$error,
-                                'border border-secondary': !(submitted && v$.entreprise.$error)
-                                }">
-                                <div v-if="submitted && v$.entreprise.$error" class="invalid-feedback">
+                                    v-model="entreprise" 
+                                    id="entreprise" 
+                                    placeholder="NOM DE L'ENTREPRISE"
+                                    class="form-control form-control-sm"  
+                                    type="text"
+                                >
+                                <!-- <div v-if="submitted && v$.entreprise.$error" class="invalid-feedback">
                                 <span v-if="v$.entreprise.required.$invalid" class="font-size-12">champ obligatoire
                                 </span>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </BCol>
 
                     <BCol md="4">
                         <div class="mb-3">
-                            <label for="telephone" class="fw-bold text-black" style="font-size: 12px;">Téléphone </label>
+                            <label for="telephone" class="fw-bold text-black" style="font-size: 12px;">Téléphone <strong class="text-danger">*</strong></label>
                             <div>
                                 <input 
                                 v-model="telephone" 
                                 id="telephone" 
+                                placeholder="VOTRE NUMERO DE TELEPHONE"
                                 class="form-control form-control-sm"  
                                 type="tel"
                                 maxlength="10" 
@@ -102,25 +101,40 @@
 
                     <BCol md="4">
                         <div class="mb-3">
-                            <label for="typePiece" class="fw-bold text-black" style="font-size: 12px;">Type de Pièce </label>
+                            <label for="typePiece" class="fw-bold text-black" style="font-size: 12px;">Type de Pièce <strong class="text-danger">*</strong></label>
                             <div class="input-group">
-                                <select v-model="typePiece" id="typePiece" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example">
+                                <select 
+                                    v-model="typePiece" 
+                                    id="typePiece" 
+                                    class="form-select form-select-sm border border-secondary rounded-2" 
+                                    :class="{
+                                        'is-invalid': submitted && v$.typePiece.$error,
+                                        'border border-danger': submitted && v$.typePiece.$error,
+                                        'border border-secondary': !(submitted && v$.typePiece.$error)
+                                        }"
+                                >
                                     <option value="">SÉLECTIONNER LE TYPE DE PIÈCE...</option>
                                     <option value="CNI">Carte Nationale d'Identité (CNI)</option>
                                     <option value="PASSPORT">PASSPORT</option>
                                 </select>
+                                <div v-if="submitted && v$.typePiece.$error" class="invalid-feedback">
+                                    <span v-if="v$.typePiece.required.$invalid" class="font-size-12">champ obligatoire
+                                    </span>
+                                </div>
                             </div>
+                            
                         </div>
                     </BCol>
                     <BCol md="4">
                         <div class="mb-3">
-                            <label for="numPiece" class="fw-bold text-black" style="font-size: 12px;">N° Pièce </label>
+                            <label for="numPiece" class="fw-bold text-black" style="font-size: 12px;">N° Pièce <strong class="text-danger">*</strong></label>
                             <div>
                                 <input 
                                 v-model="numPiece" 
                                 id="numPiece" 
+                                placeholder="NUMERO DE LA PIECE"
                                 class="form-control form-control-sm"  
-                                typePiece="text"
+                                type="text"
                                 :class="{
                                 'is-invalid': submitted && v$.numPiece.$error,
                                 'border border-danger': submitted && v$.numPiece.$error,
@@ -136,10 +150,10 @@
 
                     <BCol md="4">
                         <div class="mb-3">
-                            <label for="visite" class="fw-bold text-black" style="font-size: 12px;">Type de Visite </label>
+                            <label for="visite" class="fw-bold text-black" style="font-size: 12px;">Type de Visite <strong class="text-danger">*</strong></label>
                             <div class="input-group">
                                 <select 
-                                    v-model="typePiece" 
+                                    v-model="visite" 
                                     id="visite" 
                                     class="form-select form-select-sm border border-secondary rounded-2" 
                                     aria-label="Default select example"
@@ -169,7 +183,7 @@
                                 v-model="codeVisite" 
                                 id="codeVisite" 
                                 class="form-control form-control-sm"  
-                                typePiece="text"
+                                type="text"
                                 :class="{
                                 'is-invalid': submitted && v$.codeVisite.$error,
                                 'border border-danger': submitted && v$.codeVisite.$error,
@@ -183,21 +197,22 @@
                         </div>
                     </BCol>
 
+                    <BRow>
                     <BCol md="4">
                         <BRow>
-                            <BCol>
+                            <BCol md="4">
                                 <BFormCheckbox
                                     id="delegation"
                                     v-model="delegation"
                                     name="delegation"
                                     value="true"
-                                    unchecked-value="false"
+                                    @click="delegation=!delegation"
                                     class="border border-secondary"
                                 >
                                     <label for="delegation" class="fw-bold text-black">Délégation</label>
                                 </BFormCheckbox>
                             </BCol>
-                            <BCol md="4" v-if="delegation">
+                            <BCol  v-if="delegation">
                                 <BFormCheckbox
                                     id="chefEquipe"
                                     v-model="chefEquipe"
@@ -219,8 +234,9 @@
                                     id="vehicule"
                                     v-model="vehicule"
                                     name="vehicule"
-                                    unchecked-value="false"
+                                    @click="vehicule=!vehicule"
                                     class="border border-secondary"
+                                    
                                     
                                 >
                                     <label for="vehicule" class="fw-bold text-black">Véhicule </label>
@@ -228,7 +244,7 @@
                             </BCol>
                             <BCol v-if="vehicule" md="12">
                                 <div  class="mb-3">
-                                    <label for="immatricule" class="fw-bold text-black" style="font-size: 12px;">Immatricule</label>
+                                    <label for="immatricule" class="fw-bold text-black" style="font-size: 12px;">Immatricule <strong class="text-danger">*</strong></label>
                                     <div>
                                         <input 
                                         v-model="immatricule" 
@@ -241,16 +257,16 @@
                                         'border border-danger': submitted && v$.immatricule.$error,
                                         'border border-secondary': !(submitted && v$.immatricule.$error)
                                         }">
-                                        <div v-if="submitted && v$.immatricule.$error" class="invalid-feedback">
-                                        <span v-if="v$.immatricule.required.$invalid" class="font-size-12">champ obligatoire
-                                        </span>
+                                        <div v-if="submitted && vehicule && v$.immatricule.$error" class="invalid-feedback">
+                                            <span v-if="v$.immatricule.required.$invalid" class="font-size-12">champ obligatoire
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                             </BCol>
                         </BRow>
                     </BCol>
-                    
+                    </BRow>
                     
 
                     
@@ -264,7 +280,7 @@
                 </BRow>
 
                 <div class="mt-4 d-flex justify-content-center">
-                <BButton @click="onSave" variant="primary" class="w-sm waves-effect waves-light btn btn-lg" >
+                <BButton @click="onSaveVisiteur" variant="primary" class="w-sm waves-effect waves-light btn btn-lg" >
                     ENREGISTRER
                 </BButton>
                 </div>
@@ -279,13 +295,19 @@
         layout: "utility"
     });
 
+    import { useVuelidate } from "@vuelidate/core";
+    import { required } from "@vuelidate/validators";
     import PhotoCamera from '~/components/camera/PhotoCamera.vue';
     export default {
+        setup() {
+            return { v$: useVuelidate() };
+        },
         components: {
             PhotoCamera
         },
         data(){
             return{
+                submitted: false,
                 nom: "",
                 prenom: "",
                 entreprise: "",
@@ -302,9 +324,52 @@
 
             }
         },
+        
+        validations: {
+            nom: {
+                required,
+            },
+            prenom: {
+                required,
+            },
+            telephone: {
+                required,
+            },
+            typePiece: {
+                required,
+            },
+            numPiece: {
+                required,
+            },
+            visite: {
+                required,
+            },
+            immatricule: {
+                required,
+            },
+
+        },
         methods: {
             handlePhoto(photo) {
                 this.form.photo = photo;
+            },
+            onSaveVisiteur(){
+                this.submitted = true;
+                this.v$.$touch();
+                if (this.v$.nom.$error || 
+                    this.v$.prenom.$error || 
+                    this.v$.typePiece.$error ||
+                    this.v$.telephone.$error ||
+                    this.v$.numPiece.$error ||
+                    (this.vehicule && this.v$.immatricule.$error)
+                ) {
+                    return;
+                }else{
+                    this.submitted = false
+                    this.$router.push({
+                        path: "/visiteur-save"
+                    });
+                }
             },
         },
     };
@@ -313,7 +378,8 @@
 
 <style>
 .bg-card {
-    background-color: rgba(204, 200, 200, 0.5); /* Gris avec 50% de transparence */
+    background-color: rgba(255, 255, 255, 0.7); 
+/* Gris avec 50% de transparence */
 }
 #qr-topbar{
     margin-top: 8em;
