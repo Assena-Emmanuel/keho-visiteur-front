@@ -29,12 +29,7 @@
     definePageMeta({
         layout: "utility"
     });
-
-    import PhotoCamera from '~/components/camera/PhotoCamera.vue';
     export default {
-        components: {
-            PhotoCamera
-        },
         data(){
             return{
                 nomVisite: "M. KOUADIO K.",

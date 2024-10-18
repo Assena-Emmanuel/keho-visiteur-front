@@ -177,7 +177,7 @@
 
                     <BCol md="4">
                         <div class="mb-3">
-                            <label for="codeVisite" class="fw-bold text-black" style="font-size: 12px;">Code de Visite </label>
+                            <label for="codeVisite" class="fw-bold text-black" style="font-size: 12px;">Code de Visite <strong class="text-danger">*</strong></label>
                             <div>
                                 <input 
                                 v-model="codeVisite" 
@@ -200,36 +200,19 @@
                     <BRow class="d-flex flex-wrap">
                     <BCol md="4">
                         <BRow>
-                            <BCol md="4">
+                            <BCol col="6">
                                 <BFormCheckbox
                                     id="delegation"
                                     v-model="delegation"
                                     name="delegation"
                                     value="true"
                                     @click="delegation=!delegation"
-                                    class="border border-secondary me-3"
+                                    class="border border-secondary"
                                 >
                                     <label for="delegation" class="fw-bold text-black">Délégation</label>
                                 </BFormCheckbox>
                             </BCol>
-                            <BCol  v-if="delegation">
-                                <BFormCheckbox
-                                    id="chefEquipe"
-                                    v-model="chefEquipe"
-                                    name="chefEquipe"
-                                    value="true"
-                                    unchecked-value="false"
-                                    class="border border-secondary"
-                                
-                                >
-                                    <label for="chefEquipe" class="fw-bold text-black">Chef d'Equipe</label>
-                                </BFormCheckbox>
-                            </BCol>
-                        </BRow>
-                    </BCol>
-                    <BCol md="4">
-                        <BRow>
-                            <BCol>
+                            <BCol col="6">
                                 <BFormCheckbox
                                     id="vehicule"
                                     v-model="vehicule"
@@ -242,37 +225,57 @@
                                     <label for="vehicule" class="fw-bold text-black">Véhicule </label>
                                 </BFormCheckbox>
                             </BCol>
-                            <BCol v-if="vehicule" md="12">
-                                <div  class="mb-3">
-                                    <label for="immatricule" class="fw-bold text-black" style="font-size: 12px;">Immatricule <strong class="text-danger">*</strong></label>
-                                    <div>
-                                        <input 
-                                        v-model="immatricule" 
-                                        id="immatricule" 
-                                        class="form-control form-control-sm"  
-                                        type="text"
-                                        placeholder="IMMATRICULATION DU VÉHICULE"
-                                        :class="{
-                                        'is-invalid': submitted && v$.immatricule.$error,
-                                        'border border-danger': submitted && v$.immatricule.$error,
-                                        'border border-secondary': !(submitted && v$.immatricule.$error)
-                                        }">
-                                        <div v-if="submitted && vehicule && v$.immatricule.$error" class="invalid-feedback">
-                                            <span v-if="v$.immatricule.required.$invalid" class="font-size-12">champ obligatoire
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </BCol>
                         </BRow>
                     </BCol>
                     </BRow>
+                    
+                    <BRow>   
+                        <BCol  v-if="delegation">
+                            <BFormCheckbox
+                                id="chefEquipe"
+                                v-model="chefEquipe"
+                                name="chefEquipe"
+                                value="true"
+                                unchecked-value="false"
+                                class="border border-secondary"
+                            
+                            >
+                                <label for="chefEquipe" class="fw-bold text-black">Délégué(e)</label>
+                            </BFormCheckbox>
+                        </BCol>
+                    </BRow>
+                    <BRow>
+                        <BCol v-if="vehicule" md="4">
+                            <div  class="mb-3">
+                                <label for="immatricule" class="fw-bold text-black" style="font-size: 12px;">Immatricule <strong class="text-danger">*</strong></label>
+                                <div>
+                                    <input 
+                                    v-model="immatricule" 
+                                    id="immatricule" 
+                                    class="form-control form-control-sm w-100"  
+                                    type="text"
+                                    placeholder="IMMATRICULATION DU VÉHICULE"
+                                    :class="{
+                                    'is-invalid': submitted && v$.immatricule.$error,
+                                    'border border-danger': submitted && v$.immatricule.$error,
+                                    'border border-secondary': !(submitted && v$.immatricule.$error)
+                                    }">
+                                    <div v-if="submitted && vehicule && v$.immatricule.$error" class="invalid-feedback">
+                                        <span v-if="v$.immatricule.required.$invalid" class="font-size-12">champ obligatoire
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </BCol>
+                    </BRow>
+                    
+                    
                     
 
                     
                     <!-- <BCol md="6">
                         <div class="mb-3">
-                            <PhotoCamera @photo-captured="handlePhoto" />
+                            <vueWebCam />
                         </div>
                     </BCol> -->
                     
@@ -294,16 +297,15 @@
     definePageMeta({
         layout: "utility"
     });
-
     import { useVuelidate } from "@vuelidate/core";
     import { required } from "@vuelidate/validators";
-    import PhotoCamera from '~/components/camera/PhotoCamera.vue';
+    import vueWebCam from "~/components/web-cam/vue-web-cam.vue";
     export default {
         setup() {
             return { v$: useVuelidate() };
         },
         components: {
-            PhotoCamera
+            vueWebCam,
         },
         data(){
             return{
@@ -327,6 +329,9 @@
         
         validations: {
             nom: {
+                required,
+            },
+            codeVisite: {
                 required,
             },
             prenom: {
@@ -361,6 +366,7 @@
                     this.v$.typePiece.$error ||
                     this.v$.telephone.$error ||
                     this.v$.numPiece.$error ||
+                    this.v$.codeVisite.$error ||
                     (this.vehicule && this.v$.immatricule.$error)
                 ) {
                     return;
