@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   plugins: [
     '~/plugins/sweetalert.ts',
     '~/plugins/qrcode-reader.js',
-    '~/plugins/vue-web-cam.js',
+   
   ],
 
   app: {
@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   modules: [
       "@nuxt/content", 
       "@pinia/nuxt", 
-      "@nuxtjs/google-fonts",
+      "@nuxtjs/google-fonts"
     ],
 
   pinia: {

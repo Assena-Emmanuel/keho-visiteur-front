@@ -196,6 +196,28 @@
                             </div>
                         </div>
                     </BCol>
+                    <BCol v-if="vehicule" md="4">
+                        <div  class="mb-3">
+                            <label for="immatricule" class="fw-bold text-black" style="font-size: 12px;">Immatricule <strong class="text-danger">*</strong></label>
+                            <div>
+                                <input 
+                                v-model="immatricule" 
+                                id="immatricule" 
+                                class="form-control form-control-sm w-100"  
+                                type="text"
+                                placeholder="IMMATRICULATION DU VÉHICULE"
+                                :class="{
+                                'is-invalid': submitted && v$.immatricule.$error,
+                                'border border-danger': submitted && v$.immatricule.$error,
+                                'border border-secondary': !(submitted && v$.immatricule.$error)
+                                }">
+                                <div v-if="submitted && vehicule && v$.immatricule.$error" class="invalid-feedback">
+                                    <span v-if="v$.immatricule.required.$invalid" class="font-size-12">champ obligatoire
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </BCol>
 
                     <BRow class="d-flex flex-wrap">
                     <BCol md="4">
@@ -245,41 +267,18 @@
                         </BCol>
                     </BRow>
                     <BRow>
-                        <BCol v-if="vehicule" md="4">
-                            <div  class="mb-3">
-                                <label for="immatricule" class="fw-bold text-black" style="font-size: 12px;">Immatricule <strong class="text-danger">*</strong></label>
-                                <div>
-                                    <input 
-                                    v-model="immatricule" 
-                                    id="immatricule" 
-                                    class="form-control form-control-sm w-100"  
-                                    type="text"
-                                    placeholder="IMMATRICULATION DU VÉHICULE"
-                                    :class="{
-                                    'is-invalid': submitted && v$.immatricule.$error,
-                                    'border border-danger': submitted && v$.immatricule.$error,
-                                    'border border-secondary': !(submitted && v$.immatricule.$error)
-                                    }">
-                                    <div v-if="submitted && vehicule && v$.immatricule.$error" class="invalid-feedback">
-                                        <span v-if="v$.immatricule.required.$invalid" class="font-size-12">champ obligatoire
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </BCol>
+                        
                     </BRow>
                     
-                    
-                    
-
-                    
-                    <!-- <BCol md="6">
+                </BRow>
+                <BRow>
+                    <BCol md="12">
                         <div class="mb-3">
-                            <vueWebCam />
+                            <ClientOnly>
+                                <vue-web-cam />
+                            </ClientOnly>
                         </div>
-                    </BCol> -->
-                    
-            
+                    </BCol>
                 </BRow>
 
                 <div class="mt-4 d-flex justify-content-center">
@@ -298,15 +297,15 @@
         layout: "utility"
     });
     import { useVuelidate } from "@vuelidate/core";
+  
     import { required } from "@vuelidate/validators";
-    import vueWebCam from "~/components/web-cam/vue-web-cam.vue";
     export default {
         setup() {
             return { v$: useVuelidate() };
         },
-        components: {
-            vueWebCam,
-        },
+        // components: {
+        //     'vue-web-cam': WebCam
+        // },
         data(){
             return{
                 submitted: false,
