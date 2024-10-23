@@ -47,10 +47,10 @@
         <div class="row justify-content-center mt-2">
           <div class="d-flex gap-3">
             <button class="btn btn-primary" @click="takeSnapshot" id="click-photo" style="display: none;">
-              <i class="fas fa-camera-retro"></i> Take Photo
+              <i class="fas fa-camera-retro"></i> Prendre une photo
             </button>
             <button class="btn btn-secondary" @click="reset" id="resetBtn" style="display: none;">
-              <i class="fas fa-sync-alt"></i> Reset
+              <i class="fas fa-sync-alt"></i> Réinitialisation
             </button>
           </div>
         </div>
