@@ -29,22 +29,31 @@
         <BFormCheckbox
             v-model="afficheCamera"
             name="camera"
-            @click="afficheCamera=!afficheCamera"
+            @click="choisirAppareil"
             class="border border-secondary"
         >
-          Appareil photo
+          Appareil photo {{ afficheCamera }}
         </BFormCheckbox>
       </div>
 
       <div class="row align-items-end">
-          <div class="col-lg-5">
-            <video class="border border-secondary" id="video" ref="video" autoplay style="display: none;"></video>
+          <div class="col-lg-5 position-relative"> <!-- Ajout de position-relative ici -->
+              <video class="border border-secondary" id="video" ref="video" autoplay style="display: none;"></video>
+              <div class="button-container d-flex gap-3 px-3" :style="{ display: affichebtn ? 'none' : 'block' }" style="position: absolute; bottom: 10px; left: 10px; right: 10px;"> <!-- Positionnement absolu -->
+                  <button class="btn btn-primary"  @click="takeSnapshot" id="click-photo" :style="{ display: !affichebtn ? 'none' : 'block' }"> 
+                      <i class="fas fa-camera-retro"></i> Prendre une photo
+                  </button>
+                  <button class="btn btn-secondary" @click="reset" id="resetBtn" :style="{ display: !affichebtn ? 'none' : 'block' }">
+                      <i class="fas fa-sync-alt"></i> Réinitialisation
+                  </button>
+              </div>
           </div>
           <div class="col-lg-5">
-            <canvas id="canvas" ref="canvas" width="420" height="240" style="display: none;"></canvas>
+              <canvas id="canvas" ref="canvas" width="420" height="240" style="display: none;"></canvas>
           </div>
-        </div>
-        <div class="row justify-content-center mt-2">
+      </div>
+
+        <!-- <div class="row justify-content-center mt-2">
           <div class="d-flex gap-3">
             <button class="btn btn-primary" @click="takeSnapshot" id="click-photo" style="display: none;">
               <i class="fas fa-camera-retro"></i> Prendre une photo
@@ -53,7 +62,7 @@
               <i class="fas fa-sync-alt"></i> Réinitialisation
             </button>
           </div>
-        </div>
+        </div> -->
 
 
     <div class="row justify-content-end p-3" id="downloadDIV" style="display: none;">
@@ -76,11 +85,18 @@ export default {
       canvas: null,
       imageDataUrl: null,
       fileName: '',
-      afficheCamera: false, // Declare afficheCamera as a boolean
+      afficheCamera: false, 
+      affichebtn: false,
     };
   },
   methods: {
-    // Detect if it's a mobile/tablet or desktop
+    choisirAppareil(){
+      if(this.afficheCamera){
+        this.video.style.display = 'none';
+        this.affichebtn = false
+      }
+      this.afficheCamera=!this.afficheCamera
+    },
     isMobileDevice() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     },
@@ -96,6 +112,7 @@ export default {
           this.video.srcObject = stream;
           this.video.style.display = 'block';
           this.toggleButtons(true);
+          this.affichebtn = !this.affichebtn
         }
       } catch (error) {
         alert(error.message);
@@ -113,6 +130,7 @@ export default {
           this.video.srcObject = stream;
           this.video.style.display = 'block';
           this.toggleButtons(true);
+          this.affichebtn = !this.affichebtn
         }
       } catch (error) {
         alert(error.message);
