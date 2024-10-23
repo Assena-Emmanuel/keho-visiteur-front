@@ -5,10 +5,12 @@
     <div class="row justify-content-center mb-2">
       <div v-if="afficheCamera==false" class="row text-center">
         <div class="col-md-6">
-          <BFormFile v-model="file" label="Recto"/>
+          <label for="rectoFile" class="form-label">Recto</label>
+          <input class="form-control form-control-sm" type="file" id="rectoFile">
         </div>
         <div class="col-md-6">
-          <BFormFile v-model="file" label="Verso"/>
+          <label for="versoFile" class="form-label">Verso</label>
+          <input class="form-control form-control-sm" type="file" id="versoFile">
         </div>
       </div>
 
