@@ -36,7 +36,7 @@
             @click="choisirAppareil"
             class="border border-secondary"
         >
-          Appareil photo {{ appareilRecto }}
+          Appareil photo {{ afficheCamera }}
         </BFormCheckbox>
       </div>
 
@@ -44,47 +44,28 @@
           <div  class="col-lg-5 position-relative"> <!-- Ajout de position-relative ici -->
             <video class="border border-secondary" id="video" ref="video" autoplay style="display: none;"></video>
             <div class="button-container d-flex gap-3 px-3"  style="position: absolute; bottom: 10px; left: 10px; right: 10px;"> <!-- Positionnement absolu -->
-                <button class="btn btn-primary"  @click="takeSnapshot()" id="click-photo" :style="{ display: !affichebtn ? 'none' : 'block' }"> 
+                <button class="btn btn-primary"  @click="takeSnapshot('canvas')" id="click-photo" :style="{ display: !appareilRecto ? 'none' : 'block' }"> 
                     <i class="fas fa-camera-retro"></i> Capturer Recto
                 </button>
-                
-                <button class="btn btn-secondary" @click="reset" id="resetBtn" :style="{ display: !affichebtn ? 'none' : 'block' }">
-                    <i class="fas fa-sync-alt"></i> Réinitialisation
-                </button>
-            </div>
-          </div>
-          <!-- <div  class="col-lg-5 position-relative"> 
-            <video class="border border-secondary" id="videoVerso" ref="videoVerso" autoplay style="display: none;"></video>
-            <div class="button-container d-flex gap-3 px-3"  style="position: absolute; bottom: 10px; left: 10px; right: 10px;"> 
-                <button class="btn btn-primary"  @click="takeSnapshot()" id="click-photo" :style="{ display: !affichebtn ? 'none' : 'block' }"> 
+                <button class="btn btn-primary"  @click="takeSnapshotVerso" id="click-photo" :style="{ display: !appareilVerso ? 'none' : 'block' }"> 
                     <i class="fas fa-camera-retro"></i> Capturer Verso
                 </button>
                 
                 <button class="btn btn-secondary" @click="reset" id="resetBtn" :style="{ display: !affichebtn ? 'none' : 'block' }">
                     <i class="fas fa-sync-alt"></i> Réinitialisation
                 </button>
+              
             </div>
-          </div> -->
+          </div>
+
          
           <div class="col-lg-5">
               <canvas id="canvas" ref="canvas" width="420" height="240" style="display: none;"></canvas>
           </div>
-            <!-- <div class="col-lg-5">
-                <canvas id="canvasverso" ref="canvasVerso" width="420" height="240" style="display: none;"></canvas>
-            </div> -->
-      </div>
-
-        <!-- <div class="row justify-content-center mt-2">
-          <div class="d-flex gap-3">
-            <button class="btn btn-primary" @click="takeSnapshot" id="click-photo" style="display: none;">
-              <i class="fas fa-camera-retro"></i> Prendre une photo
-            </button>
-            <button class="btn btn-secondary" @click="reset" id="resetBtn" style="display: none;">
-              <i class="fas fa-sync-alt"></i> Réinitialisation
-            </button>
+          <div class="col-lg-5">
+              <canvas id="canvasVerso" ref="canvasVerso" width="420" height="240" style="display: none;"></canvas>
           </div>
-        </div> -->
-
+      </div>
 
     <div class="row justify-content-end p-3" id="downloadDIV" style="display: none;">
       <div class="col-md-6">
@@ -119,7 +100,7 @@ export default {
 
   methods: {
     handleFileChange(event, typeFile) {
-      this[typeFile] = event.target.files[0];  
+      this[typeFile] = event.target.files[0];
     },
     choisirAppareil(){
       if(this.afficheCamera){
@@ -144,7 +125,7 @@ export default {
           this.video.srcObject = stream;
           this.video.style.display = 'block';
           this.toggleButtons(true);
-          this.affichebtn = !this.affichebtn
+          this.affichebtn = true
           this.appareilRecto = !this.appareilRecto
           this.appareilVerso = false
         }
@@ -161,12 +142,11 @@ export default {
             facingMode: this.isMobileDevice() ? "environment" : "user" // Rear camera on mobile, front on desktop
           }
         });
-        if (this.videoVerso) {
-          this.videoVerso.srcObject = stream;
-          this.videoVerso.style.display = 'block';
-          this.video.style.display = 'none';
+        if (this.video) {
+          this.video.srcObject = stream;
+          this.video.style.display = 'block'
           this.toggleButtons(true);
-          this.affichebtn = !this.affichebtn
+          this.affichebtn = true
 
           this.appareilRecto = false
           this.appareilVerso = !this.appareilVerso
@@ -176,30 +156,31 @@ export default {
       }
     },
 
-    takeSnapshot() {
-      if (this.canvas && this.video) {
-        const ctx = this.canvas.getContext('2d');
+    takeSnapshot(canvas) {
+      if (this[canvas] && this.video) {
+        const ctx = this[canvas].getContext('2d');
         
         // Set canvas size to match the video size
-        this.canvas.width = this.video.videoWidth;
-        this.canvas.height = this.video.videoHeight;
+        this[canvas].width = this.video.videoWidth;
+        this[canvas].height = this.video.videoHeight;
 
         // Draw the video frame to the canvas
         ctx.drawImage(this.video, 0, 0);
 
         // Get the image data URL from the canvas
-        this.imageDataUrl = this.canvas.toDataURL('image/jpeg');
+        this.imageDataUrl = this[canvas].toDataURL('image/jpeg');
 
         // Display the canvas and make it visible
-        this.canvas.style.display = 'block'; // Make the canvas visible
+        this[canvas].style.display = 'block'; // Make the canvas visible
 
         // Display the download section
-        document.getElementById('downloadDIV').style.display = 'block'; // Show download options
+        // document.getElementById('downloadDIV').style.display = 'block'; // Show download options
       }
     },
 
     takeSnapshotVerso() {
       if (this.canvasVerso && this.video) {
+        alert()
         const ctx = this.canvasVerso.getContext('2d');
         
         // Set canvas size to match the video size
@@ -216,14 +197,14 @@ export default {
         this.canvasVerso.style.display = 'block'; // Make the canvas visible
 
         // Display the download section
-        document.getElementById('downloadDIV').style.display = 'block'; // Show download options
+        // document.getElementById('downloadDIV').style.display = 'block'; // Show download options
       }
     },
 
     reset() {
       if (this.video) {
         //this.video.style.display = 'none';
-        this.afficheCamera = false; // Update afficheCamera when resetting the camera
+        // this.afficheCamera = false; 
         this.toggleButtons(false);
         if (this.canvas) {
           this.canvas.style.display = 'none';
@@ -244,6 +225,7 @@ export default {
   mounted() {
     this.video = this.$refs.video; // Access the video ref
     this.canvas = this.$refs.canvas; // Access the canvas ref
+    this.canvasVerso = this.$refs.canvasVerso; // Access the canvas ref
   },
 };
 </script>
