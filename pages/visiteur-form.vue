@@ -271,14 +271,15 @@
                     </BRow>
                     
                 </BRow>
+                <hr>
                 <BRow>
-                    <BCol md="12">
+                    
                         <div class="mb-3">
                             <ClientOnly>
                                 <vue-web-cam />
                             </ClientOnly>
                         </div>
-                    </BCol>
+                   
                 </BRow>
 
                 <div class="mt-4 d-flex justify-content-center">

@@ -149,23 +149,23 @@ function onError(err) {
   error.value = `[${err.name}]: `
 
   if (err.name === 'NotAllowedError') {
-    error.value += 'you need to grant camera access permission'
+     error.value += 'Vous devez autoriser l\'accès à la caméra.';
   } else if (err.name === 'NotFoundError') {
-    error.value += 'no camera on this device'
+    error.value += 'Aucune caméra trouvée sur cet appareil.';
   } else if (err.name === 'NotSupportedError') {
-    error.value += 'secure context required (HTTPS, localhost)'
+    error.value += 'Un problème est survenu';
   } else if (err.name === 'NotReadableError') {
-    error.value += 'is the camera already in use?'
+    error.value += 'La caméra est-elle déjà utilisée ?';
   } else if (err.name === 'OverconstrainedError') {
-    error.value += 'installed cameras are not suitable'
+    error.value += 'Les caméras installées ne sont pas compatibles.';
   } else if (err.name === 'StreamApiNotSupportedError') {
-    error.value += 'Stream API is not supported in this browser'
+    error.value += 'Un problème est survenu';
   } else if (err.name === 'InsecureContextError') {
-    error.value +=
-      'Camera access is only permitted in secure context. Use HTTPS or localhost rather than HTTP.'
+    error.value += 'Un problème est survenu';
   } else {
-    error.value += err.message
+    error.value += err.message;
   }
+
 }
 </script>
 

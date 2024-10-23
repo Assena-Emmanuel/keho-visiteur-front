@@ -1,16 +1,18 @@
 <template>
-  <div class="container">
+  <div>
     <h5 class="text-center">Joindre la pièce</h5>
     
-    <div class="row justify-content-center mb-2">
-      <div v-if="afficheCamera==false" class="row text-center">
+    <div class="mb-2">
+      <div v-if="afficheCamera==false" class="row">
         <div class="col-md-6">
           <label for="rectoFile" class="form-label">Recto</label>
-          <input class="form-control form-control-sm" type="file" id="rectoFile">
+          <input class="form-control form-control-sm" @change="handleFileChange('rectoFile')" type="file" id="rectoFile">
+          <!-- <input class="form-control form-control-sm" v-model="rectoFile" type="file" id="rectoFile"> -->
         </div>
         <div class="col-md-6">
           <label for="versoFile" class="form-label">Verso</label>
-          <input class="form-control form-control-sm" type="file" id="versoFile">
+          <input class="form-control form-control-sm" @change="handleFileChange('versoFile')" type="file" id="rectoFile">
+          <!-- <input class="form-control form-control-sm" v-model="versoFile" type="file" id="versoFile"> -->
         </div>
       </div>
 
@@ -34,22 +36,23 @@
             @click="choisirAppareil"
             class="border border-secondary"
         >
-          Appareil photo {{ afficheCamera }}
+          Appareil photo 
         </BFormCheckbox>
       </div>
 
       <div class="row align-items-end">
-          <div class="col-lg-5 position-relative"> <!-- Ajout de position-relative ici -->
-              <video class="border border-secondary" id="video" ref="video" autoplay style="display: none;"></video>
-              <div class="button-container d-flex gap-3 px-3" :style="{ display: affichebtn ? 'none' : 'block' }" style="position: absolute; bottom: 10px; left: 10px; right: 10px;"> <!-- Positionnement absolu -->
-                  <button class="btn btn-primary"  @click="takeSnapshot" id="click-photo" :style="{ display: !affichebtn ? 'none' : 'block' }"> 
-                      <i class="fas fa-camera-retro"></i> Prendre une photo
-                  </button>
-                  <button class="btn btn-secondary" @click="reset" id="resetBtn" :style="{ display: !affichebtn ? 'none' : 'block' }">
-                      <i class="fas fa-sync-alt"></i> Réinitialisation
-                  </button>
-              </div>
+          <div v-if="appareilRecto" class="col-lg-5 position-relative"> <!-- Ajout de position-relative ici -->
+            <video class="border border-secondary" id="video" ref="video" autoplay style="display: none;"></video>
+            <div class="button-container d-flex gap-3 px-3" :style="{ display: affichebtn ? 'none' : 'block' }" style="position: absolute; bottom: 10px; left: 10px; right: 10px;"> <!-- Positionnement absolu -->
+                <button class="btn btn-primary"  @click="takeSnapshot" id="click-photo" :style="{ display: !affichebtn ? 'none' : 'block' }"> 
+                    <i class="fas fa-camera-retro"></i> Capturer Recto
+                </button>
+                <button class="btn btn-secondary" @click="reset" id="resetBtn" :style="{ display: !affichebtn ? 'none' : 'block' }">
+                    <i class="fas fa-sync-alt"></i> Réinitialisation
+                </button>
+            </div>
           </div>
+         
           <div class="col-lg-5">
               <canvas id="canvas" ref="canvas" width="420" height="240" style="display: none;"></canvas>
           </div>
@@ -89,9 +92,16 @@ export default {
       fileName: '',
       afficheCamera: false, 
       affichebtn: false,
+      rectoFile: '',
+      versoFile: '',
+      appareilRecto: false,
+      appareilVerso: false,
     };
   },
   methods: {
+    handleFileChange(event, typeFile) {
+      this[typeFile] = event.target.files[0];  
+    },
     choisirAppareil(){
       if(this.afficheCamera){
         this.video.style.display = 'none';
@@ -115,6 +125,8 @@ export default {
           this.video.style.display = 'block';
           this.toggleButtons(true);
           this.affichebtn = !this.affichebtn
+          this.appareilRecto = false
+          this.appareilVerso = true
         }
       } catch (error) {
         alert(error.message);
@@ -133,6 +145,8 @@ export default {
           this.video.style.display = 'block';
           this.toggleButtons(true);
           this.affichebtn = !this.affichebtn
+          this.appareilRecto = true
+          this.appareilVerso = false
         }
       } catch (error) {
         alert(error.message);
