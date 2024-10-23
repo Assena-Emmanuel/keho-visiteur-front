@@ -45,14 +45,17 @@
             <video class="border border-secondary" id="video" ref="video" autoplay style="display: none;"></video>
             <div class="button-container d-flex gap-3 px-3"  style="position: absolute; bottom: 10px; left: 10px; right: 10px;"> <!-- Positionnement absolu -->
                 <button class="btn btn-primary"  @click="takeSnapshot('canvas')" id="click-photo" :style="{ display: !appareilRecto ? 'none' : 'block' }"> 
-                    <i class="fas fa-camera-retro"></i> Capturer Recto
+                    <i class="fas fa-camera-retro"></i> <span class="d-md-block d-none">Capturer Recto</span><span class="d-md-none d-block">Recto</span>
                 </button>
                 <button class="btn btn-primary"  @click="takeSnapshotVerso" id="click-photo" :style="{ display: !appareilVerso ? 'none' : 'block' }"> 
-                    <i class="fas fa-camera-retro"></i> Capturer Verso
+                    <i class="fas fa-camera-retro"></i> <span class="d-md-block d-none">Capturer Verso</span><span class="d-md-none d-block">Verso</span>
                 </button>
                 
-                <button class="btn btn-secondary" @click="reset" id="resetBtn" :style="{ display: !affichebtn ? 'none' : 'block' }">
-                    <i class="fas fa-sync-alt"></i> Réinitialisation
+                <button class="btn btn-secondary" @click="reset('canvas')" id="resetBtn" :style="{ display: !appareilRecto ? 'none' : 'block' }">
+                    <i class="fas fa-sync-alt"></i> <span class="d-md-block d-none">Réinitialisation</span>
+                </button>
+                <button class="btn btn-secondary" @click="reset('canvasVerso')" id="resetBtn" :style="{ display: !appareilVerso ? 'none' : 'block' }">
+                    <i class="fas fa-sync-alt"></i> <span class="d-md-block d-none">Réinitialisation</span>
                 </button>
               
             </div>
@@ -62,7 +65,7 @@
           <div class="col-lg-5">
               <canvas id="canvas" ref="canvas" width="420" height="240" style="display: none;"></canvas>
           </div>
-          <div class="col-lg-5">
+          <div class="col-lg-5 mt-2">
               <canvas id="canvasVerso" ref="canvasVerso" width="420" height="240" style="display: none;"></canvas>
           </div>
       </div>
@@ -95,6 +98,7 @@ export default {
       versoFile: '',
       appareilRecto: false,
       appareilVerso: false,
+
     };
   },
 
@@ -180,7 +184,6 @@ export default {
 
     takeSnapshotVerso() {
       if (this.canvasVerso && this.video) {
-        alert()
         const ctx = this.canvasVerso.getContext('2d');
         
         // Set canvas size to match the video size
@@ -201,13 +204,13 @@ export default {
       }
     },
 
-    reset() {
+    reset(canvas) {
       if (this.video) {
         //this.video.style.display = 'none';
         // this.afficheCamera = false; 
         this.toggleButtons(false);
-        if (this.canvas) {
-          this.canvas.style.display = 'none';
+        if (this[canvas]) {
+          this[canvas].style.display = 'none';
         }
         document.getElementById('downloadDIV').style.display = 'none';
         this.fileName = '';
