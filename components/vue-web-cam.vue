@@ -44,10 +44,10 @@
           <div  class="col-lg-5 position-relative"> <!-- Ajout de position-relative ici -->
             <video class="border border-secondary" id="video" ref="video" autoplay style="display: none;"></video>
             <div class="button-container d-flex gap-3 px-3"  style="position: absolute; bottom: 10px; left: 10px; right: 10px;"> <!-- Positionnement absolu -->
-                <button class="btn btn-primary"  @click="takeSnapshot('canvas')" id="click-photo" :style="{ display: !appareilRecto ? 'none' : 'block' }"> 
+                <button class="btn btn-primary" @click="takeSnapshot('canvas', 'rectoFichiercache')" id="click-photo" :style="{ display: !appareilRecto ? 'none' : 'block' }"> 
                     <i class="fas fa-camera-retro"></i> <span class="d-md-block d-none">Capturer Recto</span><span class="d-md-none d-block">Recto</span>
                 </button>
-                <button class="btn btn-primary"  @click="takeSnapshotVerso" id="click-photo" :style="{ display: !appareilVerso ? 'none' : 'block' }"> 
+                <button class="btn btn-primary" @click="takeSnapshot('canvasVerso', 'versoFichiercache')" id="click-photo" :style="{ display: !appareilVerso ? 'none' : 'block' }"> 
                     <i class="fas fa-camera-retro"></i> <span class="d-md-block d-none">Capturer Verso</span><span class="d-md-none d-block">Verso</span>
                 </button>
                 
@@ -64,9 +64,11 @@
          
           <div class="col-lg-5">
               <canvas id="canvas" ref="canvas" width="420" height="240" style="display: none;"></canvas>
+              <input type="hidden" v-model="rectoFichiercache">
           </div>
           <div class="col-lg-5 mt-2">
               <canvas id="canvasVerso" ref="canvasVerso" width="420" height="240" style="display: none;"></canvas>
+              <input type="hidden" v-model="versoFichiercache">
           </div>
       </div>
 
@@ -98,7 +100,8 @@ export default {
       versoFile: '',
       appareilRecto: false,
       appareilVerso: false,
-
+      rectoFichiercache: null,
+      versoFichiercache: null
     };
   },
 
@@ -160,62 +163,27 @@ export default {
       }
     },
 
-    takeSnapshot(canvas) {
-      if (this[canvas] && this.video) {
-        const ctx = this[canvas].getContext('2d');
-        
-        // Set canvas size to match the video size
-        this[canvas].width = this.video.videoWidth;
-        this[canvas].height = this.video.videoHeight;
-
-        // Draw the video frame to the canvas
-        ctx.drawImage(this.video, 0, 0);
-
-        // Get the image data URL from the canvas
-        this.imageDataUrl = this[canvas].toDataURL('image/jpeg');
-
-        // Display the canvas and make it visible
-        this[canvas].style.display = 'block'; // Make the canvas visible
-
-        // Display the download section
-        // document.getElementById('downloadDIV').style.display = 'block'; // Show download options
-      }
-    },
-
-    takeSnapshotVerso() {
-      if (this.canvasVerso && this.video) {
-        const ctx = this.canvasVerso.getContext('2d');
-        
-        // Set canvas size to match the video size
-        this.canvasVerso.width = this.video.videoWidth;
-        this.canvasVerso.height = this.video.videoHeight;
-
-        // Draw the video frame to the canvas
-        ctx.drawImage(this.video, 0, 0);
-
-        // Get the image data URL from the canvas
-        this.imageDataUrl = this.canvasVerso.toDataURL('image/jpeg');
-
-        // Display the canvas and make it visible
-        this.canvasVerso.style.display = 'block'; // Make the canvas visible
-
-        // Display the download section
-        // document.getElementById('downloadDIV').style.display = 'block'; // Show download options
-      }
+    takeSnapshot(canvas, hiddenInput) {
+        if (this[canvas] && this.video) {
+            const ctx = this[canvas].getContext('2d');
+            // Ajuster la taille du canvas à la vidéo
+            this[canvas].width = this.video.videoWidth;
+            this[canvas].height = this.video.videoHeight;
+            // Dessiner la vidéo sur le canvas
+            ctx.drawImage(this.video, 0, 0);
+            // Obtenir l'image sous forme de data URL (Base64)
+            const imageDataUrl = this[canvas].toDataURL('image/jpeg');
+            // Affecter la valeur à l'input hidden correspondant
+            this[hiddenInput] = imageDataUrl;
+            // Afficher le canvas
+            this[canvas].style.display = 'block';
+        }
     },
 
     reset(canvas) {
-      if (this.video) {
-        //this.video.style.display = 'none';
-        // this.afficheCamera = false; 
-        this.toggleButtons(false);
-        if (this[canvas]) {
-          this[canvas].style.display = 'none';
-        }
-        document.getElementById('downloadDIV').style.display = 'none';
-        this.fileName = '';
-        this.imageDataUrl = null;
-      }
+        // Réinitialiser l'image du canvas
+        this[canvas].getContext('2d').clearRect(0, 0, this[canvas].width, this[canvas].height);
+        this[canvas].style.display = 'none';
     },
 
     toggleButtons(show) {
