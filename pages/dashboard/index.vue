@@ -9,7 +9,7 @@ export default {
       title: "Dashboard",
       items: [
         {
-          text: "Minible"
+          text: ""
         },
         {
           text: "Dashboard",

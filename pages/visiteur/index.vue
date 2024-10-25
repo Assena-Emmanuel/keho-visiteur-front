@@ -1,16 +1,10 @@
 <script>
 import "simplebar";
-import Visiteur from "~/components/dashboard/Visiteur.vue";
-
 
 export default {
   data() {
     return {
-      title: "Visiteur",
       items: [
-        {
-          text: "Visiteur"
-        },
         {
           text: "Visiteur",
           active: true
@@ -18,15 +12,14 @@ export default {
       ]
     };
   },
-  // components:{
-  //   Visiteur,
-  // }
+//   components:{
+//     Visiteur,
+//   }
 };
 </script>
 
 <template>
   <SiteHeader :title="title" />
   <PageHeader :title="title" :items="items" />
-  
   <DashboardVisiteur />
 </template>

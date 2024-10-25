@@ -2,21 +2,31 @@ export const menuItems = [
   {
     id: 2,
     label: "TABLEAU DE BORD",
-    icon: "uil-tv",
+    icon: {
+      active: "/images/sideBarIcon/dashboard.png",
+      desactive: "/images/sideBarIcon/dashboard-desactive.png",
+    },
     link: "/dashboard"
   },
   {
     id: 4,
-    label: "Mon Agenda",
-    icon: "uil-calender",
-    link: "/agenda"
+    label: "Visiteurs",
+    icon:{
+      active: "/images/sideBarIcon/visiteur.png",
+      desactive: "/images/sideBarIcon/visiteur-desactive.png",
+    },
+    link: "/visiteur"
   },
   {
     id: 4,
-    label: "Visiteurs",
-    icon: "uil-users-alt",
-    link: "/dashboard/visiteur"
+    label: "Mon Agenda",
+    icon: {
+      active: "/images/sideBarIcon/calendrier.png",
+      desactive: "/images/sideBarIcon/calendrier-desactive.png",
+    },
+    link: "/agenda"
   },
+ 
   // {
   //   id: 25,
   //   label: "menuitems.pages.text",
