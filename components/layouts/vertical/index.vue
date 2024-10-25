@@ -63,7 +63,7 @@ export default {
           <slot />
         </BContainer>
       </div>
-      <Footer />
+      <!-- <Footer /> -->
     </div>
     <RightSideBar />
   </div>

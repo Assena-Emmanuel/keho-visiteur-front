@@ -2,8 +2,8 @@ export const menuItems = [
   {
     id: 2,
     label: "TABLEAU DE BORD",
-    icon: "uil-home-alt",
-    link: "/"
+    icon: "uil-tv",
+    link: "/dashboard"
   },
   {
     id: 4,

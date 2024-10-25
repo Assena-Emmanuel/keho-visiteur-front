@@ -1,6 +1,7 @@
 <script>
 import "simplebar";
-import Stat from "~/components/dashboard/Stat.vue";
+import Dashboard from "~/components/dashboard/DashBoard.vue";
+
 
 export default {
   data() {
@@ -17,11 +18,14 @@ export default {
       ]
     };
   },
+  components:{
+    Dashboard,
+  }
 };
 </script>
 
 <template>
   <SiteHeader :title="title" />
   <PageHeader :title="title" :items="items" />
-  
+  <Dashboard />
 </template>
