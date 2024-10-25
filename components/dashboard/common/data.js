@@ -38,37 +38,81 @@
             { 
               data: [12, 19, 3, 2, 3],
               backgroundColor: [
-                "rgba(255, 99, 132, 0.2)",
-                "rgba(54, 162, 235, 0.2)",
-                "rgba(255, 206, 86, 0.2)",
-                "rgba(75, 192, 192, 0.2)",
-                "rgba(153, 102, 255, 0.2)",
-                "rgba(255, 159, 64, 0.2)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(54, 162, 235, 1)",
               ],
               borderColor: [
-                "rgba(255, 99, 132, 1)",
                 "rgba(54, 162, 235, 1)",
-                "rgba(255, 206, 86, 1)",
-                "rgba(75, 192, 192, 1)",
-                "rgba(153, 102, 255, 1)",
-                "rgba(255, 159, 64, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(54, 162, 235, 1)",
               ],
               borderWidth: 1,
             },
           ],
         },
-        // options: {
-        //   responsive: true,
-        //   plugins: {
-        //     legend: {
-        //       position: "top",
-        //     },
-        //     title: {
-        //       display: true,
-        //       text: "Number of animals in the zoo",
-        //     },
-        //   },
-        // },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "none",
+            },
+            title: {
+              display: false,
+              text: "Number of animals in the zoo",
+            },
+          },
+        },
       };
-      
-  
+
+   // data/data.js
+
+export const areaChartData = {
+  type: "line", // Type de graphique
+  data: {
+      labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
+      datasets: [
+          {
+              label: "Visites RDV",
+              data: [10, 20, 15, 25, 30, 40],
+              fill: true,
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 3,
+              tension: 0.2,
+          },
+          {
+              label: "Visites sans RDV",
+              data: [8, 12, 18, 22, 28, 30],
+              fill: true,
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+              borderColor: "rgba(54, 162, 235, 1)",
+              borderWidth: 3,
+              tension: 0.2,
+          }
+      ]
+  },
+  options: {
+      responsive: true,
+      plugins: {
+          legend: {
+              position: "top",
+          },
+          title: {
+              display: false,
+              text: "Visites au fil des mois",
+          },
+      },
+      scales: {
+          y: {
+              beginAtZero: true
+          }
+      }
+  }
+};

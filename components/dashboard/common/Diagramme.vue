@@ -3,7 +3,7 @@
   <BCard no-body >
     <BCardBody>
       <div class="d-flex">
-        <canvas id="pieChart" class="pie-chart" style="max-height: 150px;"></canvas>
+        <canvas id="pieChart" class="pie-chart" style="max-height: 200px;"></canvas>
       </div>
       <div class="text-center"><span class="titre">DIAGRAMME DES VISITES</span></div>
     </BCardBody>

@@ -2,7 +2,7 @@
     <BCard no-body >
       <BCardBody>
         <div class="d-flex">
-          <canvas id="bar-chart" style="max-height: 150px;"></canvas>
+          <canvas id="bar-chart" style="max-height: 200px;"></canvas>
         </div>
         <div class="text-center titreDiagramme">DIAGRAMME DES VISITES</div>
       </BCardBody>
