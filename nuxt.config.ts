@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   plugins: [
     '~/plugins/sweetalert.ts',
     '~/plugins/qrcode-reader.js',
-   
+   '~/plugins/vue-cal.js',
   ],
 
   app: {
@@ -17,7 +17,16 @@ export default defineNuxtConfig({
         },
         { name: "author", content: "Themesbrand" }
       ],
-      link: [{ rel: "icon", type: "image/ico", href: "/images/total-sans-arriere-plan.png" }]
+      link: [
+        { 
+          rel: "icon", type: "image/ico", 
+          href: "/images/total-sans-arriere-plan.png" 
+        },
+        { 
+          rel: "stylesheet", 
+          href: "https://unpkg.com/vue-cal/dist/vuecal.css" 
+        },
+      ]
     }
   },
 

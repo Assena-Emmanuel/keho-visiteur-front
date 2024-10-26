@@ -54,6 +54,7 @@
     "simplebar-vue": "^2.3.3",
     "sweetalert2": "^11.7.26",
     "vue": "^3.3.4",
+    "vue-cal": "^4.10.0",
     "vue-chartjs": "^5.2.0",
     "vue-countup-v3": "^1.4.1",
     "vue-easy-lightbox": "^1.16.0",
