@@ -19,6 +19,15 @@ export const menuItems = [
   },
   {
     id: 4,
+    label: "Mes Visiteurs",
+    icon:{
+      active: "/images/sideBarIcon/visiteur.png",
+      desactive: "/images/sideBarIcon/visiteur-desactive.png",
+    },
+    link: "/visiteur"
+  },
+  {
+    id: 4,
     label: "Mon Agenda",
     icon: {
       active: "/images/sideBarIcon/calendrier.png",
