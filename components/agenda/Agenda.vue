@@ -10,7 +10,7 @@
             hide-view-selector
             active-view="month"
             :disable-views="['years', 'year', 'week', 'day']"
-            @cell-focus="selectedDate = $event"
+            @cell-focus="onCellFocus"
             class="vuecal--blue-theme vuecal--rounded-theme calendrier-court"
           />
         </BCol>
@@ -25,26 +25,47 @@
             active-view="week"
             :selected-date="selectedDate"
             :events="events" 
+            :eventsCountOnYearView=true
             class="vuecal--blue-theme calendrier-long"
-            @cell-focus="onCellFocus"  
+            @cell-focus="onCellFocus"
             @cell-click="openEventModal($event)"
           />
         </BCol>
       </BRow>
 
-      <!-- Modal pour ajouter un événement -->
-      <BModal v-model="modalVisible" title="Ajouter un événement" hide-footer>
-        <BForm @submit.prevent="addEvent">
+      <!-- Modal pour ajouter ou modifier un événement -->
+      <BModal v-model="modalVisible" :title="isEditing ? 'Modifier l\'événement' : 'Ajouter un événement'" hide-footer>
+        <div>
+          <BAlert variant="danger"v-model="error" dismissible>
+            {{ errorMsg }}
+          </BAlert>
+        </div>
+        <BForm @submit.prevent="isEditing ? updateEvent() : addEvent()">
           <BFormGroup label="Titre de l'événement">
-            <BFormInput v-model="eventTitle" required />
+            <BFormInput v-model="eventTitle" required class="border border-secondary" />
           </BFormGroup>
-          <BFormGroup label="Heure de début">
-            <BFormInput type="time" v-model="eventStartTime" required />
-          </BFormGroup>
-          <BFormGroup label="Heure de fin">
-            <BFormInput type="time" v-model="eventEndTime" required />
-          </BFormGroup>
-          <BButton type="submit" variant="primary">Ajouter</BButton>
+          <BRow class="mt-3 mb-3">
+            <BCol md="6">
+              <BFormGroup label="Heure de début">
+                <BFormInput :min="8" :max="17" type="time" v-model="eventStartTime" required class="border border-secondary" />
+              </BFormGroup>
+            </BCol>
+            <BCol md="6">
+                <BFormGroup label="Heure de fin">
+                  <BFormInput :min="heureDebut" :max="heureFin" type="time" v-model="eventEndTime" required class="border border-secondary" />
+                </BFormGroup>
+            </BCol>
+          </BRow>
+          
+          <div class="d-flex justify-content-between" v-if="isEditing">
+            <BButton v-if="isEditing" class="mt-2" @click="deleteEvent" variant="danger">Supprimer</BButton>
+            <BButton class="mt-2" type="submit" variant="primary">Modifier</BButton>
+          </div>
+          <div class="d-flex justify-content-end" v-if="!isEditing">
+            <BButton class="mt-2" type="submit" variant="primary">Ajouter</BButton>
+          </div>
+
+          
         </BForm>
       </BModal>
     </BCardBody>
@@ -66,44 +87,173 @@ export default {
       eventTitle: '',
       eventStartTime: null,
       eventEndTime: null,
-      events: [  // Événements par défaut
-        { title: 'Réunion', start: '2018-11-19 09:00', end: '2018-11-19 10:00' },
-        { title: 'Déjeuner', start: '2018-11-19 12:00', end: '2018-11-19 13:00' },
-        { title: 'Atelier', start: '2018-11-19 14:00', end: '2018-11-19 15:30' }
-      ]
+      error: false,
+      errorMsg: null,
+      colors: [
+      'event-1', 'event-2',
+      'event-3', 'event-4',
+      'event-5', 'event-6',
+      'event-7', 'event-8',
+      'event-9', 'event-10',
+      ],
+      events: [
+        { title: 'Réunion', start: '2024-10-21 09:00', end: '2024-10-22 10:00', class: 'event-1' },
+        { title: 'Déjeuner', start: '2024-10-22 12:00', end: '2024-10-22 13:00', class: 'event-9' },
+        { title: 'Atelier', start: '2024-10-24 14:00', end: '2024-10-24 15:30', class: 'event-5' }
+      ],
+      isEditing: false,
+      editingIndex: null,
     };
   },
   methods: {
-    openEventModal(date) {
-      this.selectedDate = date;
-      this.modalVisible = true; // Ouvrir le modal
+    onCellFocus(date) {
+      this.selectedDate = new Date(date);
+    },
+    openEventModal(event) {
+      const eventFound = this.events.find(e => e.start === event.start && e.end === event.end);
+      if (eventFound) {
+        alert()
+        this.eventTitle = eventFound.title;
+        this.eventStartTime = eventFound.start.split(' ')[1]; // Extraire l'heure
+        this.eventEndTime = eventFound.end.split(' ')[1]; // Extraire l'heure
+        this.isEditing = true;
+        this.editingIndex = this.events.indexOf(eventFound);
+      } else {
+        const eventStartTime = new Date(event.start).toTimeString().slice(0, 5); // Extract HH:mm
+        this.eventTitle = '';
+        this.eventStartTime = eventStartTime
+        this.eventEndTime = null;
+        this.isEditing = false;
+        this.editingIndex = null;
+      }
+      this.modalVisible = true;
     },
     addEvent() {
       if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
-        const startDateTime = `${this.selectedDate} ${this.eventStartTime}`;
-        const endDateTime = `${this.selectedDate} ${this.eventEndTime}`;
+        if (!this.selectedDate) {
+          alert("Veuillez sélectionner une date.");
+          return;
+        }
 
+        // Récupération des valeurs de l'heure
+        const [startHour, startMinute] = this.eventStartTime.split(':').map(Number);
+        const [endHour, endMinute] = this.eventEndTime.split(':').map(Number);
+
+        // Création des objets Date en utilisant les valeurs de l'année, du mois, du jour, de l'heure et des minutes
+        const startDateTime = new Date(this.selectedDate);
+        startDateTime.setHours(startHour, startMinute, 0, 0); // Définir l'heure de début
+
+        const endDateTime = new Date(this.selectedDate);
+        endDateTime.setHours(endHour, endMinute, 0, 0); // Définir l'heure de fin
+
+        // Vérification que l'heure de début est avant l'heure de fin
+        if (startDateTime >= endDateTime) {
+          this.error= true
+          this.errorMsg = "L\'heure de début doit être avant l\'heure de fin."
+          return;
+        }
+
+        // Formatage des dates au format souhaité
+        const startFormatted = `${startDateTime.toISOString().split('T')[0]} ${startDateTime.toTimeString().split(' ')[0]}`;
+        const endFormatted = `${endDateTime.toISOString().split('T')[0]} ${endDateTime.toTimeString().split(' ')[0]}`;
+
+        console.log(`Start: ${startFormatted}, End: ${endFormatted}`);
+
+        // Choisir une couleur aléatoire et ajouter l'événement
+        const randomColor = this.colors[Math.floor(Math.random() * this.colors.length)];
+        alert(Math.floor(Math.random() * this.colors.length))
         this.events.push({
+          title: this.eventTitle,
+          start: startFormatted,
+          end: endFormatted,
+          class: randomColor,
+        });
+
+        this.resetForm();
+  }
+},
+
+
+    updateEvent() {
+      if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
+        const startDateTime = `${this.selectedDate.toISOString().split('T')[0]} ${this.eventStartTime}`;
+        const endDateTime = `${this.selectedDate.toISOString().split('T')[0]} ${this.eventEndTime}`;
+
+        this.events[this.editingIndex] = {
           title: this.eventTitle,
           start: startDateTime,
           end: endDateTime,
-        });
-        this.eventTitle = ''; // Réinitialiser le titre
-        this.eventStartTime = ''; // Réinitialiser l'heure de début
-        this.eventEndTime = ''; // Réinitialiser l'heure de fin
-        this.modalVisible = false; // Fermer le modal
+          class: this.getEventClass(this.eventTitle),
+        };
+
+        this.resetForm();
       }
     },
-    onCellFocus(date) {
-      this.selectedDate = date; // Mettre à jour la date sélectionnée
+    deleteEvent() {
+      this.events.splice(this.editingIndex, 1);
+      this.resetForm();
     },
+    resetForm() {
+      this.eventTitle = '';
+      this.eventStartTime = null;
+      this.eventEndTime = null;
+      this.modalVisible = false;
+      this.isEditing = false;
+      this.editingIndex = null;
+      this.error = false
+      this.errorMsg = null
+    },
+    onCellClick(event) {
+
+    // Extraire l'heure de l'événement cliqué
+    const startHour = event.date.getHours();
+    const startMinute = event.date.getMinutes();
+
+    // Pré-remplir les heures de début et de fin
+    this.eventStartTime = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+    return this.eventStartTime
   },
+
+  }
 };
 </script>
 
 <style>
+.event-1 {
+  background-color: rgba(232, 245, 233, 0.7) !important;
+}
+.event-2 {
+  background-color: rgba(226, 242, 253, 0.7) !important;
+}
+.event-3 {
+  background-color: rgba(255, 243, 224, 0.7) !important;
+}
+.event-4 {
+  background-color: rgba(255, 204, 204, 0.7) !important;
+}
+.event-5 {
+  background-color: rgba(204, 255, 204, 0.7) !important;
+}
+.event-6 {
+  background-color: rgba(204, 204, 255, 0.7) !important;
+}
+.event-7 {
+  background-color: rgba(255, 255, 204, 0.7) !important;
+}
+.event-8 {
+  background-color: rgba(255, 235, 238, 0.7) !important;
+}
+.event-9 {
+  background-color: rgba(255, 204, 255, 0.7) !important;
+}
+.event-10 {
+  background-color: rgba(204, 255, 255, 0.7) !important;
+}
+
+
+
 .calendrier-court {
-  height: 300px; /* Ajuste la hauteur pour le premier calendrier */
-  overflow: hidden; /* Pour masquer le débordement si nécessaire */
+  height: 300px;
+  overflow: hidden;
 }
 </style>
