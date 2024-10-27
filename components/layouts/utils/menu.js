@@ -24,7 +24,7 @@ export const menuItems = [
       active: "/images/sideBarIcon/visiteur.png",
       desactive: "/images/sideBarIcon/visiteur-desactive.png",
     },
-    link: "/visiteur"
+    link: "/mes-visiteurs"
   },
   {
     id: 4,

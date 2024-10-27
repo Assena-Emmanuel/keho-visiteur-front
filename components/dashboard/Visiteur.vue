@@ -11,11 +11,11 @@
               <BRow class="mb-3">
                 <BCol sm="12" md="2">
                   Debut
-                  <BFormInput type="date" v-model="dateDebut" class="border border-secondary":options="listVisiteur" size="sm" />
+                  <BFormInput type="datetime-local" v-model="dateDebut" class="border border-secondary":options="listVisiteur" size="sm" />
                 </BCol>
                 <BCol sm="12" md="2">
                   Fin
-                  <BFormInput type="date" v-model="dateFin" class="border border-secondary":options="listVisiteur" size="sm" />
+                  <BFormInput type="datetime-local" v-model="dateFin" class="border border-secondary":options="listVisiteur" size="sm" />
                 </BCol>
                 <BCol sm="12" md="5">
                   <BFormSelect v-model="visiteurSelectionner" class="mt-4 border border-secondary":options="listVisiteur" size="sm" />

@@ -11,6 +11,7 @@
       <span class="badge bg-danger rounded-pill">{{ myNotifs.length }}</span>
     </template>
 
+
     <div class="p-3">
       <BRow class="align-items-center">
         <BCol>
@@ -20,6 +21,9 @@
         </BCol>
       </BRow>
     </div>
+
+    <!-- Popup de la notification -->
+    <DashboardNotification />
 
     <div style="max-height: 230px" data-simplebar class="bg-danger">
       <template v-if="myNotifs.length > 0">

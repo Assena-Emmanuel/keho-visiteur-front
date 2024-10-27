@@ -9,17 +9,17 @@
             <p>Bonjour monsieur <strong>{{ nomEmploye }}</strong><br>Vous avez un visiteur en Salle</p>
           </div>
           <div>
-            <div class="d-flex justify-content-between line font-size-12">
+            <div class="d-flex justify-content-between line font-size-12 line">
               <span >Nom & Prénom</span>
               <span>{{visiteur.nom}}</span>
             </div>
 
-            <div class="d-flex justify-content-between line font-size-12">
+            <div class="d-flex justify-content-between line font-size-12 line">
               <span>Entreprise</span>
               <span>{{ visiteur.entreprise }}</span>
             </div>
 
-            <div class="d-flex justify-content-between line font-size-12">
+            <div class="d-flex justify-content-between line font-size-12 line">
               <span>Contact</span>
               <span>{{ visiteur.contact }}</span>
             </div>
@@ -43,3 +43,9 @@
         }
     }
 </script>
+<style>
+.line{
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+</style>

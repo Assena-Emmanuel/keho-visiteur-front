@@ -11,29 +11,38 @@
             active-view="month"
             :disable-views="['years', 'year', 'week', 'day']"
             @cell-focus="selectedDate = $event"
-            @click="openEventModal($event)"  
-            class="vuecal--blue-theme vuecal--rounded-theme"
+            class="vuecal--blue-theme vuecal--rounded-theme calendrier-court"
           />
         </BCol>
         <BCol md="9">
           <vue-cal
             small
-            :time="false"
+            :time-from="heureDebut * 60"
+            :time-to="heureFin * 60"
             locale="fr"
+            hide-weekends
             hide-view-selector
             active-view="week"
             :selected-date="selectedDate"
-            class="vuecal--blue-theme"
+            :events="events" 
+            class="vuecal--blue-theme calendrier-long"
             @cell-focus="onCellFocus"  
+            @cell-click="openEventModal($event)"
           />
         </BCol>
       </BRow>
 
       <!-- Modal pour ajouter un événement -->
-      <BModal v-model="modalVisible" title="Ajouter un événement">
+      <BModal v-model="modalVisible" title="Ajouter un événement" hide-footer>
         <BForm @submit.prevent="addEvent">
           <BFormGroup label="Titre de l'événement">
             <BFormInput v-model="eventTitle" required />
+          </BFormGroup>
+          <BFormGroup label="Heure de début">
+            <BFormInput type="time" v-model="eventStartTime" required />
+          </BFormGroup>
+          <BFormGroup label="Heure de fin">
+            <BFormInput type="time" v-model="eventEndTime" required />
           </BFormGroup>
           <BButton type="submit" variant="primary">Ajouter</BButton>
         </BForm>
@@ -47,13 +56,21 @@ import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
 
 export default {
-  components: { VueCal},
+  components: { VueCal },
   data() {
     return {
+      heureDebut: 8,
+      heureFin: 17,
       selectedDate: null,
       modalVisible: false,
       eventTitle: '',
-      events: []  // Stocker les événements
+      eventStartTime: null,
+      eventEndTime: null,
+      events: [  // Événements par défaut
+        { title: 'Réunion', start: '2018-11-19 09:00', end: '2018-11-19 10:00' },
+        { title: 'Déjeuner', start: '2018-11-19 12:00', end: '2018-11-19 13:00' },
+        { title: 'Atelier', start: '2018-11-19 14:00', end: '2018-11-19 15:30' }
+      ]
     };
   },
   methods: {
@@ -62,12 +79,18 @@ export default {
       this.modalVisible = true; // Ouvrir le modal
     },
     addEvent() {
-      if (this.eventTitle) {
+      if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
+        const startDateTime = `${this.selectedDate} ${this.eventStartTime}`;
+        const endDateTime = `${this.selectedDate} ${this.eventEndTime}`;
+
         this.events.push({
           title: this.eventTitle,
-          date: this.selectedDate,
+          start: startDateTime,
+          end: endDateTime,
         });
         this.eventTitle = ''; // Réinitialiser le titre
+        this.eventStartTime = ''; // Réinitialiser l'heure de début
+        this.eventEndTime = ''; // Réinitialiser l'heure de fin
         this.modalVisible = false; // Fermer le modal
       }
     },
@@ -79,5 +102,8 @@ export default {
 </script>
 
 <style>
-/* Ajoute tes styles ici si nécessaire */
+.calendrier-court {
+  height: 300px; /* Ajuste la hauteur pour le premier calendrier */
+  overflow: hidden; /* Pour masquer le débordement si nécessaire */
+}
 </style>
