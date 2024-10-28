@@ -113,7 +113,6 @@ export default {
     openEventModal(event) {
       const eventFound = this.events.find(e => e.start === event.start && e.end === event.end);
       if (eventFound) {
-        alert()
         this.eventTitle = eventFound.title;
         this.eventStartTime = eventFound.start.split(' ')[1]; // Extraire l'heure
         this.eventEndTime = eventFound.end.split(' ')[1]; // Extraire l'heure
@@ -162,7 +161,6 @@ export default {
 
         // Choisir une couleur aléatoire et ajouter l'événement
         const randomColor = this.colors[Math.floor(Math.random() * this.colors.length)];
-        alert(Math.floor(Math.random() * this.colors.length))
         this.events.push({
           title: this.eventTitle,
           start: startFormatted,
