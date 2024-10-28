@@ -9,7 +9,6 @@
             locale="fr"
             hide-view-selector
             active-view="month"
-            :disable-views="['years', 'year', 'week', 'day']"
             @cell-focus="onCellFocus"
             class="vuecal--blue-theme vuecal--rounded-theme calendrier-court"
           />
@@ -21,7 +20,6 @@
             :time-to="heureFin * 60"
             locale="fr"
             hide-weekends
-            hide-view-selector
             active-view="week"
             :editable-events="true"
             :selected-date="selectedDate"
@@ -30,6 +28,7 @@
             class="vuecal--blue-theme calendrier-long"
             @cell-focus="onCellFocus"
             @cell-click="openEventModal($event)"
+
           />
         </BCol>
       </BRow>
@@ -98,9 +97,9 @@ export default {
       'event-9', 'event-10',
       ],
       events: [
-        { title: 'Réunion', start: '2024-10-21 09:00', end: '2024-10-22 10:00', class: 'event-1' },
-        { title: 'Déjeuner', start: '2024-10-22 12:00', end: '2024-10-22 13:00', class: 'event-9' },
-        { title: 'Atelier', start: '2024-10-24 14:00', end: '2024-10-24 15:30', class: 'event-5' }
+        { title: 'Réunion', start: '2024-10-28 09:00', end: '2024-10-28 10:00', class: 'event-1' },
+        { title: 'Déjeuner', start: '2024-11-1 12:00', end: '2024-11-1 13:00', class: 'event-9' },
+        { title: 'Atelier', start: '2024-10-29 14:00', end: '2024-10-29 15:30', class: 'event-5' }
       ],
       isEditing: false,
       editingIndex: null,
