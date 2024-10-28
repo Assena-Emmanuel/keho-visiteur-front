@@ -10,7 +10,7 @@
             hide-view-selector
             active-view="month"
             @cell-focus="onCellFocus"
-            class="vuecal--blue-theme vuecal--rounded-theme calendrier-court"
+            class="mb-4 vuecal--blue-theme vuecal--rounded-theme calendrier-court"
           />
         </BCol>
         <BCol md="9">
@@ -21,14 +21,14 @@
             locale="fr"
             hide-weekends
             active-view="week"
-            :editable-events="true"
+
             :selected-date="selectedDate"
             :events="events" 
             :eventsCountOnYearView=true
             class="vuecal--blue-theme calendrier-long"
             @cell-focus="onCellFocus"
             @cell-click="openEventModal($event)"
-
+            @event-click="openEventModal($event)"
           />
         </BCol>
       </BRow>
@@ -45,12 +45,12 @@
             <BFormInput v-model="eventTitle" required class="border border-secondary" />
           </BFormGroup>
           <BRow class="mt-3 mb-3">
-            <BCol md="6">
+            <BCol md="6" sm="6" cols="6">
               <BFormGroup label="Heure de début">
                 <BFormInput :min="8" :max="17" type="time" v-model="eventStartTime" required class="border border-secondary" />
               </BFormGroup>
             </BCol>
-            <BCol md="6">
+            <BCol md="6" sm="6" cols="6">
                 <BFormGroup label="Heure de fin">
                   <BFormInput :min="heureDebut" :max="heureFin" type="time" v-model="eventEndTime" required class="border border-secondary" />
                 </BFormGroup>
@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import { title } from 'process';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
 
@@ -111,12 +112,19 @@ export default {
     },
     openEventModal(event) {
       const eventFound = this.events.find(e => e.start === event.start && e.end === event.end);
-      if (eventFound) {
-        this.eventTitle = eventFound.title;
-        this.eventStartTime = eventFound.start.split(' ')[1]; // Extraire l'heure
-        this.eventEndTime = eventFound.end.split(' ')[1]; // Extraire l'heure
+      console.log(event.start.time)
+      if (event._eid) {
+        this.eventTitle = event.title;
+        this.eventStartTime = event.start // Extraire l'heure
+        this.eventEndTime = event.end // Extraire l'heure
         this.isEditing = true;
-        this.editingIndex = this.events.indexOf(eventFound);
+        let obj = {
+          title: this.eventTitle,
+          start: this.eventStartTime,
+          end: this.eventEndTime,
+          class: event.class
+        }
+        this.editingIndex = this.events.indexOf(obj);
       } else {
         const eventStartTime = new Date(event.start).toTimeString().slice(0, 5); // Extract HH:mm
         this.eventTitle = '';
@@ -212,6 +220,15 @@ export default {
     return this.eventStartTime
   },
 
+  // confirmDeleteEvent(event) {
+  //     if (confirm(`Voulez-vous vraiment supprimer "${event.title}" ?`)) {
+  //       this.deleteEvent(event.id); // Appelez la méthode de suppression
+  //     }
+  //   },
+  //   deleteEvent(eventId) {
+  //     this.events = this.events.filter(event => event.id !== eventId); // Supprimez l'événement
+  //   }
+
   }
 };
 </script>
@@ -247,7 +264,6 @@ export default {
 .event-10 {
   background-color: rgba(204, 255, 255, 0.7) !important;
 }
-
 
 
 .calendrier-court {
