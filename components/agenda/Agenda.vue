@@ -23,6 +23,7 @@
             hide-weekends
             hide-view-selector
             active-view="week"
+            :editable-events="true"
             :selected-date="selectedDate"
             :events="events" 
             :eventsCountOnYearView=true
