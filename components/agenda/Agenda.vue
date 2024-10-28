@@ -112,7 +112,7 @@ export default {
     },
     openEventModal(event) {
       const eventFound = this.events.find(e => e.start === event.start && e.end === event.end);
-      console.log(event.start.time)
+      console.log(event.start)
       if (event._eid) {
         this.eventTitle = event.title;
         this.eventStartTime = event.start // Extraire l'heure
