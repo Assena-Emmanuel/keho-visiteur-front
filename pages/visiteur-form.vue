@@ -98,6 +98,31 @@
                             </div>
                         </div>
                     </BCol>
+                    <BCol md="4">
+                        <div class="mb-3">
+                            <label for="email" class="fw-bold text-black" style="font-size: 12px;">E-mail <strong class="text-danger">*</strong></label>
+                            <div>
+                                <input 
+                                v-model="email" 
+                                id="email" 
+                                placeholder="exemple@gmail.com"
+                                class="form-control form-control-sm"  
+                                type="email"
+                                maxlength="10"  
+                                :class="{
+                                'is-invalid': submitted && v$.email.$error,
+                                'border border-danger': submitted && v$.email.$error,
+                                'border border-secondary': !(submitted && v$.email.$error)
+                                }">
+                                <div v-if="submitted && v$.email.$error" class="invalid-feedback">
+                                    <span v-if="v$.email.required.$invalid" class="font-size-12">champ obligatoire
+                                    </span>
+                                    <span v-if="v$.email.email.$invalid">Email invalide
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </BCol>
 
                     <BCol md="4">
                         <div class="mb-3">
@@ -297,9 +322,9 @@
     definePageMeta({
         layout: "utility"
     });
-    import { useVuelidate } from "@vuelidate/core";
+    import { useVuelidate} from "@vuelidate/core";
   
-    import { required } from "@vuelidate/validators";
+    import { email, required } from "@vuelidate/validators";
     export default {
         setup() {
             return { v$: useVuelidate() };
@@ -322,7 +347,8 @@
                 chefEquipe: false,
                 immatricule: "",
                 codeVisite: "",
-                photoPiece: ""
+                photoPiece: "",
+                email: ""
 
             }
         },
@@ -333,6 +359,10 @@
             },
             codeVisite: {
                 required,
+            },
+            email: {
+                required,
+                email
             },
             prenom: {
                 required,
@@ -367,6 +397,7 @@
                     this.v$.telephone.$error ||
                     this.v$.numPiece.$error ||
                     this.v$.codeVisite.$error ||
+                    this.v$.email.$error ||
                     (this.vehicule && this.v$.immatricule.$error)
                 ) {
                     return;
