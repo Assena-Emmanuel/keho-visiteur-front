@@ -10,6 +10,15 @@ export const menuItems = [
   },
   {
     id: 4,
+    label: "Mon Agenda",
+    icon: {
+      active: "/images/sideBarIcon/calendrier.png",
+      desactive: "/images/sideBarIcon/calendrier-desactive.png",
+    },
+    link: "/agenda"
+  },
+  {
+    id: 4,
     label: "Visiteurs",
     icon:{
       active: "/images/sideBarIcon/visiteur.png",
@@ -26,15 +35,7 @@ export const menuItems = [
     },
     link: "/mes-visiteurs"
   },
-  {
-    id: 4,
-    label: "Mon Agenda",
-    icon: {
-      active: "/images/sideBarIcon/calendrier.png",
-      desactive: "/images/sideBarIcon/calendrier-desactive.png",
-    },
-    link: "/agenda"
-  },
+  
  
   // {
   //   id: 25,

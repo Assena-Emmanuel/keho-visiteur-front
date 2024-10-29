@@ -29,7 +29,7 @@ export default {
 
 <template>
   <BRow>
-    <BCol v-for="(data, index) in datas" :key="index" :md="getCol" sm="getCol" cols="getCol">
+    <BCol v-for="(data, index) in datas" :key="index" :md="getCol" :sm="getCol" :cols="getCol">
       <LayoutsCommonStatStatatistique 
         :titre="data.titre" 
         :valeur="data.valeur" 

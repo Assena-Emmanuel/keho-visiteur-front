@@ -1,5 +1,5 @@
 <template>
-    <BModal v-model="afficherModalNotification" title="Notification et envoi du visiteur" hide-footer>
+    <BModal @update:value="afficherModalNotification = $event" :value="afficherModalNotification" title="Notification et envoi du visiteur" hide-footer>
       <div class="d-flex justify-content-center gap-3 pb-2">
         <div style="height: 100%;">
           <BImg thumbnail fluid src="/images/pages/personne.png" width="140" height="100" alt="Image 1" />
@@ -32,7 +32,6 @@
     export default {
         data(){
             return{
-                afficherModalNotification: true,
                 nomEmploye: 'KOUADIO Konan Jean',
                 visiteur: {
                 nom: 'Koffi Jean',
@@ -40,6 +39,9 @@
                 contact: '07 07 07 07 00'
                 },
             }
+        },
+        props:{
+          afficherModalNotification: Boolean,
         }
     }
 </script>
