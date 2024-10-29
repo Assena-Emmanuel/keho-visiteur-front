@@ -23,7 +23,7 @@
     </div>
 
     <!-- Popup de la notification -->
-    <DashboardNotification :afficherModalNotification="true" />
+    <DashboardNotification :afficherModalNotification="false" />
 
     <div style="max-height: 230px" data-simplebar class="bg-danger">
       <template v-if="myNotifs.length > 0">
