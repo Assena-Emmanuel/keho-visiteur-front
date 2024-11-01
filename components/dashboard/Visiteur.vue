@@ -1,6 +1,73 @@
 <template>
     <DashboardCommonStat />
     
+
+    <!-- Modal détail -->
+    <BModal v-model="detailModal" hide-footer title="Détails des Visites">
+      
+      <div v-for="item in paginatedData" :key="item['Code visite']">
+        <div class="text-center"><h4>M. {{ item['Nom & Prénoms'] }}</h4>
+          <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">délégué</span>
+          <span class="border border-success rounded px-2 ms-2">Statut visite: <span class="text-success">Terminé</span></span>
+          <span class="border border-primary rounded px-2 ms-2 text-primary">Date: <span>{{ item.Date }}</span></span>
+        </div>
+        <hr class="text-secondary">
+        <div class="row">
+          <div class="col col-md-6">
+            <p><strong>Téléphone:</strong> {{ item.Telephone }}</p>
+          </div>
+          <div class="col col-md-6">
+            <p><strong>Société:</strong> {{ item.Société }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col col-md-6">
+            <p><strong>E-mail:</strong> {{ item.Email }}</p>
+          </div>
+          <div class="col col-md-6">
+            <p><strong>Code visiteur:</strong> {{ item['Code visiteur'] }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col col-md-6">
+            <p><strong>Type pièce:</strong> {{ item.TypePiece }}</p>
+          </div>
+          <div class="col col-md-6">
+            <p><strong>Num pièce:</strong> {{ item.CNI }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col col-md-6">
+            <p><strong>Employé:</strong> {{ item.Employé }}</p>
+          </div>
+          <div class="col col-md-6">
+            <p><strong>Code:</strong> {{ item["Code visite"] }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col col-md-6">
+            <p><strong>Heure d'entrée:</strong> {{ item['H entrée'] }}</p>
+          </div>
+          <div class="col col-md-6">
+            <p><strong>Heure de Sortie:</strong> {{ item["H Sortie"] }}</p>
+          </div>
+        </div>
+        <div class="bg-secondary text-center text-light">En délégation</div>
+        <hr />
+      </div>
+      <div class="d-flex justify-content-end">
+        <BPagination
+        v-model="page"
+        :total-rows="items.length"
+        :per-page="itemsPerPage"
+        aria-controls="modal-pagination"
+      ></BPagination>
+      </div>
+      
+    </BModal>
+
+
+
     <div class="mb-2"><span>Visites enregistrées</span></div>
     <div>
       <!-- Tableau des visiteurs -->
@@ -40,11 +107,7 @@
                   v-model:sort-desc.sync="sortDesc" 
                   @filtered="onFiltered" 
                 >
-                <BTr>
-                  <BTh v-for="(field, index) in fields" :key="field.key" :class="index === 0 ? 'sticky-column' : ''">
-                    {{ field.key }}
-                  </BTh>
-                </BTr>
+                :
                   <template #cell(Statut)="row">
                     <span v-if="row.item.Statut" class="badge rounded-pill text-bg-success">activé</span>
                     <span v-if="!row.item.Statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
@@ -58,7 +121,7 @@
                           <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
                             <i class="uil uil-trash-alt font-size-15"></i>
                           </BButton>
-                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex justify-content-center align-items-center" @click="showDetailsModal(row.index, data, typeForme)">
+                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex justify-content-center align-items-center" @click="showDetailsModal">
                             <i class="fas fa-eye"></i>
                           </BButton>
                       </div>
@@ -97,15 +160,54 @@
 export default {
     data() {
         return {
-        isActive: 'Jour' ,
-        dateDebut: '',
-        dateFin: '',
-        visiteurSelectionner: null,
-        listVisiteur : [
-        {value: null, text: 'Liste Visiteurs'},
-        {value: '1', text: 'AKA ANDRE'},
-        
-        ],
+          items: [ 
+          {
+              Date: "2024/10/20",
+              "Nom & Prénoms": "Dupont Jean",
+              Delegué: true,
+              TypePiece: "Carte Nationale d'Identité (CNI)",
+              Telephone: "0900020319",
+              Email: "dupond@gmail.com",
+              CNI: "C123456789",
+              Société: "Société A",
+              "Code visiteur": "VTR-xxx",
+              "Code visite": "017",
+              Employé: "KOUADIO Konan jean",
+              Visite: "RDV",
+              "H entrée": "08:30",
+              Statut: "Terminé",
+              "H Sortie": "12:30",
+          },
+          {
+              Date: "2024/10/10",
+              Delegué: false,
+              "Nom & Prénoms": "Aka André",
+              TypePiece: "Carte Nationale d'Identité (CNI)",
+              Telephone: "0700020310",
+              Email: "aka@gmail.com",
+              CNI: "C000956789",
+              Société: "Société B",
+              "Code visiteur": "VTR-xxx",
+              "Code visite": "006",
+              Employé: "Ouattara Khader",
+              Visite: "RDV",
+              "H entrée": "10:30",
+              Statut: "en cours",
+              "H Sortie": "11:38",
+          }
+           ],
+          page: 1,
+          itemsPerPage: 1,
+
+          detailModal: true,
+          isActive: 'Jour' ,
+          dateDebut: '',
+          dateFin: '',
+          visiteurSelectionner: null,
+          listVisiteur : [
+          {value: null, text: 'Liste Visiteurs'},
+          {value: '1', text: 'AKA ANDRE'},
+          ],
 
         totalRows: 1,
         currentPage: 1,
@@ -120,55 +222,43 @@ export default {
             {key: "Nom & Prénoms"},
             {key: "CNI"},
             {key: "Société"},
+            {key: "Code visiteur"},
+            {key: "Code visite"},
             {key: "Employé"},
             {key: "Visite"},
             {key: "H entrée"},
-            {key: "Statut"},
-            {key: "H statut"},
+            {key: "statut"},
             {key: "H Sortie"},
-            {key: "Ecart"},
             {key: "Actions"},
         ],
         title: null,
         data: [
           {
-              Date: "2024-10-20",
+              Date: "2024/10/20",
               "Nom & Prénoms": "Dupont Jean",
-              CNI: "123456789",
+              CNI: "C123456789",
               Société: "Société A",
-              Employé: "Oui",
-              Visite: "Non",
+              "Code visiteur": "VTR-xxx",
+              "Code visite": "017",
+              Employé: "KOUADIO Konan jean",
+              Visite: "RDV",
               "H entrée": "08:30",
-              Statut: "Actif",
-              "H statut": "09:00",
-              "H Sortie": "17:00",
-              Ecart: "0h30",
+              Statut: "Terminé",
+              "H Sortie": "12:30",
           },
           {
-              Date: "2024-10-21",
-              "Nom & Prénoms": "Martin Claire",
-              CNI: "987654321",
+              Date: "2024/10/10",
+              "Nom & Prénoms": "Aka André",
+             
+              CNI: "C000956789",
               Société: "Société B",
-              Employé: "Non",
-              Visite: "Oui",
-              "H entrée": "09:00",
-              Statut: "En attente",
-              "H statut": "10:00",
-              "H Sortie": "15:00",
-              Ecart: "1h00",
-          },
-          {
-              Date: "2024-10-22",
-              "Nom & Prénoms": "Lefèvre Sophie",
-              CNI: "456789123",
-              Société: "Société C",
-              Employé: "Oui",
-              Visite: "Non",
-              "H entrée": "08:00",
-              Statut: "Actif",
-              "H statut": "08:30",
-              "H Sortie": "16:30",
-              Ecart: "0h00",
+              "Code visiteur": "VTR-xxx",
+              "Code visite": "006",
+              Employé: "Ouattara Khader",
+              Visite: "RDV",
+              "H entrée": "10:30",
+              Statut: "en cours",
+              "H Sortie": "11:38",
           }
         ],
     };
@@ -183,6 +273,10 @@ export default {
 
         handleEdit(index, data) {
           alert(index)
+        },
+
+        showDetailsModal(){
+          this.detailModal = !this.detailModal
         },
 
         confirmDelete(code) {
@@ -239,6 +333,11 @@ export default {
         );
       }
       return this.data;
+    },
+    paginatedData() {
+      const start = (this.page - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.items.slice(start, end);
     }
   },
   mounted() {
