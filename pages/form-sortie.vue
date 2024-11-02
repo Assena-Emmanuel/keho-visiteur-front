@@ -107,7 +107,7 @@
           <vue-awesome-paginate
             :total-items="items.length"
             :items-per-page="1"
-            :max-pages-shown="items.length>= 18 ? 3 : 5"
+            :max-pages-shown="items.length>= 18 ? 2 : 5"
             v-model="currentPage"
           />
         </div>
