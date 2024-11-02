@@ -15,9 +15,9 @@
                 </div>
             </div>
             <div class="text-center text-secondary" style="margin: 2em 0 5em 0;">
-                <h5 class="text-secondary fw-bold">Merci pour votre <br> visite chaleureuse.</h5>
+                <h5 class="fw-bold" style="color: #0052a5;">Merci pour votre <br> visite chaleureuse.</h5>
                 <div style="margin-top: 3em;">
-                    <h4 class="text-secondary">AUREVOIR</h4>
+                    <h4 style="color: #00b140;">AUREVOIR</h4>
                 </div>
             </div>
         </BCardBody>

@@ -61,6 +61,7 @@
     "vue-easy-lightbox": "^1.16.0",
     "vue-flatpickr-component": "^11.0.3",
     "vue-i18n": "^9.2.2",
+    "vue-multiselect": "^3.1.0",
     "vue-qrcode-reader": "^5.5.11",
     "vue-web-cam": "^1.9.0",
     "vue3-apexcharts": "^1.4.4",
