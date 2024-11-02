@@ -103,12 +103,14 @@
               
             </div>
           </div>
+          <div class="d-flex justify-content-center">
           <vue-awesome-paginate
             :total-items="items.length"
             :items-per-page="1"
-            :max-pages-shown="5"
+            :max-pages-shown="items.length>= 18 ? 3 : 5"
             v-model="currentPage"
           />
+        </div>
         </BForm>
         </BCardBody>
       </BCard>
@@ -138,23 +140,160 @@
         submitted: false,
         currentPage: 1,
         items: [
-          {
-            'Code Visiteur': '------------',
-            'Nom & Prénom': 'KOFFI JEAN',
-            Pièce: 'CNI',
-            numPiece: 'C0078453691',
-            Société: 'Keho Groupe',
-            Contact: '+225 0707142536'
-          },
-          {
-            'Code Visiteur': '------------',
-            'Nom & Prénom': 'ZIE Fatou',
-            Pièce: 'CNI',
-            numPiece: 'C0097353689',
-            Société: 'Keho Groupe',
-            Contact: '+225 0709182532'
-          },
-        ],
+  {
+    "Code Visiteur": "A123456",
+    "Nom & Prénom": "KOFFI JEAN",
+    "Pièce": "CNI",
+    "numPiece": "C0078453691",
+    "Société": "Keho Groupe",
+    "Contact": "+225 0707142536"
+  },
+  {
+    "Code Visiteur": "B654321",
+    "Nom & Prénom": "DOE MARIE",
+    "Pièce": "Passeport",
+    "numPiece": "P0098765432",
+    "Société": "Abidjan Services",
+    "Contact": "+225 0587943625"
+  },
+  {
+    "Code Visiteur": "C098765",
+    "Nom & Prénom": "OUATTARA ALI",
+    "Pièce": "CNI",
+    "numPiece": "C0078943125",
+    "Société": "Transco",
+    "Contact": "+225 0758213456"
+  },
+  {
+    "Code Visiteur": "D678901",
+    "Nom & Prénom": "KOUADIO EMMANUEL",
+    "Pièce": "Passeport",
+    "numPiece": "P0054897321",
+    "Société": "Groupe Omega",
+    "Contact": "+225 0745932186"
+  },
+  {
+    "Code Visiteur": "E345678",
+    "Nom & Prénom": "TRA BI AMANDINE",
+    "Pièce": "CNI",
+    "numPiece": "C0082365478",
+    "Société": "Ivotel",
+    "Contact": "+225 0792435681"
+  },
+  {
+    "Code Visiteur": "F234567",
+    "Nom & Prénom": "YAO ANNE",
+    "Pièce": "Passeport",
+    "numPiece": "P0043218765",
+    "Société": "CIE",
+    "Contact": "+225 0543287945"
+  },
+  {
+    "Code Visiteur": "G456789",
+    "Nom & Prénom": "BLE GUILLAUME",
+    "Pièce": "CNI",
+    "numPiece": "C0098354721",
+    "Société": "Sotra",
+    "Contact": "+225 0589632147"
+  },
+  {
+    "Code Visiteur": "H567890",
+    "Nom & Prénom": "SANGARE MARIAM",
+    "Pièce": "Passeport",
+    "numPiece": "P0012457893",
+    "Société": "Prosuma",
+    "Contact": "+225 0532174896"
+  },
+  {
+    "Code Visiteur": "I789012",
+    "Nom & Prénom": "FOFANA AMARA",
+    "Pièce": "CNI",
+    "numPiece": "C0038745126",
+    "Société": "MTN CI",
+    "Contact": "+225 0712345896"
+  },
+  {
+    "Code Visiteur": "J890123",
+    "Nom & Prénom": "N'DRI MATHIEU",
+    "Pièce": "Passeport",
+    "numPiece": "P0075123468",
+    "Société": "Orange CI",
+    "Contact": "+225 0551234789"
+  },
+  {
+    "Code Visiteur": "K901234",
+    "Nom & Prénom": "ADOU PAUL",
+    "Pièce": "CNI",
+    "numPiece": "C0084567391",
+    "Société": "NSIA",
+    "Contact": "+225 0703456892"
+  },
+  {
+    "Code Visiteur": "L012345",
+    "Nom & Prénom": "TOURE FATOU",
+    "Pièce": "Passeport",
+    "numPiece": "P0032674819",
+    "Société": "CNPS",
+    "Contact": "+225 0591342678"
+  },
+  {
+    "Code Visiteur": "M123456",
+    "Nom & Prénom": "DIALLO ISMAEL",
+    "Pièce": "CNI",
+    "numPiece": "C0065432189",
+    "Société": "CFAO",
+    "Contact": "+225 0745671293"
+  },
+  {
+    "Code Visiteur": "N234567",
+    "Nom & Prénom": "KONE MARIAMA",
+    "Pièce": "Passeport",
+    "numPiece": "P0043527186",
+    "Société": "Air Côte d'Ivoire",
+    "Contact": "+225 0554728391"
+  },
+  {
+    "Code Visiteur": "O345678",
+    "Nom & Prénom": "ZADI FLORENT",
+    "Pièce": "CNI",
+    "numPiece": "C0089764325",
+    "Société": "Sedec",
+    "Contact": "+225 0791342589"
+  },
+  {
+    "Code Visiteur": "P456789",
+    "Nom & Prénom": "KOUAME THOMAS",
+    "Pièce": "Passeport",
+    "numPiece": "P0056893247",
+    "Société": "EECI",
+    "Contact": "+225 0782135469"
+  },
+  {
+    "Code Visiteur": "Q567890",
+    "Nom & Prénom": "SIA ANNE-MARIE",
+    "Pièce": "CNI",
+    "numPiece": "C0032145897",
+    "Société": "La BICICI",
+    "Contact": "+225 0541237896"
+  },
+  {
+    "Code Visiteur": "R678901",
+    "Nom & Prénom": "N'GUESSAN CYRIL",
+    "Pièce": "Passeport",
+    "numPiece": "P0091245783",
+    "Société": "BNI",
+    "Contact": "+225 0532146789"
+  },
+  {
+    "Code Visiteur": "S789012",
+    "Nom & Prénom": "TANOH SIMON",
+    "Pièce": "CNI",
+    "numPiece": "C0074359821",
+    "Société": "Ecobank",
+    "Contact": "+225 0712345698"
+  },
+ 
+],
         codeVisiteur: null,
         options: [
           {code: 'VTR-001'},
