@@ -121,6 +121,10 @@
                             <div class="mb-3">
                                 <BFormSelect v-model="planning" class="mt-4 border border-secondary":options="listplanning" size="sm" />
                             </div>
+                            <BRow>
+                                <BCol md="8" class=""><button class="btn btn-success">IMPRIMER LE ICKER</button></BCol>
+                                <BCol md="4"><input v-model="nbTicket" type="number" class="form-control"></BCol>
+                            </BRow>
                             
                         </BCardBody>
                     </BCard>
@@ -136,6 +140,7 @@
 export default {
     data() {
         return {
+            nbTicket: 1,
             employeSelectionner:null,
             planning: null,
             listplanning:[
