@@ -71,7 +71,7 @@
               </div>
             </BCol>
           </BRow>
-          <div class="border border-success p-3 mb-3">
+          <div class="rounded p-3 mb-3" style="border: 1px solid #0052a5;">
             <div v-for="(item, index) in paginatedData" :key="index">
               <p style="background-color: #ff7900; color: #fff;" class="fw-bold text-center">Code Visiteur: {{ item['Code Visiteur'] }}</p>
               <BRow>
