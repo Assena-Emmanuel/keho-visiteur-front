@@ -25,6 +25,7 @@ type NuxtAppInjections =
   InjectionType<typeof import("../../plugins/sweetalert").default> &
   InjectionType<typeof import("../../plugins/qrcode-reader.js").default> &
   InjectionType<typeof import("../../plugins/vue-cal.js").default> &
+  InjectionType<typeof import("../../plugins/vue-awesome-paginate.js").default> &
   InjectionType<typeof import("../../plugins/i18n.client.js").default> &
   InjectionType<typeof import("../../plugins/pusher.js").default> &
   InjectionType<typeof import("../../plugins/vueBootstrap.client.js").default>

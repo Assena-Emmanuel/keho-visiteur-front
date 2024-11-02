@@ -199,7 +199,7 @@ export default {
           page: 1,
           itemsPerPage: 1,
 
-          detailModal: true,
+          detailModal: false,
           isActive: 'Jour' ,
           dateDebut: '',
           dateFin: '',
