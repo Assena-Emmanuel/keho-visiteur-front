@@ -29,12 +29,12 @@ export default {
 
                 <span class="logo-md d-none d-md-block d-lg-none">
                     <!-- Logo pour écran moyen (tablette) -->
-                    <img src="/images/total.jpg" alt="logo-md" height="50" />
+                    <img src="/images/total.jpg" alt="logo-md" height="30" />
                 </span>
 
                 <span class="logo-lg d-none d-lg-block">
                     <!-- Logo pour grand écran (ordinateur) -->
-                    <img src="/images/total.jpg" alt="logo-lg" height="70" />
+                    <img src="/images/total.jpg" alt="logo-lg" height="50" />
                 </span>
 
             </div>

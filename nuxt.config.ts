@@ -4,6 +4,7 @@ export default defineNuxtConfig({
     '~/plugins/sweetalert.ts',
     '~/plugins/qrcode-reader.js',
    '~/plugins/vue-cal.js',
+   '~/plugins/vue-awesome-paginate.js',
   ],
 
   app: {

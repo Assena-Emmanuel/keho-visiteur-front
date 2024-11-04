@@ -6,12 +6,37 @@
         
         id="qr-topbar"
     >
-        
+    
+    <!-- Test Modal -->
+
+
         <BCardBody>
             <h3 class="text-center">Je m'identifie</h3>
             <hr>
             <BForm class="form-vertical  px-3" role="form">
                 <BRow>
+                    <BCol sm="4" class="mb-3">
+                        <label for="civilite" style="font-size: 12px; font-weight: bolder">Civilité<strong class="text-danger">*</strong></label>
+                        <div class="input-group">
+                        <select v-model="civilite" id="civilite" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example" 
+                        :class="{
+                            'is-invalid': submitted && v$.civilite.$error,
+                            'border border-danger': submitted && v$.civilite.$error,
+                            'border border-secondary': !(submitted && v$.civilite.$error)
+                            }"
+                        >
+                            <option value="" selected>civilité...</option>
+                            <option value="MONSIEUR">MONSIEUR</option>
+                            <option value="MADAME">MADAME</option>
+                            <option value="MADEMOISELLE">MADEMOISELLE</option>
+                        </select>
+                        <div v-if="next && v$.civilite.$error" class="invalid-feedback">
+                            <span v-if="v$.civilite.required.$invalid">champ obligatoire
+                            </span>
+                        </div>
+                        </div>
+                    </BCol>
+
                     <BCol md="4">
                         <div class="mb-3">
                         <label for="nom" class="fw-bold text-black" style="font-size: 12px;">Nom <strong class="text-danger">*</strong></label>
@@ -98,6 +123,31 @@
                             </div>
                         </div>
                     </BCol>
+                    <BCol md="4">
+                        <div class="mb-3">
+                            <label for="email" class="fw-bold text-black" style="font-size: 12px;">E-mail <strong class="text-danger">*</strong></label>
+                            <div>
+                                <input 
+                                v-model="email" 
+                                id="email" 
+                                placeholder="exemple@gmail.com"
+                                class="form-control form-control-sm"  
+                                type="email"
+                                maxlength="10"  
+                                :class="{
+                                'is-invalid': submitted && v$.email.$error,
+                                'border border-danger': submitted && v$.email.$error,
+                                'border border-secondary': !(submitted && v$.email.$error)
+                                }">
+                                <div v-if="submitted && v$.email.$error" class="invalid-feedback">
+                                    <span v-if="v$.email.required.$invalid" class="font-size-12">champ obligatoire
+                                    </span>
+                                    <span v-if="v$.email.email.$invalid">Email invalide
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </BCol>
 
                     <BCol md="4">
                         <div class="mb-3">
@@ -148,7 +198,7 @@
                         </div>
                     </BCol>
 
-                    <BCol md="4">
+                    <!-- <BCol md="4">
                         <div class="mb-3">
                             <label for="visite" class="fw-bold text-black" style="font-size: 12px;">Type de Visite <strong class="text-danger">*</strong></label>
                             <div class="input-group">
@@ -173,7 +223,7 @@
                                 </div>
                             </div>
                         </div>
-                    </BCol>
+                    </BCol> -->
 
                     <BCol md="4">
                         <div class="mb-3">
@@ -297,18 +347,21 @@
     definePageMeta({
         layout: "utility"
     });
-    import { useVuelidate } from "@vuelidate/core";
+    import { useVuelidate} from "@vuelidate/core";
+    import Visiteur from "~/components/detail/Visiteur.vue";
   
-    import { required } from "@vuelidate/validators";
+    import { email, required } from "@vuelidate/validators";
     export default {
         setup() {
             return { v$: useVuelidate() };
         },
-        // components: {
-        //     'vue-web-cam': WebCam
-        // },
+        components: {
+            Visiteur,
+        },
         data(){
             return{
+                detailModal:true,
+
                 submitted: false,
                 nom: "",
                 prenom: "",
@@ -316,13 +369,15 @@
                 telephone: "",
                 typePiece: "",
                 numPiece: "",
+                civilite: "",
                 visite: "",
                 delegation: false,
                 vehicule: false,
                 chefEquipe: false,
                 immatricule: "",
                 codeVisite: "",
-                photoPiece: ""
+                photoPiece: "",
+                email: ""
 
             }
         },
@@ -331,8 +386,15 @@
             nom: {
                 required,
             },
+            civilite: {
+                required,
+            },
             codeVisite: {
                 required,
+            },
+            email: {
+                required,
+                email
             },
             prenom: {
                 required,
@@ -367,6 +429,8 @@
                     this.v$.telephone.$error ||
                     this.v$.numPiece.$error ||
                     this.v$.codeVisite.$error ||
+                    this.v$.email.$error ||
+                    this.v$.civilite.$error ||
                     (this.vehicule && this.v$.immatricule.$error)
                 ) {
                     return;

@@ -36,7 +36,7 @@
             @click="choisirAppareil"
             class="border border-secondary"
         >
-          Appareil photo {{ afficheCamera }}
+          Appareil photo 
         </BFormCheckbox>
       </div>
 
@@ -51,7 +51,7 @@
                     <i class="fas fa-camera-retro"></i> <span class="d-md-block d-none">Capturer Verso</span><span class="d-md-none d-block">Verso</span>
                 </button>
                 
-                <button class="btn btn-secondary" @click="reset('canvas')" id="resetBtn" :style="{ display: !appareilRecto ? 'none' : 'block' }">
+                <button class="btn btn-secondary" @click="reset('canvas')" id="resetBtn" :style="{ display: !appareilRecto  ? 'none' : 'block' }">
                     <i class="fas fa-sync-alt"></i> <span class="d-md-block d-none">Réinitialisation</span>
                 </button>
                 <button class="btn btn-secondary" @click="reset('canvasVerso')" id="resetBtn" :style="{ display: !appareilVerso ? 'none' : 'block' }">
@@ -113,6 +113,10 @@ export default {
       if(this.afficheCamera){
         this.video.style.display = 'none';
         this.affichebtn = false
+        this.appareilRecto = false
+        this.appareilVerso = false
+        this.reset('canvasVerso')
+        this.reset('canvas')
       }
       this.afficheCamera=!this.afficheCamera
     },
@@ -184,6 +188,7 @@ export default {
         // Réinitialiser l'image du canvas
         this[canvas].getContext('2d').clearRect(0, 0, this[canvas].width, this[canvas].height);
         this[canvas].style.display = 'none';
+
     },
 
     toggleButtons(show) {
