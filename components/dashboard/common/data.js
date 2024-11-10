@@ -79,7 +79,7 @@ export const areaChartData = {
       labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
       datasets: [
           {
-              label: "Visites RDV",
+              label: "Visites",
               data: [10, 20, 15, 25, 30, 40],
               fill: true,
               backgroundColor: "rgba(75, 192, 192, 0.2)",
@@ -91,8 +91,8 @@ export const areaChartData = {
               label: "Visites rejétées",
               data: [8, 12, 18, 22, 28, 30],
               fill: true,
-              backgroundColor: "rgb(233, 143, 123)",
-              borderColor: "red",
+              backgroundColor: "rgba(255, 0, 0, 0.2)",  
+              borderColor: "rgba(255, 0, 0, 1)",
               borderWidth: 3,
               tension: 0.2,
           }
