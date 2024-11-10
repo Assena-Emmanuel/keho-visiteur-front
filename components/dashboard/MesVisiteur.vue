@@ -4,7 +4,7 @@
 
     <!-- Modal détail -->
     <BModal v-model="detailModal" hide-footer title="Détails des Visites">
-        <div class="d-flex justify-content-end my-3">
+        <div class="d-flex justify-content-end">
             <BButton variant="primary" size="sm" >
                 <i class="uil uil-print font-size-15 annuler"></i> Imprimer
             </BButton>
