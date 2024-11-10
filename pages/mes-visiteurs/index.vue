@@ -1,6 +1,5 @@
 <script>
 import "simplebar";
-import Visiteur from "~/components/dashboard/Visiteur.vue";
 
 
 export default {
@@ -28,5 +27,5 @@ export default {
   <SiteHeader :title="title" />
   <PageHeader :title="title" :items="items" />
   
-  <DashboardVisiteur />
+  <DashboardMesVisiteur />
 </template>

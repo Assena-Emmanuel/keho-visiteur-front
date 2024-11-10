@@ -4,12 +4,16 @@
 
     <!-- Modal détail -->
     <BModal v-model="detailModal" hide-footer title="Détails des Visites">
-      
+      <div class="d-flex justify-content-end">
+        <BButton  size="sm" >
+            Imprimer
+        </BButton>
+      </div>
       <div v-for="item in paginatedData" :key="item['Code visite']">
         <div class="text-center"><h4>M. {{ item['Nom & Prénoms'] }}</h4>
-          <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">délégué</span>
-          <span class="border border-success rounded px-2 ms-2">Statut visite: <span class="text-success">Terminé</span></span>
-          <span class="border border-primary rounded px-2 ms-2 text-primary">Date: <span>{{ item.Date }}</span></span>
+          <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">Délégué</span>
+          <span class="border border-success rounded px-2 ms-2">Statut: <span class="text-success">Terminé</span></span>
+          <span class="border border-primary rounded px-2 ms-2 text-primary"><span>{{ item.Date }}</span></span>
         </div>
         <hr class="text-secondary">
         <div class="row">
@@ -115,13 +119,13 @@
 
                   <template #cell(Actions)="row">
                       <div class="d-flex gap-1">
-                          <!-- <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 text-primary d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)">
-                              <i class="fas fa-edit" ></i>
-                          </BButton> -->
+                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-danger d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'Annuler'">
+                            <i class="uil uil-ban font-size-15 annuler"></i>
+                          </BButton>
                           <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
                             <i class="uil uil-trash-alt font-size-15"></i>
                           </BButton>
-                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex justify-content-center align-items-center" @click="showDetailsModal">
+                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex text-primary justify-content-center align-items-center" @click="showDetailsModal">
                             <i class="fas fa-eye"></i>
                           </BButton>
                       </div>
@@ -360,4 +364,5 @@ export default {
     background-color: white; /* Fond blanc */
     color: gray; /* Couleur du texte */
 }
+
 </style>

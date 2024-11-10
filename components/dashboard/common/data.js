@@ -88,11 +88,11 @@ export const areaChartData = {
               tension: 0.2,
           },
           {
-              label: "Visites sans RDV",
+              label: "Visites rejétées",
               data: [8, 12, 18, 22, 28, 30],
               fill: true,
-              backgroundColor: "rgba(54, 162, 235, 0.2)",
-              borderColor: "rgba(54, 162, 235, 1)",
+              backgroundColor: "rgb(233, 143, 123)",
+              borderColor: "red",
               borderWidth: 3,
               tension: 0.2,
           }
