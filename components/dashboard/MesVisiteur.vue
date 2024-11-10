@@ -4,19 +4,23 @@
 
     <!-- Modal détail -->
     <BModal v-model="detailModal" hide-footer title="Détails des Visites">
-      <div class="d-flex justify-content-end">
-        <BButton  size="sm" >
-            Imprimer
-        </BButton>
-      </div>
+        <div class="d-flex justify-content-end my-3">
+            <BButton variant="primary" size="sm" >
+                <i class="uil uil-print font-size-15 annuler"></i> Imprimer
+            </BButton>
+        </div>
       <div v-for="item in paginatedData" :key="item['Code visite']">
         <div class="text-center"><h4>M. {{ item['Nom & Prénoms'] }}</h4>
           <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">Délégué</span>
-          <span class="border border-success rounded px-2 ms-2">Statut: <span class="text-success">Terminé</span></span>
-          <span class="border border-primary rounded px-2 ms-2 text-primary"><span>{{ item.Date }}</span></span>
+          
         </div>
         <hr class="text-secondary">
+        <div class="d-flex justify-content-between my-3">
+            <span class="border border-primary rounded px-2 ms-2 text-primary"><span>{{ item.Date }}</span></span>
+            <span class="border border-success rounded px-2 ms-2 text-success">visite: <span class="fw-bold">Terminé</span></span>
+        </div>
         <div class="row">
+            
           <div class="col col-md-6">
             <p><strong>Téléphone:</strong> {{ item.Telephone }}</p>
           </div>
