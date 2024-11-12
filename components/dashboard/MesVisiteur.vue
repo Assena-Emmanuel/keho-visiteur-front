@@ -5,19 +5,19 @@
     <!-- Modal détail -->
     <BModal v-model="detailModal" hide-footer title="Détails des Visites">
         <div class="d-flex justify-content-end">
-            <BButton variant="primary" size="sm" >
+            <BButton variant="primary" size="sm" style="padding: 2px;">
                 <i class="uil uil-print font-size-15 annuler"></i> Imprimer
             </BButton>
         </div>
       <div v-for="item in paginatedData" :key="item['Code visite']">
-        <div class="text-center"><h4>M. {{ item['Nom & Prénoms'] }}</h4>
-          <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">Délégué</span>
-          
+        <div class="text-center"><span class="h4">M. {{ item['Nom & Prénoms'] }}</span> <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">Délégué</span>
+          <div class="bg-secondary text-center text-light mt-1">En délégation</div>
         </div>
         <hr class="text-secondary">
         <div class="d-flex justify-content-between my-3">
-            <span class="border border-primary rounded px-2 ms-2 text-primary"><span>{{ item.Date }}</span></span>
+            <span class="border border-primary rounded px-2 ms-2 text-primary fw-bold"><span>{{ item.Date }}</span></span>
             <span class="border border-success rounded px-2 ms-2 text-success">visite: <span class="fw-bold">Terminé</span></span>
+
         </div>
         <div class="row">
             
@@ -60,8 +60,10 @@
             <p><strong>Heure de Sortie:</strong> {{ item["H Sortie"] }}</p>
           </div>
         </div>
-        <div class="bg-secondary text-center text-light">En délégation</div>
-        <hr />
+      </div>
+      <div class="d-flex justify-content-evenly mb-3">
+        <div><img src="/images/pdf.png" width="70" alt=""></div>
+        <div><img src="/images/pdf.png" width="70" alt=""></div>
       </div>
       <div class="d-flex justify-content-end">
         <BPagination
@@ -123,7 +125,7 @@
 
                   <template #cell(Actions)="row">
                       <div class="d-flex gap-1">
-                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-danger d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'rejeter'">
+                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-warning d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'rejeter'">
                             <i class="uil uil-ban font-size-15 annuler"></i>
                           </BButton>
                           <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
