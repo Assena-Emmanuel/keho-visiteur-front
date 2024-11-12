@@ -33,7 +33,7 @@
       export  const barChartData = {
         type: "bar",
         data: {
-          labels: ["Agence Marcory", "Agence Koumassi", "Agence Abobo", "Agence Yopougon", "Agence Adjamé"],
+          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"],
           datasets: [
             { 
               data: [12, 19, 3, 2, 3],
