@@ -4,15 +4,15 @@
     <div class="mb-2 d-flex justify-content-between">
       <div>Historique des visites</div>
       <div class="d-flex gap-2">
-        <!-- <BDropdown text="Imprimer" variant="primary" class="">
-          <BDropdownItem href="#">An item</BDropdownItem>
-          <BDropdownItem href="#">Another item</BDropdownItem>
-        </BDropdown> -->
-        <BDropdown text="Imprimer" variant="primary">
+        <BDropdown variant="primary" :style="{ width: 'auto' }">
+          <template #button-content>
+            <i class="fas fa-print"></i> Imprimer
+          </template>
           <BDropdownItem @click="telecharger('csv')">CSV</BDropdownItem>
           <BDropdownItem @click="telecharger('csv')">EXCEL</BDropdownItem>
           <BDropdownItem @click="telecharger('csv')">PDF</BDropdownItem>
         </BDropdown>
+
       </div>
     </div>
     <div>
@@ -305,4 +305,5 @@ export default {
     background-color: white; /* Fond blanc */
     color: gray; /* Couleur du texte */
 }
+
 </style>
