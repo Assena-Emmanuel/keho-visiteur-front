@@ -9,9 +9,9 @@
           <BDropdownItem href="#">Another item</BDropdownItem>
         </BDropdown> -->
         <BDropdown text="Imprimer" variant="primary">
-          <BDropdownItem href="#">CSV</BDropdownItem>
-          <BDropdownItem href="#">EXCEL</BDropdownItem>
-          <BDropdownItem href="#">PDF</BDropdownItem>
+          <BDropdownItem @click="telecharger('csv')">CSV</BDropdownItem>
+          <BDropdownItem @click="telecharger('csv')">EXCEL</BDropdownItem>
+          <BDropdownItem @click="telecharger('csv')">PDF</BDropdownItem>
         </BDropdown>
       </div>
     </div>
@@ -207,6 +207,9 @@ export default {
   },
 
     methods: {
+        telecharger(typeFichier){
+          alert(typeFichier)
+        },
         onFiltered(filteredItems) {
           // Update totalRows and reset to first page after filtering
           this.totalRows = filteredItems.length;
