@@ -1,20 +1,12 @@
 <template>
-    <DashboardCommonStat />
     
-    <div class="mb-2 d-flex justify-content-between">
-      <div>Historique des visites</div>
-      <div class="d-flex gap-2">
-        <BDropdown variant="primary" class="me-2">
-          <template #button-content>
-            <i class="fas fa-print"></i> Imprimer
-          </template>
-          <BDropdownItem @click="telecharger('csv')">CSV</BDropdownItem>
-          <BDropdownItem @click="telecharger('csv')">EXCEL</BDropdownItem>
-          <BDropdownItem @click="telecharger('csv')">PDF</BDropdownItem>
-        </BDropdown>
+    <div class="mb-2 d-flex justify-content-end gap-3">
 
+        <BButton size="sm" variant="outline-primary">CSV</BButton>
+        <BButton size="sm" variant="outline-primary">EXCEL</BButton>
+        <BButton size="sm" variant="outline-primary">PDF</BButton>
       </div>
-    </div>
+  
     <div>
       <!-- Tableau des visiteurs -->
       <BRow>
