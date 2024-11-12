@@ -123,7 +123,7 @@
 
                   <template #cell(Actions)="row">
                       <div class="d-flex gap-1">
-                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-danger d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'Annuler'">
+                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-danger d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'rejeter'">
                             <i class="uil uil-ban font-size-15 annuler"></i>
                           </BButton>
                           <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">

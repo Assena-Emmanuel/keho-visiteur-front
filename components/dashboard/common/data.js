@@ -3,7 +3,7 @@
     export const pieChartData = {
         type: "pie",
         data: {
-          labels: ["Visites rejetées", "Visites RDV", "Visites sans RDV"],
+          labels: ["Visites rejetées", "Visites RDV", "Visites en cours"],
           datasets: [
             {
               data: [59.7, 35.3, 5],
