@@ -4,7 +4,7 @@
     <div class="mb-2 d-flex justify-content-between">
       <div>Historique des visites</div>
       <div class="d-flex gap-2">
-        <BDropdown variant="primary" :style="{ width: 'auto' }">
+        <BDropdown variant="primary" class="me-2">
           <template #button-content>
             <i class="fas fa-print"></i> Imprimer
           </template>
@@ -305,5 +305,7 @@ export default {
     background-color: white; /* Fond blanc */
     color: gray; /* Couleur du texte */
 }
-
+.dropdown-menu{
+  width: 100px;
+}
 </style>
