@@ -35,6 +35,15 @@ export const menuItems = [
     },
     link: "/mes-visiteurs"
   },
+  {
+    id: 4,
+    label: "Historique",
+    icon:{
+      active: "/images/sideBarIcon/history.png",
+      desactive: "/images/sideBarIcon/history-desactive.png",
+    },
+    link: "/historique"
+  },
   
  
   // {

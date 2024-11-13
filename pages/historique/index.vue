@@ -1,31 +1,25 @@
 <script>
 import "simplebar";
 
-
 export default {
   data() {
     return {
-      title: "Visiteur",
       items: [
         {
-          text: "Visiteur"
-        },
-        {
-          text: "Visiteur",
+          text: "Historique",
           active: true
         }
       ]
     };
   },
-  // components:{
-  //   Visiteur,
-  // }
+//   components:{
+//     Visiteur,
+//   }
 };
 </script>
 
 <template>
   <SiteHeader :title="title" />
   <PageHeader :title="title" :items="items" />
-  
-  <DashboardMesVisiteur />
+  <DashboardHistorique />
 </template>

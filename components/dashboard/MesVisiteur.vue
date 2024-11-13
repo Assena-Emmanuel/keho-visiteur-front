@@ -4,15 +4,23 @@
 
     <!-- Modal détail -->
     <BModal v-model="detailModal" hide-footer title="Détails des Visites">
-      
+        <div class="d-flex justify-content-end">
+            <BButton variant="primary" size="sm" style="padding: 2px;">
+                <i class="uil uil-print font-size-15 annuler"></i> Imprimer
+            </BButton>
+        </div>
       <div v-for="item in paginatedData" :key="item['Code visite']">
-        <div class="text-center"><h4>M. {{ item['Nom & Prénoms'] }}</h4>
-          <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">délégué</span>
-          <span class="border border-success rounded px-2 ms-2">Statut visite: <span class="text-success">Terminé</span></span>
-          <span class="border border-primary rounded px-2 ms-2 text-primary">Date: <span>{{ item.Date }}</span></span>
+        <div class="text-center"><span class="h4">M. {{ item['Nom & Prénoms'] }}</span> <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">Délégué</span>
+          <div class="bg-secondary text-center text-light mt-1">En délégation</div>
         </div>
         <hr class="text-secondary">
+        <div class="d-flex justify-content-between my-3">
+            <span class="border border-primary rounded px-2 ms-2 text-primary fw-bold"><span>{{ item.Date }}</span></span>
+            <span class="border border-success rounded px-2 ms-2 text-success">visite: <span class="fw-bold">Terminé</span></span>
+
+        </div>
         <div class="row">
+            
           <div class="col col-md-6">
             <p><strong>Téléphone:</strong> {{ item.Telephone }}</p>
           </div>
@@ -52,8 +60,10 @@
             <p><strong>Heure de Sortie:</strong> {{ item["H Sortie"] }}</p>
           </div>
         </div>
-        <div class="bg-secondary text-center text-light">En délégation</div>
-        <hr />
+      </div>
+      <div class="d-flex justify-content-evenly mb-3">
+        <div><img src="/images/pdf.png" width="70" alt=""></div>
+        <div><img src="/images/pdf.png" width="70" alt=""></div>
       </div>
       <div class="d-flex justify-content-end">
         <BPagination
@@ -360,4 +370,5 @@ export default {
     background-color: white; /* Fond blanc */
     color: gray; /* Couleur du texte */
 }
+
 </style>

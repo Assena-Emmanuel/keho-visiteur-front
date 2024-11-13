@@ -1,74 +1,12 @@
 <template>
-    <DashboardCommonStat />
     
+    <div class="mb-2 d-flex justify-content-end gap-3">
 
-    <!-- Modal détail -->
-    <BModal v-model="detailModal" hide-footer title="Détails des Visites">
-      
-      <div v-for="item in paginatedData" :key="item['Code visite']">
-        <div class="text-center"><h4>M. {{ item['Nom & Prénoms'] }}</h4>
-          <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">délégué</span>
-          <span class="border border-success rounded px-2 ms-2">Statut visite: <span class="text-success">Terminé</span></span>
-          <span class="border border-primary rounded px-2 ms-2 text-primary">Date: <span>{{ item.Date }}</span></span>
-        </div>
-        <hr class="text-secondary">
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>Téléphone:</strong> {{ item.Telephone }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Société:</strong> {{ item.Société }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>E-mail:</strong> {{ item.Email }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Code visiteur:</strong> {{ item['Code visiteur'] }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>Type pièce:</strong> {{ item.TypePiece }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Num pièce:</strong> {{ item.CNI }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>Employé:</strong> {{ item.Employé }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Code:</strong> {{ item["Code visite"] }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>Heure d'entrée:</strong> {{ item['H entrée'] }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Heure de Sortie:</strong> {{ item["H Sortie"] }}</p>
-          </div>
-        </div>
-        <div class="bg-secondary text-center text-light">En délégation</div>
-        <hr />
+        <BButton size="sm" variant="outline-primary">CSV</BButton>
+        <BButton size="sm" variant="outline-primary">EXCEL</BButton>
+        <BButton size="sm" variant="outline-primary">PDF</BButton>
       </div>
-      <div class="d-flex justify-content-end">
-        <BPagination
-        v-model="page"
-        :total-rows="items.length"
-        :per-page="itemsPerPage"
-        aria-controls="modal-pagination"
-      ></BPagination>
-      </div>
-      
-    </BModal>
-
-
-
-    <div class="mb-2"><span>Visites enregistrées</span></div>
+  
     <div>
       <!-- Tableau des visiteurs -->
       <BRow>
@@ -109,23 +47,19 @@
                 >
                 :
                   <template #cell(Statut)="row">
-                    <span v-if="row.item.Statut" class="badge rounded-pill text-bg-success">activé</span>
-                    <span v-if="!row.item.Statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
+                    <span v-if="row.item.Statut" class="badge rounded-pill text-bg-success">{{ row.item.Statut }}</span>
                   </template>
 
-                  <template #cell(Actions)="row">
+                  <!-- <template #cell(Actions)="row">
                       <div class="d-flex gap-1">
-                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-warning d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'rejeter'">
-                            <i class="uil uil-ban font-size-15 annuler"></i>
-                          </BButton>
                           <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
                             <i class="uil uil-trash-alt font-size-15"></i>
                           </BButton>
-                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex text-primary justify-content-center align-items-center" @click="showDetailsModal">
+                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex justify-content-center align-items-center" @click="showDetailsModal">
                             <i class="fas fa-eye"></i>
                           </BButton>
                       </div>
-                  </template>
+                  </template> -->
 
                 </BTable>
               </div>
@@ -212,7 +146,7 @@ export default {
         totalRows: 1,
         currentPage: 1,
         perPage: 5,
-        pageOptions: [5, 10, 15, 20],
+        pageOptions: [1, 2, 5, 20],
         filter: "", 
         sortBy: "age",
         sortDesc: false,
@@ -227,9 +161,9 @@ export default {
             {key: "Employé"},
             {key: "Visite"},
             {key: "H entrée"},
-            {key: "statut"},
             {key: "H Sortie"},
-            {key: "Actions"},
+            {key: "Statut"},
+
         ],
         title: null,
         data: [
@@ -243,8 +177,8 @@ export default {
               Employé: "KOUADIO Konan jean",
               Visite: "RDV",
               "H entrée": "08:30",
-              Statut: "Terminé",
               "H Sortie": "12:30",
+              Statut: "Terminé",
           },
           {
               Date: "2024/10/10",
@@ -257,14 +191,17 @@ export default {
               Employé: "Ouattara Khader",
               Visite: "RDV",
               "H entrée": "10:30",
-              Statut: "en cours",
               "H Sortie": "11:38",
+              Statut: "Terminé",
           }
         ],
     };
   },
 
     methods: {
+        telecharger(typeFichier){
+          alert(typeFichier)
+        },
         onFiltered(filteredItems) {
           // Update totalRows and reset to first page after filtering
           this.totalRows = filteredItems.length;
@@ -359,5 +296,8 @@ export default {
     border: 1px solid gray; /* Bordure grise */
     background-color: white; /* Fond blanc */
     color: gray; /* Couleur du texte */
+}
+.dropdown-menu{
+  width: 100px;
 }
 </style>

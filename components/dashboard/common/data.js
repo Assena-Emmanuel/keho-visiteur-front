@@ -3,7 +3,7 @@
     export const pieChartData = {
         type: "pie",
         data: {
-          labels: ["Visites rejetées", "Visites RDV", "Visites sans RDV"],
+          labels: ["Visites rejetées", "Visites RDV", "Visites en cours"],
           datasets: [
             {
               data: [59.7, 35.3, 5],
@@ -33,7 +33,7 @@
       export  const barChartData = {
         type: "bar",
         data: {
-          labels: ["Agence Marcory", "Agence Koumassi", "Agence Abobo", "Agence Yopougon", "Agence Adjamé"],
+          labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"],
           datasets: [
             { 
               data: [12, 19, 3, 2, 3],
@@ -79,7 +79,7 @@ export const areaChartData = {
       labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
       datasets: [
           {
-              label: "Visites RDV",
+              label: "Visites",
               data: [10, 20, 15, 25, 30, 40],
               fill: true,
               backgroundColor: "rgba(75, 192, 192, 0.2)",
@@ -88,11 +88,11 @@ export const areaChartData = {
               tension: 0.2,
           },
           {
-              label: "Visites sans RDV",
+              label: "Visites rejétées",
               data: [8, 12, 18, 22, 28, 30],
               fill: true,
-              backgroundColor: "rgba(54, 162, 235, 0.2)",
-              borderColor: "rgba(54, 162, 235, 1)",
+              backgroundColor: "rgba(255, 0, 0, 0.2)",  
+              borderColor: "rgba(255, 0, 0, 1)",
               borderWidth: 3,
               tension: 0.2,
           }
