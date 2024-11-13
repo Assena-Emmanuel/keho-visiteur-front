@@ -62,8 +62,14 @@
         </div>
       </div>
       <div class="d-flex justify-content-evenly mb-3">
-        <div><img src="/images/pdf.png" width="70" alt=""></div>
-        <div><img src="/images/pdf.png" width="70" alt=""></div>
+        <div class="d-flex align-items-center">
+          <div>Recto</div>
+          <div><img src="/images/pdf.png" width="70" alt=""></div>
+        </div>
+        <div>
+          <div>Verso</div>
+          <img src="/images/pdf.png" width="70" alt="">
+        </div>
       </div>
       <div class="d-flex justify-content-end">
         <BPagination
@@ -282,7 +288,27 @@ export default {
         },
 
         handleEdit(index, data) {
-          alert(index)
+          this.$swal.fire({
+          text: "Voulez-vous rejeter?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Oui',
+          cancelButtonText: 'Non',
+          reverseButtons: true // Inverser l'ordre des boutons
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Logique pour supprimer l'élément ici
+            this.deleteItem(code);
+
+            this.$swal.fire(
+              'Rejeter!',
+              'Visite rejetée',
+              'success'
+            );
+          }
+        });
         },
 
         showDetailsModal(){
