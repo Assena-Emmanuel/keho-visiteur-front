@@ -9,6 +9,7 @@ export default {
   },
   data() {
     return {
+      dismissibleAlert: true,
       email: "admin@themesbrand.com",
       password: "123456",
       isRemember: true,
@@ -41,6 +42,7 @@ export default {
       localStorage.removeItem("isOk")
     },
     async onLogin() {
+      
       this.submitted = true;
       this.v$.$touch();
       if (this.v$.$invalid) {
@@ -50,22 +52,31 @@ export default {
         try {
           this.processing = true;
           const { data } = await axios.post(
-            "https://api-node.themesbrand.website/auth/signin",
+            "https://visitors.kehogroupe-ci.com/api/auth/login",
             {
               email: this.email,
               password: this.password
             }
           );
-          const status = data.status;
-          const response = data.data;
-          if (status === "success") {
-            localStorage.setItem("user", JSON.stringify(response));
+          console.log(data)
+          const code = data.code;
+          const isError = data.error;
+          
+          if (code != 0 && !isError) {
+            // localStorage.setItem("user", JSON.stringify(response));
             localStorage.removeItem("isOk")
+
+            const { userdData } = await axios.post(
+            "https://visitors.kehogroupe-ci.com/api/auth/me",
+            );
+
+            console.log(userdData)
+
             this.$router.push({
               path: "/dashboard"
             });
           } else {
-            this.errorMsg = response;
+            this.errorMsg = "Email ou mot de passe invalide";
           }
         } catch (error) {
           console.error("failed at onLogin", { error });
@@ -88,6 +99,14 @@ export default {
                 Mot de passe réinitialisé avec succes!
                 <button type="button" class="btn-close" @click="dismissAlert"></button>
             </div>
+            <BAlert v-if="errorMsg" variant="danger" v-model="dismissibleAlert" dismissible>
+              <p class="">{{ errorMsg }}</p>
+            </BAlert>
+<!-- 
+            <div v-if="errorMsg" class="alert alert-danger alert-dismissible fade show font-size-13">
+                {{ errorMsg }}
+                <button type="button" class="btn-close" @click="errorMsg = ''"></button>
+            </div> -->
               <div class="mb-3">
                 <label for="email" class="font-size-12 text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
                 <input v-model="email" type="text" class="form-control form-control-sm login-input" id="email" placeholder="Votre email" :class="{
@@ -127,8 +146,6 @@ export default {
                 </div>
               </div>
 
-
-              <div class="mt-3 text-danger">{{ errorMsg }}</div>
               
 
               <div class="d-flex justify-content-center mt-4">

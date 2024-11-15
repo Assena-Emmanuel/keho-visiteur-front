@@ -34,7 +34,8 @@ export default defineNuxtConfig({
   modules: [
       "@nuxt/content", 
       "@pinia/nuxt", 
-      "@nuxtjs/google-fonts"
+      "@nuxtjs/google-fonts",
+      '@primevue/nuxt-module'
     ],
 
   pinia: {
@@ -77,6 +78,10 @@ export default defineNuxtConfig({
 
   devtools: {
     enabled: true
+  },
+
+  axios: {
+    baseURL: 'https://visitors.kehogroupe-ci.com/api', 
   },
 
   compatibilityDate: "2024-10-07"
