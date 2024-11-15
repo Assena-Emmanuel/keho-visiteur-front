@@ -83,6 +83,20 @@ export default defineNuxtConfig({
   axios: {
     baseURL: 'https://visitors.kehogroupe-ci.com/api', 
   },
+  primevue: {
+    options: {
+        ripple: true,
+        inputVariant: 'filled',
+        theme: {
+            preset: Aura,
+            options: {
+                prefix: 'p',
+                darkModeSelector: 'system',
+                cssLayer: false
+            }
+        }
+    }
+},
 
   compatibilityDate: "2024-10-07"
 });
