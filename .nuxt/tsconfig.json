@@ -81,13 +81,13 @@
         "../node_modules/nuxt/dist/app/compat/vue-demi"
       ],
       "#mdc-configs": [
-        "./mdc-configs"
+        "./mdc-configs.mjs"
       ],
       "#mdc-highlighter": [
-        "./mdc-highlighter"
+        "./mdc-highlighter.mjs"
       ],
       "#mdc-imports": [
-        "./mdc-imports"
+        "./mdc-imports.mjs"
       ],
       "pinia": [
         "../node_modules/pinia/dist/pinia"
@@ -99,7 +99,7 @@
         "./imports"
       ],
       "#app-manifest": [
-        "./manifest/meta/fba19bcf-dd5c-4b98-80ed-d279f5ceef20.json"
+        "./manifest/meta/d2461707-9b9c-4177-b523-2c8c11d83e6e.json"
       ],
       "#build": [
         "."
