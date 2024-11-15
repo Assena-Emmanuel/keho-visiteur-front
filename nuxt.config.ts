@@ -45,7 +45,10 @@ export default defineNuxtConfig({
   css: [
     "bootstrap-vue-next/dist/bootstrap-vue-next.css",
     "~/assets/scss/app.scss",
-    "simplebar/dist/simplebar.css"
+    "simplebar/dist/simplebar.css",
+    '@primevue/themes/aura.css', 
+    'primevue/resources/primevue.min.css', 
+    'primeicons/primeicons.css'
   ],
 
   alias: {
@@ -83,20 +86,20 @@ export default defineNuxtConfig({
   axios: {
     baseURL: 'https://visitors.kehogroupe-ci.com/api', 
   },
-  primevue: {
-    options: {
-        ripple: true,
-        inputVariant: 'filled',
-        theme: {
-            preset: "Aura",
-            options: {
-                prefix: 'p',
-                darkModeSelector: 'system',
-                cssLayer: false
-            }
-        }
-    }
-},
+//   primevue: {
+//     options: {
+//         ripple: true,
+//         inputVariant: 'filled',
+//         theme: {
+//             preset: "Aura",
+//             options: {
+//                 prefix: 'p',
+//                 darkModeSelector: 'system',
+//                 cssLayer: false
+//             }
+//         }
+//     }
+// },
 
   compatibilityDate: "2024-10-07"
 });
