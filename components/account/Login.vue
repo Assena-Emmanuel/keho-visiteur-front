@@ -52,31 +52,22 @@ export default {
         try {
           this.processing = true;
           const { data } = await axios.post(
-            "https://visitors.kehogroupe-ci.com/api/auth/login",
+            "https://api-node.themesbrand.website/auth/signin",
             {
               email: this.email,
               password: this.password
             }
           );
-          console.log(data)
-          const code = data.code;
-          const isError = data.error;
-          
-          if (code != 0 && !isError) {
-            // localStorage.setItem("user", JSON.stringify(response));
-            localStorage.removeItem("isOk")
-
-            const { userdData } = await axios.post(
-            "https://visitors.kehogroupe-ci.com/api/auth/me",
-            );
-
-            console.log(userdData)
-
+          const status = data.status;
+          const response = data.data;
+          console.log(response)
+          if (status === "success") {
+            localStorage.setItem("user", JSON.stringify(response));
             this.$router.push({
               path: "/dashboard"
             });
           } else {
-            this.errorMsg = "Email ou mot de passe invalide";
+            this.errorMsg = response;
           }
         } catch (error) {
           console.error("failed at onLogin", { error });

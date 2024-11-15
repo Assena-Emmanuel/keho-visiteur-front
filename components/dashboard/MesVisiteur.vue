@@ -63,13 +63,18 @@
       </div>
       <div class="d-flex justify-content-evenly mb-3">
         <div class="d-flex align-items-center">
-          <div>Recto</div>
-          <div><img src="/images/pdf.png" width="70" alt=""></div>
+          <!-- <div><img src="/images/pdf.png" width="70" alt=""></div> -->
+          <Image src="/images/pdf.png" alt="Image" width="70" preview v-b-tooltip.hover.top="'Recto'" />
         </div>
         <div>
-          <div>Verso</div>
-          <img src="/images/pdf.png" width="70" alt="">
+          <!-- <img src="/images/pdf.png" width="70" alt=""> -->
+          <div class="d-flex align-items-center">
+            <Image src="/images/pdf.png" alt="Image" width="70" preview v-b-tooltip.hover.top="'Verso'" />
+          </div>
         </div>
+        <!-- <div class="card flex justify-center">
+          <Image src="/images/pdf.png" alt="Image" width="250" preview />
+      </div> -->
       </div>
       <div class="d-flex justify-content-end">
         <BPagination
@@ -173,7 +178,13 @@
   </div>
 </template>
 <script>
+
+import Image from 'primevue/image';
+import Tooltip from 'primevue/tooltip';
 export default {
+  directives: {
+        Tooltip
+    },
     data() {
         return {
           items: [ 
