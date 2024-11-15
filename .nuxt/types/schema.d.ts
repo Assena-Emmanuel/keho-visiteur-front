@@ -469,7 +469,23 @@ declare module 'nuxt/schema' {
 
       loadStyles: boolean,
 
-      options: any,
+      options: {
+         ripple: boolean,
+
+         inputVariant: string,
+
+         theme: {
+            preset: string,
+
+            options: {
+               prefix: string,
+
+               darkModeSelector: string,
+
+               cssLayer: boolean,
+            },
+         },
+      },
 
       components: Array<{
 
