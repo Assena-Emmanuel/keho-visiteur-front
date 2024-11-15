@@ -62,7 +62,7 @@
         </div>
       </div>
       <div class="d-flex justify-content-evenly mb-3">
-        <div class="" align="center" @click="showImg('rectoVisible')">
+        <div class="piece" align="center" @click="showImg('rectoVisible')">
           <div>Recto</div>
           <img src="/images/pdf.png" alt="recto" width="90" />
         </div>
@@ -73,7 +73,7 @@
           />
         
         <div>
-          <div class="" align="center" @click="showImg('versoVisible')">
+          <div class="piece" align="center" @click="showImg('versoVisible')">
             <div>Verso</div>
             <img  src="/images/pdf.png" width="90" alt="verso" />
           </div>
@@ -443,5 +443,9 @@ export default {
 img {
   max-width: 100%; /* S'assure que les images ne débordent pas */
   height: auto;
+}
+
+.piece:hover {
+  cursor: pointer;
 }
 </style>
