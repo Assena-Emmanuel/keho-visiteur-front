@@ -39,10 +39,5 @@ export { fetchContentNavigation } from '../node_modules/@nuxt/content/dist/runti
 export { flatUnwrap as unwrapSlot } from '../node_modules/@nuxtjs/mdc/dist/runtime/utils/node';
 export { parseMarkdown } from '../node_modules/@nuxtjs/mdc/dist/runtime/parser';
 export { defineStore, acceptHMRUpdate, usePinia, storeToRefs } from '../node_modules/@pinia/nuxt/dist/runtime/composables';
-export { usePrimeVue } from 'primevue/config';
-export { useStyle } from 'primevue/usestyle';
-export { useConfirm } from 'primevue/useconfirm';
-export { useToast } from 'primevue/usetoast';
-export { useDialog } from 'primevue/usedialog';
 export { useNuxtDevTools } from '../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';
 export { definePageMeta } from '../node_modules/nuxt/dist/pages/runtime/composables';

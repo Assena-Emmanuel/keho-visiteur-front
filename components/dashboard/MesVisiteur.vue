@@ -62,19 +62,29 @@
         </div>
       </div>
       <div class="d-flex justify-content-evenly mb-3">
-        <div class="" align="center">
+        <div class="" align="center" @click="showImg('rectoVisible')">
           <div>Recto</div>
-          <Image src="/images/pdf.png" alt="Image" width="70" preview />
+          <img src="/images/pdf.png" alt="recto" width="90" />
         </div>
+        <VueEasyLightbox
+              :visible="rectoVisible"
+              :imgs="['/images/pdf.png']"
+              @hide="onHide('rectoVisible')"
+          />
+        
         <div>
-          <!-- <img src="/images/pdf.png" width="70" alt=""> -->
-          <div class="" align="center">
+          <div class="" align="center" @click="showImg('versoVisible')">
             <div>Verso</div>
-            <Image src="/images/pdf.png" alt="Image" width="70" preview />
+            <img  src="/images/pdf.png" width="90" alt="verso" />
           </div>
+          <VueEasyLightbox
+              :visible="versoVisible"
+              imgs="/images/pdf.png"
+              @hide="onHide('versoVisible')"
+            />
         </div>
-
       </div>
+
       <div class="d-flex justify-content-end">
         <BPagination
         v-model="page"
@@ -178,14 +188,16 @@
 </template>
 <script>
 
-import Image from 'primevue/image';
-import Tooltip from 'primevue/tooltip';
 export default {
-  directives: {
-        Tooltip
-    },
     data() {
         return {
+          rectoVisible : false,
+          versoVisible : false,
+          imgs : [
+            "/images/bg-qrcode.png",
+            "/images/pdf.png",
+            "/images/pdf.png",
+          ],
           items: [ 
           {
               Date: "2024/10/20",
@@ -291,6 +303,15 @@ export default {
   },
 
     methods: {
+      showImg(type){
+        // this.indexRef = index;
+        this[type] = true;
+        console.log("show")
+      },
+      onHide(type){
+        this[type] = false;
+        console.log(`recto: ${this.rectoVisible} et verso: ${this.versoVisible}`)
+      },
         onFiltered(filteredItems) {
           // Update totalRows and reset to first page after filtering
           this.totalRows = filteredItems.length;
@@ -406,5 +427,21 @@ export default {
     background-color: white; /* Fond blanc */
     color: gray; /* Couleur du texte */
 }
+</style>
+<style scoped>
+.image-container {
+  display: flex;           /* Utilisation de Flexbox */
+  flex-wrap: wrap;          /* Permet aux images de se replier si nécessaire */
+  justify-content: center;  /* Aligne les images à gauche */
+}
 
+.pic {
+  margin-right: 10px; /* Espacement entre les images */
+  margin-bottom: 10px; /* Espacement vertical entre les images */
+}
+
+img {
+  max-width: 100%; /* S'assure que les images ne débordent pas */
+  height: auto;
+}
 </style>
