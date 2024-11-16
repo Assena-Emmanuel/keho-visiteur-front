@@ -10,8 +10,8 @@ export default {
   data() {
     return {
       dismissibleAlert: true,
-      email: "admin@themesbrand.com",
-      password: "123456",
+      email: "ibrahim1155@outlook.com",
+      password: "1P@ssword",
       isRemember: true,
       processing: false,
       errorMsg: "",
@@ -52,20 +52,35 @@ export default {
         try {
           this.processing = true;
           const { data } = await axios.post(
-            "https://api-node.themesbrand.website/auth/signin",
+            "https://visitors.kehogroupe-ci.com/api/auth/login",
             {
               email: this.email,
               password: this.password
             }
           );
-          const status = data.status;
-          const response = data.data;
-          console.log(response)
-          if (status === "success") {
-            localStorage.setItem("user", JSON.stringify(response));
-            this.$router.push({
-              path: "/dashboard"
+          const token = data.access_token;
+          console.log(`token: ${token}`)
+          if (token) {
+            
+            axios.post('https://visitors.kehogroupe-ci.com/api/auth/me', {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then(response => {
+              const user = response.data
+              if(user){
+                localStorage.setItem("user", JSON.stringify(user));
+                this.$router.push({
+                  path: "/dashboard"
+                });
+              }
+                console.log('User information:', response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching user info:', error);
             });
+
           } else {
             this.errorMsg = response;
           }

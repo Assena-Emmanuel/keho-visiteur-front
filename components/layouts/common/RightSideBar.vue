@@ -17,7 +17,8 @@ export default {
       widthOptions,
       sideBarTypeOptions,
       topBarOptions,
-      layoutModeOptions
+      layoutModeOptions,
+      user
     };
   },
   components: {
@@ -77,6 +78,8 @@ export default {
   },
   mounted() {
     this.addEventListener();
+    let dataUser = localStorage.getItem('user')
+    this.user = JSON.parse(dataUser)
   },
   methods: {
     deconnexion(){
@@ -122,9 +125,9 @@ export default {
         </div>
         <div class="p-3">
           <div class="text-center">
-            <img class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
-            <div class="ms-1 fw-medium font-size-12">Assena Emanuel yao</div>
-            <div class="ms-1 fw-medium font-size-12 text-primary">assenaemmanuel3@outlook.com</div>
+            <img class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
+            <div class="ms-1 fw-medium font-size-12">{{ user.nom +' '+ user.prenom}}</div>
+            <div class="ms-1 fw-medium font-size-12 text-primary">{{user.email}}</div>
             <div><BBadge variant="secondary">Administrateur</BBadge></div>
           </div>
           <div class="mt-5">

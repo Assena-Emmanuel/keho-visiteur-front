@@ -12,7 +12,8 @@ export default {
     return {
       parametres: ["Paramètre des Visités, Paramètre des Visiteurs, "],
       value: null,
-      config: useRuntimeConfig()
+      config: useRuntimeConfig(),
+      user: []
     };
   },
   components: {
@@ -24,11 +25,11 @@ export default {
     Notifications,
     Profile
   },
-  // mounted() {
-  //   this.value = this.languages.find((x) => x.language === this.$i18n.locale);
-  //   this.text = this.value.title;
-  //   this.flag = this.value.flag;
-  // },
+  mounted() {
+    let userData = localStorage.getItem("user");
+    this.user = JSON.parse(userData)
+    console.log(this.user)
+  },
   methods: {
     toggleMenu() {
       this.$parent.toggleMenu();
@@ -95,8 +96,8 @@ export default {
           <Notifications />
            <div class="d-flex align-items-center">
             <button @click="toggleRightSidebar" class="btn btn-outline-secondary "  style="width: 100%; padding: 1px 3px;">
-              <img class="rounded-circle header-profile-user" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
-              <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">Assena emmanuel</span>
+              <img class="rounded-circle header-profile-user" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
+              <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">{{ user.nom + ' ' + user.prenom }}</span>
            </button>
            </div>
 
