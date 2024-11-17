@@ -27,9 +27,15 @@ export default {
         }
     },
     mounted() {
-        const ctx = document.getElementById("bar-chart");
+    this.$nextTick(() => {
+      const ctx = document.getElementById("bar-chart");
+      if (ctx) {
         Chart.register(...registerables);
         new Chart(ctx, this.barChartData);
-    }
+      } else {
+        console.error("Canvas element not found.");
+      }
+    });
+  },
 };
 </script>

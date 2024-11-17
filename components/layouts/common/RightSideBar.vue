@@ -18,7 +18,7 @@ export default {
       sideBarTypeOptions,
       topBarOptions,
       layoutModeOptions,
-      user
+      user: {},
     };
   },
   components: {
@@ -80,6 +80,7 @@ export default {
     this.addEventListener();
     let dataUser = localStorage.getItem('user')
     this.user = JSON.parse(dataUser)
+    console.log(this.user)
   },
   methods: {
     deconnexion(){
@@ -128,7 +129,7 @@ export default {
             <img class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
             <div class="ms-1 fw-medium font-size-12">{{ user.nom +' '+ user.prenom}}</div>
             <div class="ms-1 fw-medium font-size-12 text-primary">{{user.email}}</div>
-            <div><BBadge variant="secondary">Administrateur</BBadge></div>
+            <div><BBadge variant="secondary">{{ user.role.libelle }}</BBadge></div>
           </div>
           <div class="mt-5">
             <button class="btn  btnParam" @click="profil">
