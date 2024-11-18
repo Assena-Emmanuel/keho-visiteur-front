@@ -1,16 +1,22 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
-import axios from "axios";
+import apiClient from "../api/intercepteur";
+import { data } from "../parametres/useData";
+import { error } from "console";
+
 export default {
   setup() {
     return { v$: useVuelidate() };
   },
   data() {
     return {
-      email: localStorage.getItem('email') || '',
+      email: '',
       submitted: false,
-      isSuccess: false
+      processing: false,
+      isSuccess: false,
+      error: false,
+      msgError: '',
     };
   },
   validations: {
@@ -22,27 +28,35 @@ export default {
 
 
   methods: {
-    onReset() {
+    async onReset() {
       this.submitted = true;
-      this.isSuccess = false;
       this.v$.$touch();
       if (this.v$.$invalid) {
         return;
-      } else {
-        axios.get('https://jsonplaceholder.typicode.com/todos/1')
-        .then(function (response) {
-          console.log('data: '+response.data);
-          console.log('status: '+response.status);
-          console.log('statusText: '+response.statusText);
-          console.log('headers: '+response.headers);
-          console.log('config: '+response.config);
-        });
+      }
+      else{
+        try{
+          this.processing = true;
+          await apiClient.post("/user/linkpwd",
+              {
+                email: this.email,
+              }
+          )
+          .then(response => {
+            data = JSON.stringify(response.data, null, 2)
+            if(data.error){
+              this.error = true
+              this.msgError = data.message
+              return
+            }
+            this.error = false
+          })
+        }catch(error){
 
-        this.isSuccess = true;
-        localStorage.setItem('email', this.email)
-        this.$router.push({
-          path: "otp"
-        });
+        }
+        finally {
+          this.processing = false;
+        }
       }
     }
   }
@@ -77,12 +91,26 @@ export default {
                   <span v-if="v$.email.required.$invalid">Cet champ est obligatoire
                   </span>
                 </div>
+                <div v-if="error" class="invalid-feedback">
+                  <span>{{ msgError }}</span>
+                </div>
               </div>
           </div>
         </BCardBody>
       </BCard>
       <div class="mt-3 text-center">
-        <BButton variant="success" class="btn-bg w-sm waves-effect waves-light btn btn-sm" @click="onReset">
+        <!-- <BButton variant="success" class="btn-bg w-sm waves-effect waves-light btn btn-sm" @click="onReset">
+          Envoyer
+        </BButton> -->
+        <BButton :loading="processing" 
+          :class="['btn-bg', processing ? 'btn-loading' : '']"  
+          :disabled="processing" 
+          variant="success" 
+          class="btn-bg w-sm waves-effect waves-light btn btn-sm" 
+          @click="onReset">
+          <template #loading>
+            <span class="material-icons spin">Envoie...</span> <!-- Icône Material -->
+          </template>
           Envoyer
         </BButton>
       </div>
@@ -96,6 +124,7 @@ export default {
     </BForm>
 
 </template>
+
 <style>
 .card-auth-pwd {
     background-color: #194698;

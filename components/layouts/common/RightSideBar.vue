@@ -1,5 +1,6 @@
 <script>
 import { useLayoutStore } from "~/stores/layout";
+import apiClient from "~/components/api/intercepteur";
 import RadioGroup from "~/components/common/RadioGroup.vue";
 import {
   layoutOptions,
@@ -83,10 +84,21 @@ export default {
     console.log(this.user)
   },
   methods: {
-    deconnexion(){
-      this.$router.push({path: "/login"})
-      this.hide()
-    },
+    async deconnexion(){
+      try {
+        await apiClient.post('/auth/logout'); // Appel à l'API pour invalider le token
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        delete apiClient.defaults.headers.common['Authorization'];
+        console.log('Déconnexion réussie');
+         // Redirection vers la page de connexion
+      this.$router.push('/login');
+      } catch (error) {
+        console.error('Erreur lors de la déconnexion:', error);
+        throw error;
+      }
+      
+  },
     profil(){
       this.$router.push({path: "/forms/parametrage-profile"})
       this.hide()

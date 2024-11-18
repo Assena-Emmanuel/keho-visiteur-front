@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 
@@ -51,29 +52,35 @@ export default {
         this.errorMsg = "";
         try {
           this.processing = true;
-          const { data } = await axios.post(
-            "https://visitors.kehogroupe-ci.com/api/auth/login",
+          const { data } = await apiClient.post(
+            "/auth/login",
             {
               email: this.email,
               password: this.password
             }
           );
           const token = data.access_token;
-          console.log(`token: ${token}`)
+          console.log(`------------------\n${data.access_token}`)
+
           if (token) {
+            localStorage.setItem("token", token);
+
+            apiClient.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
+            apiClient.post('/auth/me')
             
-            axios.post('https://visitors.kehogroupe-ci.com/api/auth/me', {}, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
             .then(response => {
               const user = response.data
+
               if(user){
                 localStorage.setItem("user", JSON.stringify(user));
-                this.$router.push({
-                  path: "/dashboard"
-                });
+                 // Vérifier s'il y a une redirection enregistrée après login
+                const redirectPath = localStorage.getItem('redirect_after_login') || '/dashboard';
+
+                // Rediriger vers la page enregistrée ou vers /dashboard par défaut
+                this.$router.push(redirectPath);
+                
+                // Supprimer la redirection après l'avoir utilisée
+                localStorage.removeItem('redirect_after_login');
               }
                 console.log('User information:', response.data);
             })

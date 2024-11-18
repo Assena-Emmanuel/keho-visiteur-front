@@ -10,9 +10,11 @@
     </BRow>
     <DashboardCommonTendanceVisite />
 </template>
-<script>
+<script setup>
+import apiClient from '../api/intercepteur';
 
-export default {
-  
-};
+apiClient.get('/action')
+  .then(response => console.log(`------------- ${response.data}`))
+  .catch(error => console.error(error));
+
 </script>
