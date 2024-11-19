@@ -3,7 +3,7 @@ import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import apiClient from "../api/intercepteur";
 import { data } from "../parametres/useData";
-import { error } from "console";
+
 
 export default {
   setup() {
@@ -15,7 +15,7 @@ export default {
       submitted: false,
       processing: false,
       isSuccess: false,
-      error: false,
+      isError: false,
       msgError: '',
     };
   },
@@ -43,16 +43,21 @@ export default {
               }
           )
           .then(response => {
-            data = JSON.stringify(response.data, null, 2)
+            let data = response.data; 
+            
+
             if(data.error){
-              this.error = true
+              this.isError = true
               this.msgError = data.message
               return
+            }else{
+              this.$router.push("/otp")
             }
-            this.error = false
+            
+            
           })
         }catch(error){
-
+          console.log(error)
         }
         finally {
           this.processing = false;
@@ -83,7 +88,7 @@ export default {
               <div class="mb-3">
                 <label for="useremail" class="text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
                 <input v-model="email" type="email" class="form-control form-control-sm" id="useremail" placeholder="Enter email" :class="{
-                  'is-invalid': v$.email.$error
+                  'is-invalid': v$.email.$error 
                 }" />
                 <div v-if="submitted && v$.email.$error" class="invalid-feedback">
                   <span v-if="v$.email.email.$invalid">Email invalide
@@ -91,7 +96,7 @@ export default {
                   <span v-if="v$.email.required.$invalid">Cet champ est obligatoire
                   </span>
                 </div>
-                <div v-if="error" class="invalid-feedback">
+                <div v-if="submitted && isError" class="text-danger">
                   <span>{{ msgError }}</span>
                 </div>
               </div>

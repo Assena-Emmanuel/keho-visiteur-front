@@ -19,6 +19,8 @@ export default {
       submitted: false,
       showAlert: localStorage.getItem('isOk') || false,
       passwordVisible: false,
+      dismissCountDown: 10000,
+      countdown: 0,
     };
   },
   validations: {
@@ -112,14 +114,20 @@ export default {
                 Mot de passe réinitialisé avec succes!
                 <button type="button" class="btn-close" @click="dismissAlert"></button>
             </div>
-            <BAlert v-if="errorMsg" variant="danger" v-model="dismissibleAlert" dismissible>
+            <!-- <BAlert v-if="errorMsg" variant="danger" v-model="dismissibleAlert" dismissible>
               <p class="">{{ errorMsg }}</p>
+            </BAlert> -->
+
+            <BAlert
+              v-model="dismissCountDown"
+              dismissible
+              variant="danger"
+              @close-countdown="countdown = $event"
+            >
+              <p class="">{{ errorMsg }}</p>
+              <BProgress variant="warning" :max="dismissCountDown" :value="countdown" height="4px" />
             </BAlert>
-<!-- 
-            <div v-if="errorMsg" class="alert alert-danger alert-dismissible fade show font-size-13">
-                {{ errorMsg }}
-                <button type="button" class="btn-close" @click="errorMsg = ''"></button>
-            </div> -->
+
               <div class="mb-3">
                 <label for="email" class="font-size-12 text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
                 <input v-model="email" type="text" class="form-control form-control-sm login-input" id="email" placeholder="Votre email" :class="{

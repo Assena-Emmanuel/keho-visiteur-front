@@ -30,7 +30,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
     
     const publicPages = ["/login", "/register", "/forgot-password", "/otp", "/reset-password", "/visiteur-form", "/visiteur-save", "/qrcode"];
     const authPage = !publicPages.includes(to.fullPath);
-    console.log(`\n----------------- {fakebackend} ---------------------\n`)
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token");
 
