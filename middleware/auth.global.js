@@ -27,12 +27,14 @@ export default defineNuxtRouteMiddleware((to, from) => {
     //   redirect("/login");
     // }
   } else if (auth === "fakebackend") {
+    
     const publicPages = ["/login", "/register", "/forgot-password", "/otp", "/reset-password", "/visiteur-form", "/visiteur-save", "/qrcode"];
     const authPage = !publicPages.includes(to.fullPath);
     if (typeof window !== "undefined") {
-      const loggedUser = localStorage.getItem("user");
+      const token = localStorage.getItem("token");
 
-      if (authPage && !loggedUser) {
+      if (authPage && !token) {
+        localStorage.setItem('redirect_after_login', to.fullPath);
         return navigateTo({ path: "/login" });
       }
     }

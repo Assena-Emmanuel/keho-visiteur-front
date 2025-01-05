@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 
@@ -9,14 +10,17 @@ export default {
   },
   data() {
     return {
-      email: "admin@themesbrand.com",
-      password: "123456",
+      dismissibleAlert: true,
+      email: "ibrahim1155@outlook.com",
+      password: "1P@ssword",
       isRemember: true,
       processing: false,
       errorMsg: "",
       submitted: false,
       showAlert: localStorage.getItem('isOk') || false,
       passwordVisible: false,
+      dismissCountDown: 10000,
+      countdown: 0,
     };
   },
   validations: {
@@ -41,6 +45,7 @@ export default {
       localStorage.removeItem("isOk")
     },
     async onLogin() {
+      
       this.submitted = true;
       this.v$.$touch();
       if (this.v$.$invalid) {
@@ -49,21 +54,42 @@ export default {
         this.errorMsg = "";
         try {
           this.processing = true;
-          const { data } = await axios.post(
-            "https://api-node.themesbrand.website/auth/signin",
+          const { data } = await apiClient.post(
+            "/auth/login",
             {
               email: this.email,
               password: this.password
             }
           );
-          const status = data.status;
-          const response = data.data;
-          if (status === "success") {
-            localStorage.setItem("user", JSON.stringify(response));
-            localStorage.removeItem("isOk")
-            this.$router.push({
-              path: "/dashboard"
+          const token = data.access_token;
+          console.log(`------------------\n${data.access_token}`)
+
+          if (token) {
+            localStorage.setItem("token", token);
+
+            apiClient.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
+            apiClient.post('/auth/me')
+            
+            .then(response => {
+              const user = response.data
+
+              if(user){
+                localStorage.setItem("user", JSON.stringify(user));
+                 // Vérifier s'il y a une redirection enregistrée après login
+                const redirectPath = localStorage.getItem('redirect_after_login') || '/dashboard';
+
+                // Rediriger vers la page enregistrée ou vers /dashboard par défaut
+                this.$router.push(redirectPath);
+                
+                // Supprimer la redirection après l'avoir utilisée
+                localStorage.removeItem('redirect_after_login');
+              }
+                console.log('User information:', response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching user info:', error);
             });
+
           } else {
             this.errorMsg = response;
           }
@@ -88,6 +114,20 @@ export default {
                 Mot de passe réinitialisé avec succes!
                 <button type="button" class="btn-close" @click="dismissAlert"></button>
             </div>
+            <!-- <BAlert v-if="errorMsg" variant="danger" v-model="dismissibleAlert" dismissible>
+              <p class="">{{ errorMsg }}</p>
+            </BAlert> -->
+
+            <BAlert
+              v-model="dismissCountDown"
+              dismissible
+              variant="danger"
+              @close-countdown="countdown = $event"
+            >
+              <p class="">{{ errorMsg }}</p>
+              <BProgress variant="warning" :max="dismissCountDown" :value="countdown" height="4px" />
+            </BAlert>
+
               <div class="mb-3">
                 <label for="email" class="font-size-12 text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
                 <input v-model="email" type="text" class="form-control form-control-sm login-input" id="email" placeholder="Votre email" :class="{
@@ -127,8 +167,6 @@ export default {
                 </div>
               </div>
 
-
-              <div class="mt-3 text-danger">{{ errorMsg }}</div>
               
 
               <div class="d-flex justify-content-center mt-4">

@@ -1,4 +1,5 @@
 <script>
+import apiClient from '../api/intercepteur';
 export default {
   data() {
     return {
@@ -26,21 +27,34 @@ export default {
     async verifyOtp() {
       // Vérifie que tous les champs sont remplis
       const otpCode = this.otp.join('');
-      if (otpCode.length === 4) {
-        // console.log(`__________________________: ${this.otp.join("")}`)
-        this.$router.push({path: "/reset-password"})
-        // try {
-        // //   const response = await this.$axios.post('/api/verify-otp', { otp: otpCode });
-        // const response = otpCode
-        //   if (response.data.success) {
-        //     this.$router.push({path: "/reset-password"})
-        //   } else {
-        //     this.msgError = "Code incorrecte"
-        //     this.showAlert = true
-        //   }
-        // } catch (error) {
-        //   console.error('Failed to verify OTP', error);
-        // }
+      if (otpCode.length === 4) {  
+        try{
+          
+          await apiClient.post("/user/verifyOtp",
+                {
+                  otp_code: otpCode,
+                }
+            )
+            .then(response => {
+              let data = response.data; 
+              console.log(data)
+
+              if(data.code == 0){
+                this.showAlert = true
+                this.msgError = data.message
+                this.otp = Array(4).fill('')
+                return
+
+              }else{
+                localStorage.setItem("otp", otpCode)
+                this.$router.push({path: "/reset-password"})
+              }
+            
+            
+          })
+        }catch(error){
+
+        }
       } else {
         this.msgError = "Veuillez renseigner ces champs svp"
         this.showAlert = true
@@ -79,7 +93,7 @@ export default {
                 />
             </div>    
           </div>
-          <div v-if="showAlert" class="text-danger text-center">
+          <div v-if="showAlert" class="text-danger text-center mt-2">
                 {{ msgError }}
             </div>
         </BCardBody>

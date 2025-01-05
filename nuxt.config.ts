@@ -6,7 +6,6 @@ export default defineNuxtConfig({
    '~/plugins/vue-cal.js',
    '~/plugins/vue-awesome-paginate.js',
   ],
-
   app: {
     head: {
       htmlAttrs: { dir: "ltr", lang: "fr" },
@@ -31,11 +30,7 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: [
-      "@nuxt/content", 
-      "@pinia/nuxt", 
-      "@nuxtjs/google-fonts"
-    ],
+  modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts", "nuxt-easy-lightbox"],
 
   pinia: {
     autoImports: ["defineStore", ["defineStore", "definePiniaStore"]]
@@ -44,7 +39,7 @@ export default defineNuxtConfig({
   css: [
     "bootstrap-vue-next/dist/bootstrap-vue-next.css",
     "~/assets/scss/app.scss",
-    "simplebar/dist/simplebar.css"
+    "simplebar/dist/simplebar.css",
   ],
 
   alias: {

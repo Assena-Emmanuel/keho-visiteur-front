@@ -2,9 +2,9 @@
     
     <div class="mb-2 d-flex justify-content-end gap-3">
 
-        <BButton size="sm" variant="outline-primary">CSV</BButton>
-        <BButton size="sm" variant="outline-primary">EXCEL</BButton>
-        <BButton size="sm" variant="outline-primary">PDF</BButton>
+        <BButton size="sm" class="export">CSV</BButton>
+        <BButton size="sm" class="export">EXCEL</BButton>
+        <BButton size="sm" class="export">PDF</BButton>
       </div>
   
     <div>
@@ -299,5 +299,15 @@ export default {
 }
 .dropdown-menu{
   width: 100px;
+}
+
+.export{
+  background-color: #FFF;
+  border: 2px solid #007bff;
+  color: #007bff;
+}
+.export:hover{
+  background-color: #007bff;
+  color: #FFF;
 }
 </style>
