@@ -26,8 +26,8 @@ export default {
     Profile
   },
   mounted() {
-    let userData = localStorage.getItem("user");
-    this.user = JSON.parse(userData)
+    const token = useCookie('access_token');
+    this.user = localStorage.getItem('user');
     console.log(this.user)
   },
   methods: {

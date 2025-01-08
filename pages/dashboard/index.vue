@@ -29,3 +29,9 @@ export default {
   <PageHeader :title="title" :items="items" />
   <Dashboard />
 </template>
+<script setup>
+// Définir les métadonnées de la page avec un middleware
+definePageMeta({
+  middleware: ['auth'] // Le middleware 'auth' sera appliqué
+})
+</script>

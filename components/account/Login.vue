@@ -1,8 +1,8 @@
 <script>
-import axios from "axios";
 import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import { useAuthStore } from "~/stores/auth"
 
 export default {
   setup() {
@@ -54,6 +54,7 @@ export default {
         this.errorMsg = "";
         try {
           this.processing = true;
+
           const { data } = await apiClient.post(
             "/auth/login",
             {
@@ -63,26 +64,40 @@ export default {
           );
           const token = data.access_token;
           console.log(`------------------\n${data.access_token}`)
-
+ 
           if (token) {
-            localStorage.setItem("token", token);
-
-            apiClient.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
-            apiClient.post('/auth/me')
-            
-            .then(response => {
+            // Initialiser les cookies avec les informations reçues
+            const accessToken = useCookie('access_token');
+            accessToken.value = token;
+            apiClient.post('/auth/me', {}, {
+              headers: {
+                Authorization: `Bearer ${token}`, // Utiliser le token dans l'en-tête Authorization
+              },
+            }).then(response => {
               const user = response.data
 
               if(user){
-                localStorage.setItem("user", JSON.stringify(user));
-                 // Vérifier s'il y a une redirection enregistrée après login
-                const redirectPath = localStorage.getItem('redirect_after_login') || '/dashboard';
+                
+                // Stocker le profil utilisateur dans le cookie
+                // let userInfo = useCookie('user', {
+                //         maxAge: 60 * 60 * 24 * 1, // 1 jour (60 secondes * 60 minutes * 24 heures)
+                //         path: '/', // Disponible sur tout le site
+                //         secure: true, // Assure que le cookie est envoyé sur HTTPS
+                //         httpOnly: true, // Empêche l'accès au cookie via JavaScript
+                //         sameSite: 'Lax', // Aide à prévenir les attaques CSRF
+                //     });
+                //   userInfo.value = user
+
+                // Convertir l'objet utilisateur en chaîne JSON
+                const userString = JSON.stringify(user);
+
+                // Enregistrer l'objet dans le localStorage
+                localStorage.setItem('user', userString);
+                console.log(`USER:---------------------------\n${user}`)
 
                 // Rediriger vers la page enregistrée ou vers /dashboard par défaut
-                this.$router.push(redirectPath);
+                this.$router.push('/dashboard');
                 
-                // Supprimer la redirection après l'avoir utilisée
-                localStorage.removeItem('redirect_after_login');
               }
                 console.log('User information:', response.data);
             })
@@ -90,12 +105,11 @@ export default {
                 console.error('Error fetching user info:', error);
             });
 
-          } else {
-            this.errorMsg = response;
-          }
+          } 
         } catch (error) {
+          this.errorMsg = "E-mail ou mot de passe incorrect";
           console.error("failed at onLogin", { error });
-          localStorage.removeItem("user");
+
         } finally {
           this.processing = false;
         }
@@ -103,6 +117,7 @@ export default {
     }
   }
 };
+
 </script>
 
 <template>
@@ -110,15 +125,15 @@ export default {
       <BCard class="card-auth-login">
         <BCardBody>
           <div>
-            <div v-if="showAlert" class="alert alert-success alert-dismissible fade show font-size-13">
+            <!-- <div v-if="showAlert" class="alert alert-success alert-dismissible fade show font-size-13">
                 Mot de passe réinitialisé avec succes!
                 <button type="button" class="btn-close" @click="dismissAlert"></button>
-            </div>
-            <!-- <BAlert v-if="errorMsg" variant="danger" v-model="dismissibleAlert" dismissible>
+            </div> -->
+            <BAlert v-if="errorMsg" variant="danger" v-model="dismissibleAlert" dismissible>
               <p class="">{{ errorMsg }}</p>
-            </BAlert> -->
+            </BAlert>
 
-            <BAlert
+            <!-- <BAlert
               v-model="dismissCountDown"
               dismissible
               variant="danger"
@@ -126,7 +141,7 @@ export default {
             >
               <p class="">{{ errorMsg }}</p>
               <BProgress variant="warning" :max="dismissCountDown" :value="countdown" height="4px" />
-            </BAlert>
+            </BAlert> -->
 
               <div class="mb-3">
                 <label for="email" class="font-size-12 text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
