@@ -86,6 +86,25 @@ export default {
   methods: {
     async deconnexion(){
       try {
+          const token = useCookie("token")
+          await  apiClient.post('/auth/logout', {}, {
+              headers: {
+                Authorization: `Bearer ${token.value}`, // Utiliser le token dans l'en-tête Authorization
+              },
+            }).then(response => {
+              const token = useCookie("token")
+              token.value = null
+              
+              localStorage.removeItem('user');
+              
+              // Rediriger vers la page enregistrée ou vers /dashboard par défaut
+              this.$router.push('/login');
+
+            })
+            .catch(error => {
+                console.error('Error fetching user info:', error);
+            });
+
         await apiClient.post('/auth/logout'); // Appel à l'API pour invalider le token
         localStorage.removeItem('token');
         localStorage.removeItem('user');

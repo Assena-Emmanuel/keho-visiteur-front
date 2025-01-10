@@ -35,6 +35,7 @@ export default {
   mounted() {
     // Vide le localStorage lorsque ce composant est monté
     localStorage.removeItem('email');
+    
   },
   methods: {
     togglePasswordVisibility() {
@@ -63,43 +64,33 @@ export default {
             }
           );
           const token = data.access_token;
-          console.log(`------------------\n${data.access_token}`)
  
           if (token) {
-            // Initialiser les cookies avec les informations reçues
-            const accessToken = useCookie('access_token');
+            const accessToken = useCookie('token', {
+              maxAge: 60 * 60 * 24 * 1, // 1 jour (60 secondes * 60 minutes * 24 heures)
+              path: '/', // Disponible sur tout le site
+              // secure: true, // Assure que le cookie est envoyé sur HTTPS
+              // httpOnly: true, // Empêche l'accès au cookie via JavaScript
+              sameSite: 'Lax', // Aide à prévenir les attaques CSRF
+            });
             accessToken.value = token;
+
+
+
             apiClient.post('/auth/me', {}, {
               headers: {
                 Authorization: `Bearer ${token}`, // Utiliser le token dans l'en-tête Authorization
               },
             }).then(response => {
               const user = response.data
+            
+              
+              // Convertir l'objet en chaîne JSON
+              localStorage.setItem("user", JSON.stringify(user));
+              
+              // Rediriger vers la page enregistrée ou vers /dashboard par défaut
+              this.$router.push('/dashboard');
 
-              if(user){
-                
-                // Stocker le profil utilisateur dans le cookie
-                // let userInfo = useCookie('user', {
-                //         maxAge: 60 * 60 * 24 * 1, // 1 jour (60 secondes * 60 minutes * 24 heures)
-                //         path: '/', // Disponible sur tout le site
-                //         secure: true, // Assure que le cookie est envoyé sur HTTPS
-                //         httpOnly: true, // Empêche l'accès au cookie via JavaScript
-                //         sameSite: 'Lax', // Aide à prévenir les attaques CSRF
-                //     });
-                //   userInfo.value = user
-
-                // Convertir l'objet utilisateur en chaîne JSON
-                const userString = JSON.stringify(user);
-
-                // Enregistrer l'objet dans le localStorage
-                localStorage.setItem('user', userString);
-                console.log(`USER:---------------------------\n${user}`)
-
-                // Rediriger vers la page enregistrée ou vers /dashboard par défaut
-                this.$router.push('/dashboard');
-                
-              }
-                console.log('User information:', response.data);
             })
             .catch(error => {
                 console.error('Error fetching user info:', error);

@@ -27,8 +27,7 @@ export default {
   },
   mounted() {
     const token = useCookie('access_token');
-    this.user = localStorage.getItem('user');
-    console.log(this.user)
+    this.user = JSON.parse(localStorage.getItem("user"));
   },
   methods: {
     toggleMenu() {

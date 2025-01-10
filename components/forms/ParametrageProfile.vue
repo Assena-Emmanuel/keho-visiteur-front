@@ -1,6 +1,7 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import apiClient from "~/components/api/intercepteur";
 
 export default {
   setup() {
@@ -12,7 +13,8 @@ export default {
       activeTab: 1,
       activeTabArrow: 2,
       activeTabprofessionnelle: false,
-  
+      selectDepartements:"",
+      selectServices:"",
       // infos personnelles
         nom: "",
         prenom: "",
@@ -66,16 +68,82 @@ export default {
       statut: {required},
    
     },
+    mounted() {
+    this.recuperertDepartements()
+    const token = useCookie('access_token');
+    this.user = JSON.parse(localStorage.getItem("user"));
+
+    this.civilite = this.user.civilite
+    this.nom = this.user.nom
+    this.prenom = this.user.prenom
+    this.email = this.user.email
+    this.mobile1 = this.user.telephone1
+    this.mobile2 = this.user.telephone2
+    this.statut = this.user.statut
+    this.photo = this.user.photo
+
+    // Info professionnelles
+    this.matricule = this.user.matricule || ""
+    this.codeVisite = this.user.code_visite || ""
+    this.departement = this.user.departement_id || ""
+    this.service = this.user.service_id || ""
+
+
+  },
  
   methods: {
     toggleWizard(tab, value) {
       this.activeTab = tab;
       this.progressBarValue = value;
     },
+    async recuperertDepartements() {
+      try {
+        // Reccuperer les services et départements
+        const response = await apiClient.post('/categorie', {});
+        this.selectDepartements = response.data;  // Assurez-vous d'accéder à la propriété data dans la réponse
+        console.log("-------------------!----", response);
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    },
+    async recuperertServices() {
+      try {
+        // Reccuperer les services et départements
+        const response = await apiClient.post('/categorie', {});
+        this.selectDepartements = response.data;  // Assurez-vous d'accéder à la propriété data dans la réponse
+        console.log("-------------------!----", response);
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    },
 
     // SweetAlert
+    // successmsg() {
+    //   this.$swal.fire("Succes!", "Modification reussie!", "success");
+    // },
+
     successmsg() {
-      this.$swal.fire("Succes!", "Modification reussie!", "success");
+      this.$swal.fire("Succes!", "Modification réussie!", "success")
+        .then(() => {
+          this.activeTabprofessionnelle = false
+          this.next = false
+          this.toggleWizard(1, 100)
+
+          this.civilite = this.user.civilite
+          this.nom = this.user.nom
+          this.prenom = this.user.prenom
+          this.email = this.user.email
+          this.mobile1 = this.user.telephone1
+          this.mobile2 = this.user.telephone2
+          this.statut = this.user.statut
+          this.photo = this.user.photo
+
+          // Info professionnelles
+          this.matricule = this.user.matricule || ""
+          this.codeVisite = this.user.code_visite || ""
+          this.departement = this.user.departement_id || ""
+          this.service = this.user.service_id || ""
+        });
     },
 
 
@@ -119,6 +187,7 @@ export default {
       }else{
         this.successmsg()
 
+
         this.civilite = ""
         this.nom = ""
         this.prenom = ""
@@ -133,6 +202,8 @@ export default {
         this.codeVisite = ""
         this.departement = ""
         this.service = ""
+
+        this.submitted = false;
       }
     }
 
@@ -182,10 +253,9 @@ export default {
                       <select v-model="civilite" id="civilite" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': next && v$.civilite.$error
                       }">
-                        <option value="" selected>civilité...</option>
-                        <option value="MONSIEUR">MONSIEUR</option>
-                        <option value="MADAME">MADAME</option>
-                        <option value="MADEMOISELLE">MADEMOISELLE</option>
+                        <option value="M." :selected="civilite === 'M.'">M.</option>
+                        <option value="Mme" :selected="civilite === 'Mme'">Mme</option>
+                        <option value="Mlle" :selected="civilite === 'Mlle'">Mlle</option>
                       </select>
                       <div v-if="next && v$.civilite.$error" class="invalid-feedback">
                         <span v-if="v$.civilite.required.$invalid">Civilité obligatoire
@@ -271,8 +341,8 @@ export default {
                       <select v-model="statut" id="statut" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': submitted && v$.statut.$error
                       }">
-                        <option value="ACTIVE">ACTIVE</option>
-                        <option value="DESACTIVE">DESACTIVE</option>
+                        <option value="1" :selected="statut === '1'">ACTIVE</option>
+                        <option value="0" :selected="statut === '0'">DESACTIVE</option>
 
                       </select>
                       <!-- <div v-if="submitted && v$.service.$error" class="invalid-feedback">
@@ -287,13 +357,9 @@ export default {
                       @change="handleFileUpload" 
                       type="file" 
                       class="form-control border border-black rounded-2" 
-                      :class="{'is-invalid': next && photo == ''}"
                       id="photo" 
                     />
-                    <div v-if="next && photo == ''" class="invalid-feedback">
-                        <span v-if="photo == ''">Photo obligatoire
-                        </span>
-                      </div>
+                    
                   </BCol>
                   <div class="d-flex justify-content-end mt-5">
                     <BButton variant="primary" class="px-5" @click="onNext">
