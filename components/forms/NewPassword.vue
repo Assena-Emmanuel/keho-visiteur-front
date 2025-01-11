@@ -1,6 +1,9 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
+import apiClient from "~/components/api/intercepteur";
+
+
 export default {
   setup() {
     return { v$: useVuelidate() };
@@ -12,7 +15,6 @@ export default {
       lastPassword: "",
       submitted: false,
       isSuccess: false,
-      isDif: false,
       passwordVisible: false,
       showLastPassword: false,
     };
@@ -35,26 +37,52 @@ export default {
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
     },
-    onReset() {
+    async onReset() {
       this.submitted = true;
       this.isSuccess = false;
       this.v$.$touch();
       if (this.v$.$invalid) {
         return;
       } else {
-        if(this.newpassword !== this.confirmPassword){
-            this.isDif = true
-        }else{
-            alert(`last: ${this.lastPassword} - new: ${this.newpassword} - cnew: ${this.confirmPassword}`)
-            this.isSuccess = true;
-            this.lastPassword = ""
-            this.newpassword = "",
-            this.confirmPassword = ""
-            this.submitted = false
+          
+          try {
+            if(this.newpassword !== this.confirmPassword){
+              this.$swal.fire("Erreur!", `Mot de passe de confirmation different!`, "error");
+              this.submitted = false;
+              return
+            }
+            const token = useCookie('token')
+
             
+            const response = await apiClient.post('/user/me_pwd', {
+                old_password: this.lastPassword,
+                password: this.newpassword,
+                password_confirmation: this.confirmPassword,
+
+              }, {
+                headers: { 
+                  'Authorization': `Bearer ${token.value}`, 
+                }
+              });
+
+            if(response.data.error){
+                const message =  response.data.message
+                this.$swal.fire("Erreur!", `${message}`, "error");
+                return
+            }else{
+              this.$swal.fire("Succes!", `${response.data.message}`, "success");
+              this.isSuccess = true;
+              this.lastPassword = ""
+              this.newpassword = "",
+              this.confirmPassword = ""
+              this.submitted = false
+              return
+            }
+            
+          } catch (error) {
+            console.error('Error fetching user info:', error);
+          }  
         }
-        
-      }
     }
   }
 };
@@ -71,10 +99,7 @@ export default {
             <!-- <p class="text-muted">Reset Password with Minible.</p> -->
           </div>
           <div class="p-2 mt-4">
-            <div v-if="isDif" class="alert alert-danger alert-dismissible fade show">
-                Mot de passe non identique
-                <button type="button" class="btn-close" @click="isDif = !isDif"></button>
-            </div>
+            
             <BForm>
                 <BRow>
                   <BCol md="4" sm="4">

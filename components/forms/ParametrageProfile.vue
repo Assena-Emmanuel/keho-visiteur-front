@@ -15,6 +15,7 @@ export default {
       activeTabprofessionnelle: false,
       selectDepartements:"",
       selectServices:"",
+      token : "",
       // infos personnelles
         nom: "",
         prenom: "",
@@ -70,9 +71,9 @@ export default {
     },
     mounted() {
     this.recuperertDepartements()
-    const token = useCookie('access_token');
+    this.recuperertServices()
+    this.token = useCookie('token')
     this.user = JSON.parse(localStorage.getItem("user"));
-
     this.civilite = this.user.civilite
     this.nom = this.user.nom
     this.prenom = this.user.prenom
@@ -99,19 +100,33 @@ export default {
     async recuperertDepartements() {
       try {
         // Reccuperer les services et départements
-        const response = await apiClient.post('/categorie', {});
-        this.selectDepartements = response.data;  // Assurez-vous d'accéder à la propriété data dans la réponse
-        console.log("-------------------!----", response);
+        const slug = "DPT"
+        const response = await apiClient.get(`/categorie_by_slug/${slug}`, {},{
+          headers: { 
+            'Authorization': `Bearer ${this.token}`, 
+          }
+        });
+         if(!response.data.error){
+          this.selectDepartements = response.data.data
+         }
+        
       } catch (error) {
-        console.error('Error fetching user info:', error);
+        console.error('Error fetching user info-----:', error);
       }
     },
     async recuperertServices() {
       try {
         // Reccuperer les services et départements
-        const response = await apiClient.post('/categorie', {});
-        this.selectDepartements = response.data;  // Assurez-vous d'accéder à la propriété data dans la réponse
-        console.log("-------------------!----", response);
+        const slug = "SRV"
+        const response = await apiClient.get(`/categorie_by_slug/${slug}`, {},{
+          headers: { 
+            'Authorization': `Bearer ${this.token}`, 
+          }
+        });
+        if(!response.data.error){
+          console.log('categorie-----------------------------:'+response.data)
+          this.selectDepartements = response.data.data
+        }
       } catch (error) {
         console.error('Error fetching user info:', error);
       }
@@ -415,9 +430,9 @@ export default {
                       <select v-model="departement" id="departement" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': submitted && v$.departement.$error}"
                       >
-                        <option value="">Département...</option>
-                        <option value="RH">DEPARTEMENT DES RESSOURCES HUMAINES (RH)</option>
-                        <option value="IT">DEPARTEMENT INFORMATIQUE (IT)</option>
+
+                      <option value="" selected>Selectionnez...</option>
+                      <option v-for="departement in selectDepartements" :key="departement.code" :value="departement.code">{{ departement.libelle }}</option>
 
                       </select>
                       <div v-if="submitted && v$.departement.$error" class="invalid-feedback">
@@ -432,9 +447,8 @@ export default {
                       <select v-model="service" id="service" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': submitted && v$.service.$error}"
                       >
-                        <option value="">SERVICE...</option>
-                        <option value="RECRUTEMENT">RECRUTEMENT</option>
-                        <option value="SUPPORT TECHNIQUE">SUPPORT TECHNIQUE</option> 
+                        <option value="" selected>Selectionnez...</option>
+                        <option v-for="service in selectServices" :key="service.code" :value="service.code">{{ service.libelle }}</option>
                       </select>
                       <div v-if="submitted && v$.service.$error" class="invalid-feedback">
                         <span v-if="v$.service.required.$invalid">Service obligatoire
