@@ -16,6 +16,7 @@ export default {
       selectDepartements:"",
       selectServices:"",
       token : "",
+      user: "",
       // infos personnelles
         nom: "",
         prenom: "",
@@ -70,8 +71,8 @@ export default {
    
     },
     mounted() {
-    this.recuperertDepartements()
-    this.recuperertServices()
+    this.recupererDepartements()
+    this.recupererServices()
     this.token = useCookie('token')
     this.user = JSON.parse(localStorage.getItem("user"));
     this.civilite = this.user.civilite
@@ -97,7 +98,7 @@ export default {
       this.activeTab = tab;
       this.progressBarValue = value;
     },
-    async recuperertDepartements() {
+    async recupererDepartements() {
       try {
         // Reccuperer les services et départements
         const slug = "DPT"
@@ -111,10 +112,10 @@ export default {
          }
         
       } catch (error) {
-        console.error('Error fetching user info-----:', error);
+        console.error('Error fetching Departement-----:', error);
       }
     },
-    async recuperertServices() {
+    async recupererServices() {
       try {
         // Reccuperer les services et départements
         const slug = "SRV"
@@ -124,11 +125,10 @@ export default {
           }
         });
         if(!response.data.error){
-          console.log('categorie-----------------------------:'+response.data)
           this.selectDepartements = response.data.data
         }
       } catch (error) {
-        console.error('Error fetching user info:', error);
+        console.error('Error fetching Service:', error);
       }
     },
 
@@ -219,6 +219,22 @@ export default {
         this.service = ""
 
         this.submitted = false;
+      }
+    },
+    async handleStatut(){
+      try {
+        const response = await apiClient.get(`/categorie_by_slug/${this.user.id}`, {
+          active : this.user.statut === 0 ? 1 : 0
+        },{
+          headers: { 
+            'Authorization': `Bearer ${this.token}`, 
+          }
+        });
+        if(!response.data.error){
+          console.log("-------------------------!"+response.data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching Service:', error);
       }
     }
 
@@ -351,9 +367,9 @@ export default {
                     />
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="statut" style="font-size: 12px; font-weight: bolder" >Statut</label>
+                    <label for="statut" style="font-size: 12px; font-weight: bolder" >Statut {{ user.statut }}</label>
                     <div class="input-group">
-                      <select v-model="statut" id="statut" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
+                      <select v-model="statut" id="statut" @change="handleStatut()" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': submitted && v$.statut.$error
                       }">
                         <option value="1" :selected="statut === '1'">ACTIVE</option>

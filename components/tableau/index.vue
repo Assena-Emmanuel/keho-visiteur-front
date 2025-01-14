@@ -31,6 +31,7 @@ export default {
     typeForme: String,
     data: Array,
     modal: Boolean,
+    isLoading: Boolean,
   },
 
   computed: {
@@ -97,7 +98,7 @@ export default {
       
     },
     handleEdit(index, data) {
-        this.$emit('edit', data[index], );
+        this.$emit('edit', {row: data[index], index});
 
       },
       confirmDelete(code) {
@@ -167,6 +168,11 @@ export default {
               </BCol>
             </BRow>
             <div class="table-responsive mb-0">
+              <div v-if="isLoading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Chargement...</span>
+                </div>
+              </div>
               <BTable 
                 :items="filteredData" 
                 :fields="fields" 
@@ -177,9 +183,9 @@ export default {
                 v-model:sort-desc.sync="sortDesc" 
                 @filtered="onFiltered" 
               >
-                <template #cell(Statut)="row">
-                  <span v-if="row.item.Statut" class="badge rounded-pill text-bg-success">activé</span>
-                  <span v-if="!row.item.Statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
+                <template #cell(statut)="row">
+                  <span v-if="row.item.statut" class="badge rounded-pill text-bg-success">activé</span>
+                  <span v-if="!row.item.statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
                 </template>
 
                 <template #cell(Actions)="row">
@@ -220,3 +226,14 @@ export default {
     </BRow>
   </div>
 </template>
+<style>
+  .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+.text-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+</style>
