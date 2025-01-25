@@ -12,7 +12,7 @@ export const useNotifiedStore = defineStore("notified", {
         `${useRuntimeConfig().public.API_URL}/user/notifs`,
         {
           headers: {
-            Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2tlaG8tdmlzaXRvcnMubG9jYWwvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3MzAyMDExNTMsImV4cCI6MTczMDI4NzU1MywibmJmIjoxNzMwMjAxMTUzLCJqdGkiOiI1RFc4Z3JtclpNVFhpQnJEIiwic3ViIjoiMTUiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.g8rwBdjHlsbROBxKBdvx0MLxhSmhUo_XwfgIsXO2gnA`, // Ajoutez le token Bearer ici
+            Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2tlaG8tdmlzaXRvcnMubG9jYWwvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3MzYyNjA2MzQsImV4cCI6MTczNjM0NzAzNCwibmJmIjoxNzM2MjYwNjM0LCJqdGkiOiJTaTVIT2xZcmxXbW5qTDNMIiwic3ViIjoiNjQiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.NrRdPSX1o8W9qC03ehDmpWsRW-DvSSWixW02ebVns8w`, // Ajoutez le token Bearer ici
             Accept: "application/json",
           },
         }

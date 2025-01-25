@@ -99,7 +99,7 @@ export default {
       ],
       events: [
         { title: 'Réunion', start: '2024-10-28 09:00', end: '2024-10-28 10:00', class: 'event-1' },
-        { title: 'Déjeuner', start: '2024-11-1 12:00', end: null, class: 'event-9' },
+        { title: 'Déjeuner', start: '2024-11-1 12:00', end: '2024-11-1 13:00', class: 'event-9' },
         { title: 'Atelier', start: '2024-10-29 14:00', end: '2024-10-29 15:30', class: 'event-5' }
       ],
       isEditing: false,
