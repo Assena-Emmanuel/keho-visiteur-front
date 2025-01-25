@@ -82,11 +82,10 @@ export default {
               },
             }).then(response => {
               const user = response.data
-            
-              
-              // Convertir l'objet en chaîne JSON
-              localStorage.setItem("user", JSON.stringify(user));
-              
+              console.log("-----------------------------user log:"+JSON.stringify(user))
+
+              const auth = useUserStore()
+              auth.setUser(user)
               // Rediriger vers la page enregistrée ou vers /dashboard par défaut
               this.$router.push('/dashboard');
 

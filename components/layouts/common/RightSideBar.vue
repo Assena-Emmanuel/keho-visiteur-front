@@ -77,12 +77,15 @@ export default {
       }
     }
   },
+
+  
   mounted() {
     this.addEventListener();
     let dataUser = localStorage.getItem('user')
     this.user = JSON.parse(dataUser)
-    console.log(this.user)
   },
+
+
   methods: {
     async deconnexion(){
       try {
@@ -95,7 +98,8 @@ export default {
               const token = useCookie("token")
               token.value = null
               
-              localStorage.removeItem('user');
+              const userStore = useUserStore()
+              userStore.clearUser()
               
               // Rediriger vers la page enregistrée ou vers /dashboard par défaut
               this.$router.push('/login');
