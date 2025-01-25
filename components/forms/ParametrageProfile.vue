@@ -1,6 +1,8 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import apiClient from "~/components/api/intercepteur";
+import { useUserStore } from '@/stores/user';
 
 export default {
   setup() {
@@ -12,7 +14,11 @@ export default {
       activeTab: 1,
       activeTabArrow: 2,
       activeTabprofessionnelle: false,
-  
+      selectDepartements:"",
+      selectServices:"",
+      token : "",
+      user: "",
+      show: false,
       // infos personnelles
         nom: "",
         prenom: "",
@@ -66,16 +72,101 @@ export default {
       statut: {required},
    
     },
+    mounted() {
+    this.recupererDepartements()
+    this.recupererServices()
+    this.token = useCookie('token')
+    const userStore = useUserStore()
+    this.user = userStore.user
+    this.civilite = this.user.civilite
+    this.nom = this.user.nom
+    this.prenom = this.user.prenom
+    this.email = this.user.email
+    this.mobile1 = this.user.telephone1
+    this.mobile2 = this.user.telephone2
+    this.statut = this.user.statut
+    this.photo = this.user.image
+
+    // Info professionnelles
+    this.matricule = this.user.matricule || ""
+    this.codeVisite = this.user.code_visite || ""
+    this.departement = this.user.departement_id || ""
+    this.service = this.user.service_id || ""
+
+
+  },
+  computed(){
+    const userStore = useUserStore()
+    this.user = userStore.user
+  },
  
   methods: {
     toggleWizard(tab, value) {
       this.activeTab = tab;
       this.progressBarValue = value;
     },
+    async recupererDepartements() {
+      try {
+        // Reccuperer les services et départements
+        const slug = "DPT"
+        const response = await apiClient.get(`/categorie_by_slug/${slug}`, {},{
+          headers: { 
+            'Authorization': `Bearer ${this.token}`, 
+          }
+        });
+         if(!response.data.error){
+          this.selectDepartements = response.data.data
+         }
+        
+      } catch (error) {
+        console.error('Error fetching Departement-----:', error);
+      }
+    },
+    async recupererServices() {
+      try {
+        // Reccuperer les services et départements
+        const slug = "SRV"
+        const response = await apiClient.get(`/categorie_by_slug/${slug}`, {},{
+          headers: { 
+            'Authorization': `Bearer ${this.token}`, 
+          }
+        });
+        if(!response.data.error){
+          this.selectServices = response.data.data
+        }
+      } catch (error) {
+        console.error('Error fetching Service:', error);
+      }
+    },
 
     // SweetAlert
+    // successmsg() {
+    //   this.$swal.fire("Succes!", "Modification reussie!", "success");
+    // },
+
     successmsg() {
-      this.$swal.fire("Succes!", "Modification reussie!", "success");
+      this.$swal.fire("Succes!", "Modification réussie!", "success")
+        .then(() => {
+          this.activeTabprofessionnelle = false
+          this.next = false
+          this.toggleWizard(1, 100)
+
+          this.user = JSON.parse(localStorage.getItem("user"));
+          this.civilite = this.user.civilite
+          this.nom = this.user.nom
+          this.prenom = this.user.prenom
+          this.email = this.user.email
+          this.mobile1 = this.user.telephone1
+          this.mobile2 = this.user.telephone2
+          this.statut = this.user.statut
+          this.photo = this.user.photo
+
+          // Info professionnelles
+          this.matricule = this.user.matricule || ""
+          this.codeVisite = this.user.code_visite || ""
+          this.departement = this.user.departement_id || ""
+          this.service = this.user.service_id || ""
+        });
     },
 
 
@@ -106,7 +197,7 @@ export default {
         this.toggleWizard(2, 100)
       }
     },
-    onSave(){
+    async onSave(){
       this.submitted = true;
       this.v$.$touch();
       if( 
@@ -117,7 +208,60 @@ export default {
         ){
           return
       }else{
+        this.show = true;
+        try{
+          alert(this.nom)
+          await apiClient.post(
+            `/user/${this.user.uuid}`,
+            {
+              nom: this.nom,
+              prenom: this.prenom,
+              email: this.email ,
+              image: this.photo,
+              telephone1: this.mobile1,
+              telephone2: this.mobile2,
+              civilite: this.civilite,
+              matricule: this.matricule,
+              departement_id: this.departement,
+              service_id: this.service,
+            },
+            {
+
+              headers: { 
+                'Authorization': `Bearer ${this.token}`, 
+              }
+
+            }).then(response =>{
+              apiClient.post('/auth/me', {}, {
+                headers: {
+                  Authorization: `Bearer ${this.token}`, // Utiliser le token dans l'en-tête Authorization
+                },
+              })
+                .then(response => {
+                  const user = response.data;
+                  const userStore = useUserStore()
+                  userStore.setUser(user)
+                  console.log("Utilisateur mis à jour :", user); // Log pour confirmer la mise à jour
+                })
+                .catch(error => {
+                  console.error("Erreur lors de la récupération de l'utilisateur :", error.message); // Log de l'erreur
+                  alert("Impossible de récupérer les informations utilisateur. Veuillez réessayer.");
+                });
+
+                
+            })
+
+        }catch{
+          alert("error")
+        }finally{
+          this.show = false
+        }
+
+
+
+
         this.successmsg()
+
 
         this.civilite = ""
         this.nom = ""
@@ -133,6 +277,24 @@ export default {
         this.codeVisite = ""
         this.departement = ""
         this.service = ""
+
+        this.submitted = false;
+      }
+    },
+    async handleStatut(){
+      try {
+        const response = await apiClient.get(`/categorie_by_slug/${this.user.id}`, {
+          active : this.user.statut === 0 ? 1 : 0
+        },{
+          headers: { 
+            'Authorization': `Bearer ${this.token}`, 
+          }
+        });
+        if(!response.data.error){
+          console.log("-------------------------!"+response.data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching Service:', error);
       }
     }
 
@@ -141,6 +303,10 @@ export default {
 </script>
 
 <template>
+  
+  <div v-if="show" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
   <BRow class="wizard" >
     <BCol>
       <BCard no-body>
@@ -175,17 +341,16 @@ export default {
               <!-- Informations personnelles -->
               <div class="tab-pane fade" :class="activeTab == 1 && 'show active'" id="pills-gen-info" role="tabpanel" aria-labelledby="pills-gen-info-tab">
                 <BRow class="mt-3 mb-4">
-                  <h4 class="text-center font-size-20 mb-5">Informations Personnelles</h4>
+                  <h4 class="text-center font-size-20 mb-5">Informations Personnelles </h4>
                   <BCol sm="3" class="mb-3">
                     <label for="civilite" style="font-size: 12px; font-weight: bolder">Civilité</label>
                     <div class="input-group">
                       <select v-model="civilite" id="civilite" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': next && v$.civilite.$error
                       }">
-                        <option value="" selected>civilité...</option>
-                        <option value="MONSIEUR">MONSIEUR</option>
-                        <option value="MADAME">MADAME</option>
-                        <option value="MADEMOISELLE">MADEMOISELLE</option>
+                        <option value="M." :selected="civilite === 'M.'">M.</option>
+                        <option value="Mme" :selected="civilite === 'Mme'">Mme</option>
+                        <option value="Mlle" :selected="civilite === 'Mlle'">Mlle</option>
                       </select>
                       <div v-if="next && v$.civilite.$error" class="invalid-feedback">
                         <span v-if="v$.civilite.required.$invalid">Civilité obligatoire
@@ -194,7 +359,7 @@ export default {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="nom" style="font-size: 12px; font-weight: bolder">Nom</label>
+                    <label for="nom" style="font-size: 12px; font-weight: bolder">Nom: {{ nom }}</label>
                     <div class="input-group">
                       <input 
                         v-model="nom" 
@@ -265,35 +430,16 @@ export default {
                       maxlength="10" 
                     />
                   </BCol>
-                  <BCol sm="3" class="mb-3">
-                    <label for="statut" style="font-size: 12px; font-weight: bolder" >Statut</label>
-                    <div class="input-group">
-                      <select v-model="statut" id="statut" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.statut.$error
-                      }">
-                        <option value="ACTIVE">ACTIVE</option>
-                        <option value="DESACTIVE">DESACTIVE</option>
-
-                      </select>
-                      <!-- <div v-if="submitted && v$.service.$error" class="invalid-feedback">
-                        <span v-if="v$.service.required.$invalid">Service obligatoire
-                        </span>
-                      </div> -->
-                    </div>
-                  </BCol>
+                  
                   <BCol sm="3" class="mb-3">
                     <label for="photo" style="font-size: 12px; font-weight: bolder">Photo</label>
                     <input 
                       @change="handleFileUpload" 
                       type="file" 
                       class="form-control border border-black rounded-2" 
-                      :class="{'is-invalid': next && photo == ''}"
                       id="photo" 
                     />
-                    <div v-if="next && photo == ''" class="invalid-feedback">
-                        <span v-if="photo == ''">Photo obligatoire
-                        </span>
-                      </div>
+                    
                   </BCol>
                   <div class="d-flex justify-content-end mt-5">
                     <BButton variant="primary" class="px-5" @click="onNext">
@@ -349,9 +495,9 @@ export default {
                       <select v-model="departement" id="departement" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': submitted && v$.departement.$error}"
                       >
-                        <option value="">Département...</option>
-                        <option value="RH">DEPARTEMENT DES RESSOURCES HUMAINES (RH)</option>
-                        <option value="IT">DEPARTEMENT INFORMATIQUE (IT)</option>
+
+                      <option value="" selected>Selectionnez...</option>
+                      <option v-for="departement in selectDepartements" :key="departement.code" :value="departement.code">{{ departement.libelle }}</option>
 
                       </select>
                       <div v-if="submitted && v$.departement.$error" class="invalid-feedback">
@@ -366,9 +512,8 @@ export default {
                       <select v-model="service" id="service" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': submitted && v$.service.$error}"
                       >
-                        <option value="">SERVICE...</option>
-                        <option value="RECRUTEMENT">RECRUTEMENT</option>
-                        <option value="SUPPORT TECHNIQUE">SUPPORT TECHNIQUE</option> 
+                        <option value="" selected>Selectionnez...</option>
+                        <option v-for="service in selectServices" :key="service.code" :value="service.code">{{ service.libelle }}</option>
                       </select>
                       <div v-if="submitted && v$.service.$error" class="invalid-feedback">
                         <span v-if="v$.service.required.$invalid">Service obligatoire
@@ -392,6 +537,7 @@ export default {
     </BCol>
   </BRow>
 </template>
+
 
 <style lang="scss">
 .progress-nav {
@@ -451,6 +597,39 @@ export default {
     .nav-link:not(.active) {
       background: var(--bs-input-bg);
     }
+  }
+}
+</style>
+
+<style scoped>
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

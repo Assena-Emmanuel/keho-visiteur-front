@@ -12,7 +12,7 @@ export default {
       dataDetail: {},
       detailModal: false,
       localModal: this.modal,
-
+      isStatutActive: false,
       totalRows: 1,
       currentPage: 1,
       perPage: 5,
@@ -31,9 +31,20 @@ export default {
     typeForme: String,
     data: Array,
     modal: Boolean,
+    isLoading: Boolean,
   },
 
   computed: {
+
+    isStatutActive: {
+      get() {
+        return this.row.item.statut === 1; // Convert to boolean
+      },
+      set(value) {
+        this.row.item.statut = value ? 1 : 0; // Convert back to numeric
+      },
+    },
+
     /**
      * Dynamically generate filterOn based on fields
      */
@@ -97,7 +108,8 @@ export default {
       
     },
     handleEdit(index, data) {
-        this.$emit('edit', data[index], );
+        localStorage.setItem('edit', {row: data[index], index})
+        this.$emit('edit', {row: data[index], index});
 
       },
       confirmDelete(code) {
@@ -167,6 +179,11 @@ export default {
               </BCol>
             </BRow>
             <div class="table-responsive mb-0">
+              <div v-if="isLoading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Chargement...</span>
+                </div>
+              </div>
               <BTable 
                 :items="filteredData" 
                 :fields="fields" 
@@ -177,9 +194,10 @@ export default {
                 v-model:sort-desc.sync="sortDesc" 
                 @filtered="onFiltered" 
               >
-                <template #cell(Statut)="row">
-                  <span v-if="row.item.Statut" class="badge rounded-pill text-bg-success">activé</span>
-                  <span v-if="!row.item.Statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
+                <template #cell(statut)="row">
+                  <!-- <span v-if="row.item.statut" class="badge rounded-pill text-bg-success">activé</span>
+                  <span v-if="!row.item.statut" class="badge rounded-pill text-bg-danger">Désactivé</span> -->
+                  <BFormCheckbox v-model="row.item.statut" class="custom-switch" :checked="row.item.statut" switch></BFormCheckbox>
                 </template>
 
                 <template #cell(Actions)="row">
@@ -220,3 +238,16 @@ export default {
     </BRow>
   </div>
 </template>
+<style scoped>
+  .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+.text-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+</style>
