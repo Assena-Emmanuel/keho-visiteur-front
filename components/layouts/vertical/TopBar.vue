@@ -5,6 +5,7 @@ import HederLogo from "~/components/layouts/common/HeaderLogo.vue";
 import AppList from "~/components/layouts/common/AppList.vue";
 import Notifications from "~/components/layouts/common/Notifications.vue";
 import Profile from "~/components/layouts/common/Profile.vue";
+import { useUserStore } from '@/stores/user';
 
 
 export default {
@@ -13,7 +14,7 @@ export default {
       parametres: ["Paramètre des Visités, Paramètre des Visiteurs, "],
       value: null,
       config: useRuntimeConfig(),
-      user: []
+      user: null,
     };
   },
   components: {
@@ -26,9 +27,16 @@ export default {
     Profile
   },
   mounted() {
-    const token = useCookie('access_token');
-    this.user = JSON.parse(localStorage.getItem("user"));
+    const userStore = useUserStore()
+    this.user = userStore.user;
   },
+
+  computed(){
+    const userStore = useUserStore()
+    this.user = userStore.user
+  },
+
+
   methods: {
     toggleMenu() {
       this.$parent.toggleMenu();

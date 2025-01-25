@@ -92,12 +92,15 @@ export default {
 
             })
             .catch(error => {
+                this.errorMsg = "E-mail ou mot de passe incorrect";
                 console.error('Error fetching user info:', error);
+                return
             });
 
           } 
         } catch (error) {
-          this.errorMsg = "E-mail ou mot de passe incorrect";
+          console.log("------------------------------token:"+token)
+          this.errorMsg = "Erreur de connexion";
           console.error("failed at onLogin", { error });
 
         } finally {

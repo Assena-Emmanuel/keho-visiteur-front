@@ -194,7 +194,7 @@ export default{
               <div class="progress">
                 <div class="progress-bar" role="progressbar" :style="`width: ${progressBarValue}%;`" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
               </div>
-
+              
               <ul class="nav nav-pills d-flex justify-content-evenly wizard-steps" role="tablist">
                 <li class="nav-item" role="presentation">
                   <button class="nav-link wizard-step" id="pills-gen-info-tab" type="button" role="tab" :class="{ 

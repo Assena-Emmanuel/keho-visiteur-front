@@ -2,6 +2,7 @@
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import apiClient from "~/components/api/intercepteur";
+import { useUserStore } from '@/stores/user';
 
 export default {
   setup() {
@@ -17,6 +18,7 @@ export default {
       selectServices:"",
       token : "",
       user: "",
+      show: false,
       // infos personnelles
         nom: "",
         prenom: "",
@@ -74,7 +76,8 @@ export default {
     this.recupererDepartements()
     this.recupererServices()
     this.token = useCookie('token')
-    this.user = JSON.parse(localStorage.getItem("user"));
+    const userStore = useUserStore()
+    this.user = userStore.user
     this.civilite = this.user.civilite
     this.nom = this.user.nom
     this.prenom = this.user.prenom
@@ -82,7 +85,7 @@ export default {
     this.mobile1 = this.user.telephone1
     this.mobile2 = this.user.telephone2
     this.statut = this.user.statut
-    this.photo = this.user.photo
+    this.photo = this.user.image
 
     // Info professionnelles
     this.matricule = this.user.matricule || ""
@@ -91,6 +94,10 @@ export default {
     this.service = this.user.service_id || ""
 
 
+  },
+  computed(){
+    const userStore = useUserStore()
+    this.user = userStore.user
   },
  
   methods: {
@@ -125,7 +132,7 @@ export default {
           }
         });
         if(!response.data.error){
-          this.selectDepartements = response.data.data
+          this.selectServices = response.data.data
         }
       } catch (error) {
         console.error('Error fetching Service:', error);
@@ -144,6 +151,7 @@ export default {
           this.next = false
           this.toggleWizard(1, 100)
 
+          this.user = JSON.parse(localStorage.getItem("user"));
           this.civilite = this.user.civilite
           this.nom = this.user.nom
           this.prenom = this.user.prenom
@@ -189,7 +197,7 @@ export default {
         this.toggleWizard(2, 100)
       }
     },
-    onSave(){
+    async onSave(){
       this.submitted = true;
       this.v$.$touch();
       if( 
@@ -200,6 +208,58 @@ export default {
         ){
           return
       }else{
+        this.show = true;
+        try{
+          alert(this.nom)
+          await apiClient.post(
+            `/user/${this.user.uuid}`,
+            {
+              nom: this.nom,
+              prenom: this.prenom,
+              email: this.email ,
+              image: this.photo,
+              telephone1: this.mobile1,
+              telephone2: this.mobile2,
+              civilite: this.civilite,
+              matricule: this.matricule,
+              departement_id: this.departement,
+              service_id: this.service,
+            },
+            {
+
+              headers: { 
+                'Authorization': `Bearer ${this.token}`, 
+              }
+
+            }).then(response =>{
+              apiClient.post('/auth/me', {}, {
+                headers: {
+                  Authorization: `Bearer ${this.token}`, // Utiliser le token dans l'en-tête Authorization
+                },
+              })
+                .then(response => {
+                  const user = response.data;
+                  const userStore = useUserStore()
+                  userStore.setUser(user)
+                  console.log("Utilisateur mis à jour :", user); // Log pour confirmer la mise à jour
+                })
+                .catch(error => {
+                  console.error("Erreur lors de la récupération de l'utilisateur :", error.message); // Log de l'erreur
+                  alert("Impossible de récupérer les informations utilisateur. Veuillez réessayer.");
+                });
+
+                
+            })
+
+        }catch{
+          alert("error")
+        }finally{
+          this.show = false
+        }
+
+
+
+
         this.successmsg()
 
 
@@ -243,6 +303,10 @@ export default {
 </script>
 
 <template>
+  
+  <div v-if="show" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
   <BRow class="wizard" >
     <BCol>
       <BCard no-body>
@@ -277,7 +341,7 @@ export default {
               <!-- Informations personnelles -->
               <div class="tab-pane fade" :class="activeTab == 1 && 'show active'" id="pills-gen-info" role="tabpanel" aria-labelledby="pills-gen-info-tab">
                 <BRow class="mt-3 mb-4">
-                  <h4 class="text-center font-size-20 mb-5">Informations Personnelles</h4>
+                  <h4 class="text-center font-size-20 mb-5">Informations Personnelles </h4>
                   <BCol sm="3" class="mb-3">
                     <label for="civilite" style="font-size: 12px; font-weight: bolder">Civilité</label>
                     <div class="input-group">
@@ -295,7 +359,7 @@ export default {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="nom" style="font-size: 12px; font-weight: bolder">Nom</label>
+                    <label for="nom" style="font-size: 12px; font-weight: bolder">Nom: {{ nom }}</label>
                     <div class="input-group">
                       <input 
                         v-model="nom" 
@@ -366,22 +430,7 @@ export default {
                       maxlength="10" 
                     />
                   </BCol>
-                  <BCol sm="3" class="mb-3">
-                    <label for="statut" style="font-size: 12px; font-weight: bolder" >Statut {{ user.statut }}</label>
-                    <div class="input-group">
-                      <select v-model="statut" id="statut" @change="handleStatut()" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.statut.$error
-                      }">
-                        <option value="1" :selected="statut === '1'">ACTIVE</option>
-                        <option value="0" :selected="statut === '0'">DESACTIVE</option>
-
-                      </select>
-                      <!-- <div v-if="submitted && v$.service.$error" class="invalid-feedback">
-                        <span v-if="v$.service.required.$invalid">Service obligatoire
-                        </span>
-                      </div> -->
-                    </div>
-                  </BCol>
+                  
                   <BCol sm="3" class="mb-3">
                     <label for="photo" style="font-size: 12px; font-weight: bolder">Photo</label>
                     <input 
@@ -489,6 +538,7 @@ export default {
   </BRow>
 </template>
 
+
 <style lang="scss">
 .progress-nav {
   position: relative;
@@ -547,6 +597,39 @@ export default {
     .nav-link:not(.active) {
       background: var(--bs-input-bg);
     }
+  }
+}
+</style>
+
+<style scoped>
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

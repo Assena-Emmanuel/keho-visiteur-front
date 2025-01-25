@@ -12,7 +12,7 @@ export default {
       dataDetail: {},
       detailModal: false,
       localModal: this.modal,
-
+      isStatutActive: false,
       totalRows: 1,
       currentPage: 1,
       perPage: 5,
@@ -35,6 +35,16 @@ export default {
   },
 
   computed: {
+
+    isStatutActive: {
+      get() {
+        return this.row.item.statut === 1; // Convert to boolean
+      },
+      set(value) {
+        this.row.item.statut = value ? 1 : 0; // Convert back to numeric
+      },
+    },
+
     /**
      * Dynamically generate filterOn based on fields
      */
@@ -98,6 +108,7 @@ export default {
       
     },
     handleEdit(index, data) {
+        localStorage.setItem('edit', {row: data[index], index})
         this.$emit('edit', {row: data[index], index});
 
       },
@@ -184,8 +195,9 @@ export default {
                 @filtered="onFiltered" 
               >
                 <template #cell(statut)="row">
-                  <span v-if="row.item.statut" class="badge rounded-pill text-bg-success">activé</span>
-                  <span v-if="!row.item.statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
+                  <!-- <span v-if="row.item.statut" class="badge rounded-pill text-bg-success">activé</span>
+                  <span v-if="!row.item.statut" class="badge rounded-pill text-bg-danger">Désactivé</span> -->
+                  <BFormCheckbox v-model="row.item.statut" class="custom-switch" :checked="row.item.statut" switch></BFormCheckbox>
                 </template>
 
                 <template #cell(Actions)="row">
@@ -226,7 +238,7 @@ export default {
     </BRow>
   </div>
 </template>
-<style>
+<style scoped>
   .spinner-border {
   width: 3rem;
   height: 3rem;
@@ -236,4 +248,6 @@ export default {
   justify-content: center;
   align-items: center;
 }
+
+
 </style>
