@@ -1,24 +1,25 @@
-// stores/auth.js
 import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: null,  // Valeur initiale du token
-    user: null,   // Valeur initiale de l'utilisateur
+    user: null,
+    token: null,
   }),
   actions: {
-    // Action pour définir le token
+    setUser(userData) {
+      this.user = userData;
+    },
     setToken(token) {
-      this.token = token
+      this.token = token;
     },
-    // Action pour définir l'utilisateur
-    setUser(user) {
-      this.user = user
-    },
-    // Action pour effacer les informations (se déconnecter)
     logout() {
-      this.token = null
-      this.user = null
+      this.user = null;
+      this.token = null;
     },
   },
-})
+  persist: true, // Sauvegarde les données dans localStorage
+});
+
+// if (import.meta.hot) {
+//   import.meta.hot.accept(acceptHMRUpdate(useAuthStore, import.meta.hot))
+// }

@@ -2,6 +2,9 @@
 import { useLayoutStore } from "~/stores/layout";
 import apiClient from "~/components/api/intercepteur";
 import RadioGroup from "~/components/common/RadioGroup.vue";
+import { useAuthStore } from '~/stores/auth'
+
+
 import {
   layoutOptions,
   widthOptions,
@@ -19,11 +22,21 @@ export default {
       sideBarTypeOptions,
       topBarOptions,
       layoutModeOptions,
-      user: {},
+      user: authStore.user,
+      token: authStore.token,
     };
   },
   components: {
     RadioGroup
+  },
+
+  setup() {
+    const authStore = useAuthStore()
+     // Mettre à jour 'data' avec les valeurs du store
+
+    this.user = authStore.user
+    this.token = authStore.token
+    return { authStore };
   },
   computed: {
     layoutData() {
@@ -81,26 +94,24 @@ export default {
   
   mounted() {
     this.addEventListener();
-    let dataUser = localStorage.getItem('user')
-    this.user = JSON.parse(dataUser)
+    // const authStore = useAuthStore();
+    // this.user = authStore.user
+    // this.token = authStore.token
+
   },
 
 
   methods: {
     async deconnexion(){
       try {
-          const token = useCookie("token")
+          const authStore = useAuthStore();
           await  apiClient.post('/auth/logout', {}, {
               headers: {
-                Authorization: `Bearer ${token.value}`, // Utiliser le token dans l'en-tête Authorization
+                Authorization: `Bearer ${token}`, // Utiliser le token dans l'en-tête Authorization
               },
             }).then(response => {
-              const token = useCookie("token")
-              token.value = null
-              
-              const userStore = useUserStore()
-              userStore.clearUser()
-              
+              authStore.logout()
+ 
               // Rediriger vers la page enregistrée ou vers /dashboard par défaut
               this.$router.push('/login');
 
@@ -109,13 +120,6 @@ export default {
                 console.error('Error fetching user info:', error);
             });
 
-        await apiClient.post('/auth/logout'); // Appel à l'API pour invalider le token
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        delete apiClient.defaults.headers.common['Authorization'];
-        console.log('Déconnexion réussie');
-         // Redirection vers la page de connexion
-      this.$router.push('/login');
       } catch (error) {
         console.error('Erreur lors de la déconnexion:', error);
         throw error;

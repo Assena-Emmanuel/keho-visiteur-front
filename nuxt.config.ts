@@ -3,8 +3,9 @@ export default defineNuxtConfig({
   plugins: [
     '~/plugins/sweetalert.ts',
     '~/plugins/qrcode-reader.js',
-   '~/plugins/vue-cal.js',
-   '~/plugins/vue-awesome-paginate.js',
+    '~/plugins/vue-cal.js',
+    '~/plugins/vue-awesome-paginate.js',
+    'pinia-plugin-persistedstate/nuxt',
   ],
   app: {
     head: {
@@ -30,11 +31,7 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts", "nuxt-easy-lightbox"],
-
-  pinia: {
-    autoImports: ["defineStore", ["defineStore", "definePiniaStore"]]
-  },
+  modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts", "nuxt-easy-lightbox", "pinia-plugin-persistedstate/nuxt",],
 
   css: [
     "bootstrap-vue-next/dist/bootstrap-vue-next.css",

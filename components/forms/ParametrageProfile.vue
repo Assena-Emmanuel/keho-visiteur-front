@@ -2,12 +2,18 @@
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import apiClient from "~/components/api/intercepteur";
-import { useUserStore } from '@/stores/user';
+import { useAuthStore } from '~/stores/auth'
 
 export default {
   setup() {
-      return { v$: useVuelidate() };
-    },
+    const authStore = useAuthStore()
+     // Mettre à jour 'data' avec les valeurs du store
+
+    this.user = authStore.user
+    this.token = authStore.token
+    return { v$: useVuelidate() ,authStore };
+  },
+
   data() {
     return {
       progressBarValue: 34,
@@ -19,6 +25,7 @@ export default {
       token : "",
       user: "",
       show: false,
+      processing: false,
       // infos personnelles
         test : "",
         nom: "",
@@ -74,27 +81,18 @@ export default {
    
     },
     
+    computed(){
+      this.updateUserInfo(this.user)
+    },
+
     mounted() {
     this.show = true
-    this.token = useCookie('token')
-    const userStore = useUserStore()
-    this.user = userStore.user
-    
-    this.test = this.user.visite.matricule
-    this.civilite = this.user.civilite
-    this.nom = this.user.nom
-    this.prenom = this.user.prenom
-    this.email = this.user.email
-    this.mobile1 = this.user.telephone1
-    this.mobile2 = this.user.telephone2
-    this.statut = this.user.statut
-    this.photo = this.user.image
+    // const userStore = useAuthStore()
+    // this.token = userStore.token
+    // this.user = userStore.user
 
-    // Info professionnelles
-    this.matricule = this.user.visite.matricule || ""
-    this.codeVisite = this.user.visite.code_visite || ""
-    this.userService = this.user.visite.service_id
-    this.userDepartement = this.user.visite.departement_id
+    // this.updateUserInfo(this.user)
+    
 
     // recuperer tous les departement
     this.toutesCategories("DPT")
@@ -118,10 +116,7 @@ export default {
 
     this.show = false
   },
-  computed(){
-    const userStore = useUserStore()
-    this.user = userStore.user
-  },
+
  
   methods: {
     toggleWizard(tab, value) {
@@ -129,6 +124,22 @@ export default {
       this.progressBarValue = value;
     },
 
+    updateUserInfo(user) {
+      this.test = user.visite.matricule || "";  // Mise à jour du matricule
+      this.civilite = user.civilite || "";  // Mise à jour de la civilité
+      this.nom = user.nom || "";  // Mise à jour du nom
+      this.prenom = user.prenom || "";  // Mise à jour du prénom
+      this.email = user.email || "";  // Mise à jour de l'email
+      this.mobile1 = user.telephone1 || "";  // Mise à jour du premier numéro de téléphone
+      this.mobile2 = user.telephone2 || "";  // Mise à jour du deuxième numéro de téléphone
+      this.statut = user.statut || "";  // Mise à jour du statut
+
+      // Informations professionnelles
+      this.matricule = user.visite.matricule || "";  // Mise à jour du matricule professionnel
+      this.codeVisite = user.visite.code_visite || "";  // Mise à jour du code visite
+      this.userService = user.visite.service_id || "";  // Mise à jour du service
+      this.userDepartement = user.visite.departement_id || "";  // Mise à jour du département
+    },
 
     async toutesCategories(slug) {
       try {
@@ -167,36 +178,19 @@ export default {
     }
 ,
 
-    // SweetAlert
-    // successmsg() {
-    //   this.$swal.fire("Succes!", "Modification reussie!", "success");
-    // },
-
-    successmsg() {
-      this.$swal.fire("Succes!", "Modification réussie!", "success")
-        .then(() => {
-          this.activeTabprofessionnelle = false
-          this.next = false
-          this.toggleWizard(1, 100)
-
-          // const userStore = useUserStore()
-          // this.user = userStore.user
-
-          // this.civilite = this.user.civilite
-          // this.nom = this.user.nom
-          // this.prenom = this.user.prenom
-          // this.email = this.user.email
-          // this.mobile1 = this.user.telephone1
-          // this.mobile2 = this.user.telephone2
-          // this.statut = this.user.statut
-          // this.photo = this.user.photo
-
-          // // Info professionnelles
-          // this.matricule = this.user.visite.matricule || ""
-          // this.codeVisite = this.user.code_visite || ""
-          // this.userDepartement = this.user.departement_id || ""
-          // this.userService = this.user.service_id || ""
-        });
+    alertMessage(message, icon="error") {
+      this.$swal.fire({
+        position: "top",
+        icon: icon,
+        text: message,
+        showConfirmButton: false,
+        timer: 2000,
+        customClass: {
+      popup: 'custom-popup', // Classe personnalisée pour le popup
+      icon: 'custom-icon', // Classe personnalisée pour l'icône
+      title: 'custom-title', // Classe personnalisée pour le titre (si nécessaire)
+    }
+      });
     },
 
 
@@ -210,6 +204,7 @@ export default {
     },
 
     onNext() {
+      alert()
       this.next = true
       this.v$.$touch();
       if( 
@@ -217,7 +212,6 @@ export default {
         this.v$.nom.$error || 
         this.v$.prenom.$error || 
         this.v$.civilite.$error || 
-        this.photo=="" || 
         this.v$.mobile1.$error){
 
           this.activeTabprofessionnelle = false
@@ -243,57 +237,60 @@ export default {
         this.show = true;
         try{
 
-          await apiClient.post(
-            `/user/${this.user.uuid}`,
-            {
-              nom: this.nom,
-              prenom: this.prenom,
-              email: this.email ,
-              image: this.photo,
-              telephone1: this.mobile1,
-              telephone2: this.mobile2,
-              civilite: this.civilite,
-              matricule: this.matricule,
-              departement_id: this.userDepartement,
-              service_id: this.userService,
-            },
-            {
+          // Création d'un objet FormData pour envoyer les données en multipart/form-data
+          const formData = new FormData();
+          
+          // Ajout des champs à envoyer
+          formData.append('nom', this.nom);
+          formData.append('prenom', this.prenom);
+          formData.append('email', this.email);
+          formData.append('telephone1', this.mobile1);
+          formData.append('telephone2', this.mobile2);
+          formData.append('civilite', this.civilite);
+          formData.append('matricule', this.matricule);
+          formData.append('departement_id', this.userDepartement);
+          formData.append('service_id', this.userService);
 
-              headers: { 
-                'Authorization': `Bearer ${this.token}`, 
+          // Vérification de l'image et ajout si elle est présente
+          if (this.photo) {
+            formData.append('image', this.photo);  // Ici, `this.photo` doit être un fichier valide (par exemple, un objet `File`)
+          }
+
+          apiClient.post(`/user/${this.user.uuid}`, formData, {
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+              'Content-Type': 'multipart/form-data', // Assurer que le type de contenu est multipart
+            },
+          }).then(reponse =>{
+            console.log("------------------------------user modif: "+JSON.stringify(reponse.data))
+            if(!reponse.data.error){ 
+              
+              apiClient.post('/auth/me', {}, {
+                headers: { Authorization: `Bearer ${token}` },
+              }).then(response=>{
+
+                console.log("Utilisateur récupéré:", response.data);
+                // const auth = useUserStore();
+                this.authStore.setUser(response.data);
+                // this.updateUserInfo(reponse.data.data)
               }
 
-            }).then(response =>{
-              console.log("------------------------Utilisateur mis à jour :", response); 
-              // apiClient.post('/auth/me', {}, {
-              //   headers: {
-              //     Authorization: `Bearer ${this.token}`, // Utiliser le token dans l'en-tête Authorization
-              //   },
-              // })
-              //   .then(response => {
-              //     const user = response.data;
-              //     const userStore = useUserStore()
-              //     userStore.setUser(user)
-              //     
-              //   })
-              //   .catch(error => {
-              //     console.error("Erreur lors de la récupération de l'utilisateur :", error.message); // Log de l'erreur
-              //     alert("Impossible de récupérer les informations utilisateur. Veuillez réessayer.");
-              //   });
+              )
+              
 
-                
-            })
+              this.alertMessage(reponse.data.message, 'success')
 
-        }catch{
-          alert("error")
+            }
+
+            
+          });
+             
+
+        }catch(error) {
+          console.log(""+token)
         }finally{
           this.show = false
         }
-
-
-
-
-        this.successmsg()
 
 
         this.civilite = ""
@@ -552,7 +549,7 @@ export default {
                     <label for="service" style="font-size: 12px; font-weight: bolder">Service</label>
                     <div class="input-group">
                       <select v-model="service" id="service" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.service.$error}"
+                        'is-invalid': submitted && v$.userService.$error}"
                       >
                         <option value="" selected>Selectionnez...</option>
                         <option 
@@ -591,6 +588,20 @@ export default {
 
 
 <style lang="scss">
+/* Classe pour le popup */
+.custom-popup {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Classe pour l'icône */
+.custom-icon {
+  font-size: 10px;
+  float: left;
+}
+
+
 .progress-nav {
   position: relative;
   display: flex;

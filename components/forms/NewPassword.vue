@@ -17,6 +17,7 @@ export default {
       isSuccess: false,
       passwordVisible: false,
       showLastPassword: false,
+      processing: false,
     };
   },
   validations: {
@@ -31,6 +32,21 @@ export default {
     }
   },
   methods: {
+    alertMessage(message, icon="error") {
+      this.$swal.fire({
+        position: "top",
+        icon: icon,
+        text: message,
+        showConfirmButton: false,
+        timer: 2000,
+        customClass: {
+      popup: 'custom-popup', // Classe personnalisée pour le popup
+      icon: 'custom-icon', // Classe personnalisée pour l'icône
+      title: 'custom-title', // Classe personnalisée pour le titre (si nécessaire)
+    }
+      });
+    },
+
     toggleLastPasswordVisibility() {
       this.showLastPassword = !this.showLastPassword;
     },
@@ -46,8 +62,11 @@ export default {
       } else {
           
           try {
+            this.processing = true;
+
             if(this.newpassword !== this.confirmPassword){
-              this.$swal.fire("Erreur!", `Mot de passe de confirmation different!`, "error");
+              // this.$swal.fire("Erreur!", `Mot de passe de confirmation different!`, "error");
+              this.alertMessage(`Mot de passe de confirmation different!`)
               this.submitted = false;
               return
             }
@@ -67,10 +86,12 @@ export default {
 
             if(response.data.error){
                 const message =  response.data.message
-                this.$swal.fire("Erreur!", `${message}`, "error");
+                // this.$swal.fire("Erreur!", `${message}`, "error");
+                this.alertMessage(`${message}`, "error")
                 return
             }else{
-              this.$swal.fire("Succes!", `${response.data.message}`, "success");
+              // this.$swal.fire("Succes!", `${response.data.message}`, "success");
+              this.alertMessage(`${response.data.message}`, "success")
               this.isSuccess = true;
               this.lastPassword = ""
               this.newpassword = "",
@@ -81,7 +102,9 @@ export default {
             
           } catch (error) {
             console.error('Error fetching user info:', error);
-          }  
+          }finally {
+            this.processing = false;
+          }
         }
     }
   }
@@ -174,7 +197,14 @@ export default {
                 </BRow>
 
               <div class="mt-3 text-center">
-                <BButton variant="primary" class="w-sm waves-effect waves-light" @click="onReset">
+                <BButton variant="primary" 
+                  class="w-sm waves-effect waves-light" 
+                  @click="onReset"
+                  loading-text="modification" 
+                  :loading="processing"
+
+                  :disabled="processing" 
+                >
                   Enregistrer
                 </BButton>
               </div>
@@ -187,3 +217,17 @@ export default {
     </BCol>
   </BRow>
 </template>
+<style>
+/* Classe pour le popup */
+.custom-popup {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Classe pour l'icône */
+.custom-icon {
+  font-size: 10px;
+  float: left;
+}
+</style>

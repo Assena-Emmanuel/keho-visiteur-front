@@ -2,16 +2,18 @@
 import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import { useAuthStore } from '~/stores/auth'
 
 export default {
   setup() {
-    return { v$: useVuelidate() };
+    const authStore = useAuthStore()
+    return { v$: useVuelidate(), authStore };
   },
   data() {
     return {
       dismissibleAlert: true,
-      email: "ibrahim1155@outlook.com",
-      password: "1P@ssword",
+      email: "assena@gmail.com",
+      password: "1111111111@",
       isRemember: true,
       processing: false,
       errorMsg: "",
@@ -31,11 +33,7 @@ export default {
       required
     }
   },
-  mounted() {
-    // Vide le localStorage lorsque ce composant est monté
-    localStorage.removeItem('email');
-    
-  },
+
   methods: {
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
@@ -44,6 +42,22 @@ export default {
       this.showAlert = !this.showAlert
       localStorage.removeItem("isOk")
     },
+
+    alertMessage(message, icon="error") {
+      this.$swal.fire({
+        position: "top",
+        icon: icon,
+        text: message,
+        showConfirmButton: false,
+        timer: 2000,
+        customClass: {
+      popup: 'custom-popup', // Classe personnalisée pour le popup
+      icon: 'custom-icon', // Classe personnalisée pour l'icône
+      title: 'custom-title', // Classe personnalisée pour le titre (si nécessaire)
+    }
+      });
+    },
+
     async onLogin() {
       
       this.submitted = true;
@@ -52,59 +66,71 @@ export default {
         return;
       } else {
         this.errorMsg = "";
+
         try {
-          this.processing = true;
 
-          const { data } = await apiClient.post(
-            "/auth/login",
-            {
-              email: this.email,
-              password: this.password
-            }
-          );
-          const token = data.access_token;
- 
-          if (token) {
-            const accessToken = useCookie('token', {
-              maxAge: 60 * 60 * 24 * 1, // 1 jour (60 secondes * 60 minutes * 24 heures)
-              path: '/', // Disponible sur tout le site
-              // secure: true, // Assure que le cookie est envoyé sur HTTPS
-              // httpOnly: true, // Empêche l'accès au cookie via JavaScript
-              sameSite: 'Lax', // Aide à prévenir les attaques CSRF
-            });
-            accessToken.value = token;
+        this.processing = true;
 
+        const { data } = await apiClient.post("/auth/login", {
+          email: this.email,
+          password: this.password
+        });
 
+        console.log("Réponse de l'API:", data); // Vérifie ce que retourne l'API
 
-            apiClient.post('/auth/me', {}, {
-              headers: {
-                Authorization: `Bearer ${token}`, // Utiliser le token dans l'en-tête Authorization
-              },
-            }).then(response => {
-              const user = response.data
-              console.log("-----------------------------user log:"+JSON.stringify(user))
-
-              const auth = useUserStore()
-              auth.setUser(user)
-              // Rediriger vers la page enregistrée ou vers /dashboard par défaut
-              this.$router.push('/dashboard');
-
-            })
-            .catch(error => {
-                this.errorMsg = "E-mail ou mot de passe incorrect";
-                console.error('Error fetching user info:', error);
-                return
-            });
-
-          } 
-        } catch (error) {
-          console.log("------------------------------token:"+token)
-          this.errorMsg = "Erreur de connexion";
-          console.error("failed at onLogin", { error });
-
-        } finally {
-          this.processing = false;
+        if (!data || !data.access_token) {
+          throw new Error("Échec de l'authentification"); // Déclenche une erreur si le token est absent
         }
+        
+        const token = data.access_token;
+        this.authStore.setToken(token);
+
+        console.log("pinia-------------------: "+authStore.token)
+
+        // const accessToken = useCookie('token', { maxAge: 86400, path: '/', sameSite: 'Lax' });
+        // accessToken.value = token;
+
+
+        // Vérifie l'utilisateur connecté
+        const response = await apiClient.post('/auth/me', {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // console.log("Utilisateur récupéré:", response.data);
+        // const auth = useUserStore();
+        // auth.setUser(response.data);
+
+        this.authStore.setUser(response.data);
+
+        this.$router.push('/dashboard');
+
+      } catch (error) {
+        console.error("Erreur de connexion:", error);
+
+        if (!navigator.onLine) {
+          this.alertMessage("Vérifiez votre connexion Internet.");
+        } else if (error.response && error.response.status) {
+          if (error.response.status === 401) {
+            this.alertMessage("E-mail ou mot de passe incorrect");
+          } else {
+            this.alertMessage("Une erreur est survenue. Veuillez réessayer.");
+          }
+        } else if (error.message && error.message.includes("Network Error")) {
+          this.alertMessage("Impossible de se connecter au serveur. Vérifiez votre connexion.");
+        } else {
+          this.alertMessage("Une erreur inconnue est survenue.");
+        }
+
+
+      } finally {
+        this.processing = false;
+      }
+
+
+
+
+
+
       }
     }
   }
@@ -200,6 +226,22 @@ export default {
     </BForm>
 </template>
 <style>
+
+/* Classe pour le popup */
+.custom-popup {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Classe pour l'icône */
+.custom-icon {
+  font-size: 10px;
+  float: left;
+}
+
+
+
 .login-input{
   background-color: #f0f5ff;
 }
