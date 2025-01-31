@@ -20,6 +20,7 @@ export default {
       user: "",
       show: false,
       // infos personnelles
+        test : "",
         nom: "",
         prenom: "",
         civilite: "",
@@ -31,8 +32,8 @@ export default {
         // infos professionnelles
         matricule: "",
         codeVisite: "",
-        departement: "",
-        service: "",
+        userDepartement: "",
+        userService: "",
         processing: false,
         submitted: false,
         next: false,
@@ -62,22 +63,24 @@ export default {
       codeVisite: {
         required
       },
-      departement:{
+      userDepartement:{
         required
       },
-      service: {
+      userService: {
         required
       },
       photo:{required},
       statut: {required},
    
     },
+    
     mounted() {
-    this.recupererDepartements()
-    this.recupererServices()
+    this.show = true
     this.token = useCookie('token')
     const userStore = useUserStore()
     this.user = userStore.user
+    
+    this.test = this.user.visite.matricule
     this.civilite = this.user.civilite
     this.nom = this.user.nom
     this.prenom = this.user.prenom
@@ -88,12 +91,32 @@ export default {
     this.photo = this.user.image
 
     // Info professionnelles
-    this.matricule = this.user.matricule || ""
-    this.codeVisite = this.user.code_visite || ""
-    this.departement = this.user.departement_id || ""
-    this.service = this.user.service_id || ""
+    this.matricule = this.user.visite.matricule || ""
+    this.codeVisite = this.user.visite.code_visite || ""
+    this.userService = this.user.visite.service_id
+    this.userDepartement = this.user.visite.departement_id
 
+    // recuperer tous les departement
+    this.toutesCategories("DPT")
+    .then(departements => {
+      this.selectDepartements = departements;
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération du departement:', error);
+    });
 
+    // recuperer tous les departement
+    this.toutesCategories("SRV")
+    .then(services => {
+      this.selectServices = services;
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération du service:', error);
+    });
+
+    
+
+    this.show = false
   },
   computed(){
     const userStore = useUserStore()
@@ -105,39 +128,44 @@ export default {
       this.activeTab = tab;
       this.progressBarValue = value;
     },
-    async recupererDepartements() {
+
+
+    async toutesCategories(slug) {
       try {
-        // Reccuperer les services et départements
-        const slug = "DPT"
         const response = await apiClient.get(`/categorie_by_slug/${slug}`, {},{
           headers: { 
             'Authorization': `Bearer ${this.token}`, 
           }
         });
          if(!response.data.error){
-          this.selectDepartements = response.data.data
+          return response.data.data
          }
         
       } catch (error) {
         console.error('Error fetching Departement-----:', error);
       }
     },
-    async recupererServices() {
+
+
+    async categorie(id) {
       try {
-        // Reccuperer les services et départements
-        const slug = "SRV"
-        const response = await apiClient.get(`/categorie_by_slug/${slug}`, {},{
+        console.log(`Requête API pour la catégorie avec l'ID : ${id}`);
+        console.log(`Token utilisé : ${this.token}`);
+        
+        const response = await apiClient.get(`/categorie/${id}`, {
           headers: { 
             'Authorization': `Bearer ${this.token}`, 
           }
         });
-        if(!response.data.error){
-          this.selectServices = response.data.data
+
+        if (!response.data.error) {
+          return response.data.data.libelle;
         }
       } catch (error) {
-        console.error('Error fetching Service:', error);
+        console.error('Erreur lors de la récupération du service :', error);
       }
-    },
+    }
+,
 
     // SweetAlert
     // successmsg() {
@@ -151,21 +179,23 @@ export default {
           this.next = false
           this.toggleWizard(1, 100)
 
-          this.user = JSON.parse(localStorage.getItem("user"));
-          this.civilite = this.user.civilite
-          this.nom = this.user.nom
-          this.prenom = this.user.prenom
-          this.email = this.user.email
-          this.mobile1 = this.user.telephone1
-          this.mobile2 = this.user.telephone2
-          this.statut = this.user.statut
-          this.photo = this.user.photo
+          // const userStore = useUserStore()
+          // this.user = userStore.user
 
-          // Info professionnelles
-          this.matricule = this.user.matricule || ""
-          this.codeVisite = this.user.code_visite || ""
-          this.departement = this.user.departement_id || ""
-          this.service = this.user.service_id || ""
+          // this.civilite = this.user.civilite
+          // this.nom = this.user.nom
+          // this.prenom = this.user.prenom
+          // this.email = this.user.email
+          // this.mobile1 = this.user.telephone1
+          // this.mobile2 = this.user.telephone2
+          // this.statut = this.user.statut
+          // this.photo = this.user.photo
+
+          // // Info professionnelles
+          // this.matricule = this.user.visite.matricule || ""
+          // this.codeVisite = this.user.code_visite || ""
+          // this.userDepartement = this.user.departement_id || ""
+          // this.userService = this.user.service_id || ""
         });
     },
 
@@ -177,7 +207,7 @@ export default {
     handleFileUpload(event) {
       // Récupérer le fichier sélectionné
       this.photo = event.target.files[0];
-      },
+    },
 
     onNext() {
       this.next = true
@@ -197,20 +227,22 @@ export default {
         this.toggleWizard(2, 100)
       }
     },
+
+
     async onSave(){
       this.submitted = true;
       this.v$.$touch();
       if( 
         this.v$.codeVisite.$error || 
-        this.v$.departement.$error || 
-        this.v$.service.$error || 
+        this.v$.userDepartement.$error || 
+        this.v$.userService.$error || 
         this.v$.matricule.$error
         ){
           return
       }else{
         this.show = true;
         try{
-          alert(this.nom)
+
           await apiClient.post(
             `/user/${this.user.uuid}`,
             {
@@ -222,8 +254,8 @@ export default {
               telephone2: this.mobile2,
               civilite: this.civilite,
               matricule: this.matricule,
-              departement_id: this.departement,
-              service_id: this.service,
+              departement_id: this.userDepartement,
+              service_id: this.userService,
             },
             {
 
@@ -232,21 +264,22 @@ export default {
               }
 
             }).then(response =>{
-              apiClient.post('/auth/me', {}, {
-                headers: {
-                  Authorization: `Bearer ${this.token}`, // Utiliser le token dans l'en-tête Authorization
-                },
-              })
-                .then(response => {
-                  const user = response.data;
-                  const userStore = useUserStore()
-                  userStore.setUser(user)
-                  console.log("Utilisateur mis à jour :", user); // Log pour confirmer la mise à jour
-                })
-                .catch(error => {
-                  console.error("Erreur lors de la récupération de l'utilisateur :", error.message); // Log de l'erreur
-                  alert("Impossible de récupérer les informations utilisateur. Veuillez réessayer.");
-                });
+              console.log("------------------------Utilisateur mis à jour :", response); 
+              // apiClient.post('/auth/me', {}, {
+              //   headers: {
+              //     Authorization: `Bearer ${this.token}`, // Utiliser le token dans l'en-tête Authorization
+              //   },
+              // })
+              //   .then(response => {
+              //     const user = response.data;
+              //     const userStore = useUserStore()
+              //     userStore.setUser(user)
+              //     
+              //   })
+              //   .catch(error => {
+              //     console.error("Erreur lors de la récupération de l'utilisateur :", error.message); // Log de l'erreur
+              //     alert("Impossible de récupérer les informations utilisateur. Veuillez réessayer.");
+              //   });
 
                 
             })
@@ -275,8 +308,8 @@ export default {
         // Info professionnelles
         this.matricule = ""
         this.codeVisite = ""
-        this.departement = ""
-        this.service = ""
+        this.userDepartement = ""
+        this.userService = ""
 
         this.submitted = false;
       }
@@ -359,7 +392,7 @@ export default {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="nom" style="font-size: 12px; font-weight: bolder">Nom: {{ nom }}</label>
+                    <label for="nom" style="font-size: 12px; font-weight: bolder">Nom</label>
                     <div class="input-group">
                       <input 
                         v-model="nom" 
@@ -492,16 +525,25 @@ export default {
                   <BCol sm="3" class="mb-3">
                     <label for="departement" style="font-size: 12px; font-weight: bolder">Département</label>
                     <div class="input-group">
-                      <select v-model="departement" id="departement" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.departement.$error}"
+                      <select v-model="userDepartement" id="departement" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
+                        'is-invalid': submitted && v$.userDepartement.$error}"
                       >
 
-                      <option value="" selected>Selectionnez...</option>
-                      <option v-for="departement in selectDepartements" :key="departement.code" :value="departement.code">{{ departement.libelle }}</option>
+                        <option value="" selected>Selectionnez...</option>
+                        <option 
+                          v-for="departement in selectDepartements" 
+                          :key="departement.code" 
+                          :value="departement.id"
+                          :selected="departement.id === userDepartement"
+                        >
+                        
+                          {{ departement.libelle }}
+                        
+                        </option>
 
                       </select>
-                      <div v-if="submitted && v$.departement.$error" class="invalid-feedback">
-                        <span v-if="v$.departement.required.$invalid">Département obligatoire
+                      <div v-if="submitted && v$.userDepartement.$error" class="invalid-feedback">
+                        <span v-if="v$.userDepartement.required.$invalid">Département obligatoire
                         </span>
                       </div>
                     </div>
@@ -513,10 +555,19 @@ export default {
                         'is-invalid': submitted && v$.service.$error}"
                       >
                         <option value="" selected>Selectionnez...</option>
-                        <option v-for="service in selectServices" :key="service.code" :value="service.code">{{ service.libelle }}</option>
+                        <option 
+                          v-for="service in selectServices" 
+                          :key="service.id" 
+                          :value="service.id"
+                          :selected="service.id === userService"
+                        >
+
+                        {{ service.libelle }}
+
+                        </option>
                       </select>
-                      <div v-if="submitted && v$.service.$error" class="invalid-feedback">
-                        <span v-if="v$.service.required.$invalid">Service obligatoire
+                      <div v-if="submitted && v$.userService.$error" class="invalid-feedback">
+                        <span v-if="v$.userService.required.$invalid">Service obligatoire
                         </span>
                       </div>
                     </div>

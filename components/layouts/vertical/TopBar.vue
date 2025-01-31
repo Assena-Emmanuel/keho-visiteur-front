@@ -102,7 +102,7 @@ export default {
           <LayoutsCommonParametreDropdown/>
           <Notifications />
            <div class="d-flex align-items-center">
-            <button @click="toggleRightSidebar" class="btn btn-outline-secondary "  style="width: 100%; padding: 1px 3px;">
+            <button @click="toggleRightSidebar" class="btn btn-outline-secondary " v-if="user"  style="width: 100%; padding: 1px 3px;">
               <img class="rounded-circle header-profile-user" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
               <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">{{ user.nom + ' ' + user.prenom }}</span>
            </button>
