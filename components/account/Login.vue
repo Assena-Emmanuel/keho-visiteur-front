@@ -2,11 +2,11 @@
 import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
-import { useAuthStore } from "~/stores/auth"
+import { useAuthStore } from "~/stores/auth.js";
 
 export default {
   setup() {
-    return { v$: useVuelidate() };
+    return { v$: useVuelidate(), authStore: useAuthStore() };
   },
   data() {
     return {
@@ -66,16 +66,8 @@ export default {
           const token = data.access_token;
  
           if (token) {
-            const accessToken = useCookie('token', {
-              maxAge: 60 * 60 * 24 * 1, // 1 jour (60 secondes * 60 minutes * 24 heures)
-              path: '/', // Disponible sur tout le site
-              // secure: true, // Assure que le cookie est envoyé sur HTTPS
-              // httpOnly: true, // Empêche l'accès au cookie via JavaScript
-              sameSite: 'Lax', // Aide à prévenir les attaques CSRF
-            });
-            accessToken.value = token;
-
-
+            this.authStore.setToken(token)
+            // accessToken.value = token;
 
             apiClient.post('/auth/me', {}, {
               headers: {
@@ -83,22 +75,27 @@ export default {
               },
             }).then(response => {
               const user = response.data
-            
-              
-              // Convertir l'objet en chaîne JSON
-              localStorage.setItem("user", JSON.stringify(user));
-              
+              this.authStore.setUser(user)
+
+              console.log("------------------------------ok")
+
+              // const auth = useUserStore()
+              // auth.setUser(user)
               // Rediriger vers la page enregistrée ou vers /dashboard par défaut
+              
               this.$router.push('/dashboard');
 
             })
             .catch(error => {
+                this.errorMsg = "E-mail ou mot de passe incorrect";
                 console.error('Error fetching user info:', error);
+                return
             });
 
           } 
         } catch (error) {
-          this.errorMsg = "E-mail ou mot de passe incorrect";
+          
+          this.errorMsg = "Erreur de connexion";
           console.error("failed at onLogin", { error });
 
         } finally {

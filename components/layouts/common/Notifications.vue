@@ -53,13 +53,18 @@
 <script setup>
 import { computed, onMounted } from "vue";
 import { useNotifiedStore } from "~/stores/notified";
+import { useAuthStore } from "~/stores/auth.js";
 
 const notifiedStore = useNotifiedStore();
 
 // Définir une propriété calculée pour obtenir les notifications
 const myNotifs = computed(() => notifiedStore.mynotifs);
 
-const userId = 64;
+// Utilisateur connecté
+const user = useAuthStore()
+const id = parseInt(user.id, 10);
+
+const userId = id;
 
 const pusher = useNuxtApp().$pusher;
 let channel;

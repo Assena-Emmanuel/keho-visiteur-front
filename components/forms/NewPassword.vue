@@ -1,18 +1,22 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
+import apiClient from "~/components/api/intercepteur";
+import { useAuthStore } from '~/stores/auth';
+
 export default {
   setup() {
-    return { v$: useVuelidate() };
+    const authStore = useAuthStore();
+    return { v$: useVuelidate(), authStore };
   },
   data() {
     return {
       newpassword: "",
       confirmPassword: "",
       lastPassword: "",
+      loading: false,
       submitted: false,
       isSuccess: false,
-      isDif: false,
       passwordVisible: false,
       showLastPassword: false,
     };
@@ -35,26 +39,73 @@ export default {
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
     },
-    onReset() {
+
+    alertMessage(message, icon="error") {
+      this.$swal.fire({
+        position: "top",
+        icon: icon,
+        text: message,
+        showConfirmButton: false,
+        timer: 2000,
+        customClass: {
+      popup: 'custom-popup', // Classe personnalisée pour le popup
+      icon: 'custom-icon', // Classe personnalisée pour l'icône
+      title: 'custom-title', // Classe personnalisée pour le titre (si nécessaire)
+    }
+      });
+    },
+
+    async onReset() {
       this.submitted = true;
       this.isSuccess = false;
       this.v$.$touch();
       if (this.v$.$invalid) {
         return;
       } else {
-        if(this.newpassword !== this.confirmPassword){
-            this.isDif = true
-        }else{
-            alert(`last: ${this.lastPassword} - new: ${this.newpassword} - cnew: ${this.confirmPassword}`)
-            this.isSuccess = true;
-            this.lastPassword = ""
-            this.newpassword = "",
-            this.confirmPassword = ""
-            this.submitted = false
+          
+          try {
+            this.loading = true
+            if(this.newpassword !== this.confirmPassword){
+              // this.$swal.fire("Erreur!", `Mot de passe de confirmation different!`, "error");
+              this.alertMessage(`Mot de passe de confirmation different!`)
+              this.submitted = false;
+              return
+            }
+
             
+            const response = await apiClient.post('/user/me_pwd', {
+                old_password: this.lastPassword,
+                password: this.newpassword,
+                password_confirmation: this.confirmPassword,
+
+              }, {
+                headers: { 
+                  'Authorization': `Bearer ${this.authStore.token}`, 
+                }
+              });
+
+            if(response.data.error){
+                const message =  response.data.message
+                this.alertMessage(`${message}`)
+                // this.$swal.fire("Erreur!", `${message}`, "error");
+                return
+            }else{
+              // this.$swal.fire("Succes!", `${response.data.message}`, "success");
+              this.alertMessage(`${response.data.message}`, "success")
+              this.isSuccess = true;
+              this.lastPassword = ""
+              this.newpassword = "",
+              this.confirmPassword = ""
+              this.submitted = false
+              return
+            }
+            
+          } catch (error) {
+            console.error('Error fetching user info:', error);
+          } finally{
+            this.loading = false
+          }
         }
-        
-      }
     }
   }
 };
@@ -71,10 +122,7 @@ export default {
             <!-- <p class="text-muted">Reset Password with Minible.</p> -->
           </div>
           <div class="p-2 mt-4">
-            <div v-if="isDif" class="alert alert-danger alert-dismissible fade show">
-                Mot de passe non identique
-                <button type="button" class="btn-close" @click="isDif = !isDif"></button>
-            </div>
+            
             <BForm>
                 <BRow>
                   <BCol md="4" sm="4">
@@ -149,7 +197,13 @@ export default {
                 </BRow>
 
               <div class="mt-3 text-center">
-                <BButton variant="primary" class="w-sm waves-effect waves-light" @click="onReset">
+                <BButton 
+                  variant="primary" 
+                  class="w-sm waves-effect waves-light" 
+                  @click="onReset"
+                  :loading="loading"
+                  loading-text="Modification" 
+                >
                   Enregistrer
                 </BButton>
               </div>
@@ -162,3 +216,18 @@ export default {
     </BCol>
   </BRow>
 </template>
+
+<style>
+/* Classe pour le popup */
+.custom-popup {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Classe pour l'icône */
+.custom-icon {
+  font-size: 10px;
+  float: left;
+}
+</style>

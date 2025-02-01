@@ -2,10 +2,14 @@
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import apiClient from "~/components/api/intercepteur";
+import { useAuthStore } from "~/stores/auth.js";
 
 export default {
   setup() {
-      return { v$: useVuelidate() };
+    const authStore = useAuthStore(); // Initialisation du store
+    const config = useRuntimeConfig();
+
+      return { v$: useVuelidate(), authStore, config  };
     },
   data() {
     return {
@@ -15,7 +19,11 @@ export default {
       activeTabprofessionnelle: false,
       selectDepartements:"",
       selectServices:"",
+      token : this.authStore.token,
+      user: this.authStore.user,
+      show: false,
       // infos personnelles
+        test : "",
         nom: "",
         prenom: "",
         civilite: "",
@@ -27,13 +35,18 @@ export default {
         // infos professionnelles
         matricule: "",
         codeVisite: "",
-        departement: "",
-        service: "",
+        userDepartement: "",
+        userService: "",
         processing: false,
         submitted: false,
         next: false,
         statut: ""
     };
+  },
+  computed:{
+    user() {
+      return this.authStore.user;
+    }
   },
   validations: {
       email: {
@@ -58,92 +71,138 @@ export default {
       codeVisite: {
         required
       },
-      departement:{
+      userDepartement:{
         required
       },
-      service: {
+      userService: {
         required
       },
       photo:{required},
       statut: {required},
    
     },
+
+    computed: {
+      user() {
+        return this.authStore.user;
+      }
+    },
+    
     mounted() {
-    this.recuperertDepartements()
-    const token = useCookie('access_token');
-    this.user = JSON.parse(localStorage.getItem("user"));
+    this.show = true
+    this.updateUserInfo(this.user)
+    // this.test = this.user.visite.matricule
+    // this.civilite = this.user.civilite
+    // this.nom = this.user.nom
+    // this.prenom = this.user.prenom
+    // this.email = this.user.email
+    // this.mobile1 = this.user.telephone1
+    // this.mobile2 = this.user.telephone2
+    // this.statut = this.user.statut
 
-    this.civilite = this.user.civilite
-    this.nom = this.user.nom
-    this.prenom = this.user.prenom
-    this.email = this.user.email
-    this.mobile1 = this.user.telephone1
-    this.mobile2 = this.user.telephone2
-    this.statut = this.user.statut
-    this.photo = this.user.photo
-
-    // Info professionnelles
-    this.matricule = this.user.matricule || ""
-    this.codeVisite = this.user.code_visite || ""
-    this.departement = this.user.departement_id || ""
-    this.service = this.user.service_id || ""
+    // // Info professionnelles
+    // this.matricule = this.user.visite ? this.user.visite.matricule : ""
+    // this.codeVisite = this.user.visite ? this.user.visite.code_visite :  ""
+    // this.userService = this.user.visite ? this.user.visite.service_id :  ""
+    // this.userDepartement = this.user.visite? this.user.visite.departement_id :  ""
 
 
+    // recuperer tous les departement
+    this.toutesCategories("DPT")
+    .then(departements => {
+      this.selectDepartements = departements;
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération du departement:', error);
+    });
+
+    // recuperer tous les departement
+    this.toutesCategories("SRV")
+    .then(services => {
+      this.selectServices = services;
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération du service:', error);
+    });
+
+    
+
+    this.show = false
   },
- 
+  
   methods: {
+    updateUserInfo(user) {
+      this.civilite = user.civilite || "";  // Mise à jour de la civilité
+      this.nom = user.nom || "";  // Mise à jour du nom
+      this.prenom = user.prenom || "";  // Mise à jour du prénom
+      this.email = user.email || "";  // Mise à jour de l'email
+      this.mobile1 = user.telephone1 || "";  // Mise à jour du premier numéro de téléphone
+      this.mobile2 = user.telephone2 || "";  // Mise à jour du deuxième numéro de téléphone
+      this.statut = user.statut || "";  // Mise à jour du statut
+
+      // Informations professionnelles
+      this.matricule = user.visite ? user.visite.matricule : ""
+      this.codeVisite = user.visite ? user.visite.code_visite :  ""
+      this.userService = user.visite ? user.visite.service_id :  ""
+      this.userDepartement = user.visite? user.visite.departement_id :  ""
+    },
+
     toggleWizard(tab, value) {
       this.activeTab = tab;
       this.progressBarValue = value;
     },
-    async recuperertDepartements() {
+
+
+    async toutesCategories(slug) {
       try {
-        // Reccuperer les services et départements
-        const response = await apiClient.post('/categorie', {});
-        this.selectDepartements = response.data;  // Assurez-vous d'accéder à la propriété data dans la réponse
-        console.log("-------------------!----", response);
-      } catch (error) {
-        console.error('Error fetching user info:', error);
-      }
-    },
-    async recuperertServices() {
-      try {
-        // Reccuperer les services et départements
-        const response = await apiClient.post('/categorie', {});
-        this.selectDepartements = response.data;  // Assurez-vous d'accéder à la propriété data dans la réponse
-        console.log("-------------------!----", response);
-      } catch (error) {
-        console.error('Error fetching user info:', error);
-      }
-    },
-
-    // SweetAlert
-    // successmsg() {
-    //   this.$swal.fire("Succes!", "Modification reussie!", "success");
-    // },
-
-    successmsg() {
-      this.$swal.fire("Succes!", "Modification réussie!", "success")
-        .then(() => {
-          this.activeTabprofessionnelle = false
-          this.next = false
-          this.toggleWizard(1, 100)
-
-          this.civilite = this.user.civilite
-          this.nom = this.user.nom
-          this.prenom = this.user.prenom
-          this.email = this.user.email
-          this.mobile1 = this.user.telephone1
-          this.mobile2 = this.user.telephone2
-          this.statut = this.user.statut
-          this.photo = this.user.photo
-
-          // Info professionnelles
-          this.matricule = this.user.matricule || ""
-          this.codeVisite = this.user.code_visite || ""
-          this.departement = this.user.departement_id || ""
-          this.service = this.user.service_id || ""
+        const response = await apiClient.get(`/categorie_by_slug/${slug}`, {},{
+          headers: { 
+            'Authorization': `Bearer ${this.token}`, 
+          }
         });
+         if(!response.data.error){
+          return response.data.data
+         }
+        
+      } catch (error) {
+        console.error('Error fetching Departement-----:', error);
+      }
+    },
+
+
+    async categorie(id) {
+      try {
+        console.log(`Requête API pour la catégorie avec l'ID : ${id}`);
+        console.log(`Token utilisé : ${this.token}`);
+        
+        const response = await apiClient.get(`/categorie/${id}`, {
+          headers: { 
+            'Authorization': `Bearer ${this.token}`, 
+          }
+        });
+
+        if (!response.data.error) {
+          return response.data.data.libelle;
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération du service :', error);
+      }
+    }
+,
+
+    alertMessage(message, icon="error") {
+      this.$swal.fire({
+        position: "top",
+        icon: icon,
+        text: message,
+        showConfirmButton: false,
+        timer: 2000,
+        customClass: {
+      popup: 'custom-popup', // Classe personnalisée pour le popup
+      icon: 'custom-icon', // Classe personnalisée pour l'icône
+      title: 'custom-title', // Classe personnalisée pour le titre (si nécessaire)
+    }
+      });
     },
 
 
@@ -154,7 +213,7 @@ export default {
     handleFileUpload(event) {
       // Récupérer le fichier sélectionné
       this.photo = event.target.files[0];
-      },
+    },
 
     onNext() {
       this.next = true
@@ -164,7 +223,6 @@ export default {
         this.v$.nom.$error || 
         this.v$.prenom.$error || 
         this.v$.civilite.$error || 
-        this.photo=="" || 
         this.v$.mobile1.$error){
 
           this.activeTabprofessionnelle = false
@@ -174,18 +232,77 @@ export default {
         this.toggleWizard(2, 100)
       }
     },
-    onSave(){
+
+
+    async onSave(){
       this.submitted = true;
       this.v$.$touch();
       if( 
         this.v$.codeVisite.$error || 
-        this.v$.departement.$error || 
-        this.v$.service.$error || 
+        this.v$.userDepartement.$error || 
+        this.v$.userService.$error || 
         this.v$.matricule.$error
         ){
           return
       }else{
-        this.successmsg()
+        this.show = true;
+        try{
+
+          const formData = new FormData();
+          
+          // Ajout des champs à envoyer
+          formData.append('nom', this.nom);
+          formData.append('prenom', this.prenom);
+          formData.append('email', this.email);
+          formData.append('telephone1', this.mobile1);
+          formData.append('telephone2', this.mobile2);
+          formData.append('civilite', this.civilite);
+          formData.append('matricule', this.matricule);
+          formData.append('departement_id', this.userDepartement);
+          formData.append('service_id', this.userService);
+
+          // Vérification de l'image et ajout si elle est présente
+          if (this.photo) {
+            formData.append('image', this.photo);  // Ici, `this.photo` doit être un fichier valide (par exemple, un objet `File`)
+          }
+
+          await apiClient.post(
+            `/user/${this.user.uuid}`,formData,
+            {
+
+              headers: { 
+                'Authorization': `Bearer ${this.token}`, 
+              }
+
+            }).then(reponse =>{
+              console.log('reponse:-----------:'+JSON.stringify(reponse))
+              if(!reponse.data.error){ 
+              
+              apiClient.post('/auth/me', {}, {
+                headers: { Authorization: `Bearer ${this.token}` },
+              }).then(response=>{
+
+                console.log("Utilisateur récupéré:", response.data);
+
+                this.authStore.setUser(response.data);
+                this.updateUserInfo(response.data)
+              }
+
+              )
+              
+
+              this.alertMessage(reponse.data.message, 'success')
+
+            }
+                
+
+
+        })
+          }catch (error) {
+            console.error("--------------Une erreur est survenue :", error);
+        }finally{
+          this.show = false
+        }
 
 
         this.civilite = ""
@@ -200,18 +317,23 @@ export default {
         // Info professionnelles
         this.matricule = ""
         this.codeVisite = ""
-        this.departement = ""
-        this.service = ""
+        this.userDepartement = ""
+        this.userService = ""
 
         this.submitted = false;
       }
-    }
+    },
+    
 
   }
 };
 </script>
 
 <template>
+  
+  <div v-if="show" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
   <BRow class="wizard" >
     <BCol>
       <BCard no-body>
@@ -246,7 +368,7 @@ export default {
               <!-- Informations personnelles -->
               <div class="tab-pane fade" :class="activeTab == 1 && 'show active'" id="pills-gen-info" role="tabpanel" aria-labelledby="pills-gen-info-tab">
                 <BRow class="mt-3 mb-4">
-                  <h4 class="text-center font-size-20 mb-5">Informations Personnelles</h4>
+                  <h4 class="text-center font-size-20 mb-5">Informations Personnelles </h4>
                   <BCol sm="3" class="mb-3">
                     <label for="civilite" style="font-size: 12px; font-weight: bolder">Civilité</label>
                     <div class="input-group">
@@ -335,22 +457,7 @@ export default {
                       maxlength="10" 
                     />
                   </BCol>
-                  <BCol sm="3" class="mb-3">
-                    <label for="statut" style="font-size: 12px; font-weight: bolder" >Statut</label>
-                    <div class="input-group">
-                      <select v-model="statut" id="statut" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.statut.$error
-                      }">
-                        <option value="1" :selected="statut === '1'">ACTIVE</option>
-                        <option value="0" :selected="statut === '0'">DESACTIVE</option>
-
-                      </select>
-                      <!-- <div v-if="submitted && v$.service.$error" class="invalid-feedback">
-                        <span v-if="v$.service.required.$invalid">Service obligatoire
-                        </span>
-                      </div> -->
-                    </div>
-                  </BCol>
+                  
                   <BCol sm="3" class="mb-3">
                     <label for="photo" style="font-size: 12px; font-weight: bolder">Photo</label>
                     <input 
@@ -412,16 +519,25 @@ export default {
                   <BCol sm="3" class="mb-3">
                     <label for="departement" style="font-size: 12px; font-weight: bolder">Département</label>
                     <div class="input-group">
-                      <select v-model="departement" id="departement" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.departement.$error}"
+                      <select v-model="userDepartement" id="departement" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
+                        'is-invalid': submitted && v$.userDepartement.$error}"
                       >
-                        <option value="">Département...</option>
-                        <option value="RH">DEPARTEMENT DES RESSOURCES HUMAINES (RH)</option>
-                        <option value="IT">DEPARTEMENT INFORMATIQUE (IT)</option>
+
+                        <option value="" selected>Selectionnez...</option>
+                        <option 
+                          v-for="departement in selectDepartements" 
+                          :key="departement.code" 
+                          :value="departement.id"
+                          :selected="departement.id === userDepartement"
+                        >
+                        
+                          {{ departement.libelle }}
+                        
+                        </option>
 
                       </select>
-                      <div v-if="submitted && v$.departement.$error" class="invalid-feedback">
-                        <span v-if="v$.departement.required.$invalid">Département obligatoire
+                      <div v-if="submitted && v$.userDepartement.$error" class="invalid-feedback">
+                        <span v-if="v$.userDepartement.required.$invalid">Département obligatoire
                         </span>
                       </div>
                     </div>
@@ -429,15 +545,23 @@ export default {
                   <BCol sm="3" class="mb-3">
                     <label for="service" style="font-size: 12px; font-weight: bolder">Service</label>
                     <div class="input-group">
-                      <select v-model="service" id="service" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.service.$error}"
+                      <select v-model="userService" id="service" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
+                        'is-invalid': submitted && v$.userService.$error}"
                       >
-                        <option value="">SERVICE...</option>
-                        <option value="RECRUTEMENT">RECRUTEMENT</option>
-                        <option value="SUPPORT TECHNIQUE">SUPPORT TECHNIQUE</option> 
+                        <option value="" selected>Selectionnez...</option>
+                        <option 
+                          v-for="service in selectServices" 
+                          :key="service.id" 
+                          :value="service.id"
+                          :selected="service.id === userService"
+                        >
+
+                        {{ service.libelle }}
+
+                        </option>
                       </select>
-                      <div v-if="submitted && v$.service.$error" class="invalid-feedback">
-                        <span v-if="v$.service.required.$invalid">Service obligatoire
+                      <div v-if="submitted && v$.userService.$error" class="invalid-feedback">
+                        <span v-if="v$.userService.required.$invalid">Service obligatoire
                         </span>
                       </div>
                     </div>
@@ -459,7 +583,21 @@ export default {
   </BRow>
 </template>
 
+
 <style lang="scss">
+/* Classe pour le popup */
+.custom-popup {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Classe pour l'icône */
+.custom-icon {
+  font-size: 10px;
+  float: left;
+}
+
 .progress-nav {
   position: relative;
   display: flex;
@@ -517,6 +655,39 @@ export default {
     .nav-link:not(.active) {
       background: var(--bs-input-bg);
     }
+  }
+}
+</style>
+
+<style scoped>
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

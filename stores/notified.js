@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import { useAuthStore } from "~/stores/auth.js";
 
 export const useNotifiedStore = defineStore("notified", {
   state: () => ({
@@ -8,11 +9,13 @@ export const useNotifiedStore = defineStore("notified", {
   }),
   actions: {
     async getNotification() {
+      const authToken = useAuthStore()
+
       const response = await axios.get(
         `${useRuntimeConfig().public.API_URL}/user/notifs`,
         {
           headers: {
-            Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2tlaG8tdmlzaXRvcnMubG9jYWwvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE3MjkxOTI3ODgsImV4cCI6MTcyOTI3OTE4OCwibmJmIjoxNzI5MTkyNzg4LCJqdGkiOiJYMmRhbmNtR2JDNnhFN0dNIiwic3ViIjoiNjQiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.jKXb74xWwRg1BhktSaYGXUavgMjvU4_QVxVe_exmnUM`, // Ajoutez le token Bearer ici
+            Authorization: `Bearer ${authToken.token}`, // Ajoutez le token Bearer ici
             Accept: "application/json",
           },
         }
@@ -27,7 +30,7 @@ export const useNotifiedStore = defineStore("notified", {
         this.notifications.push(...notifs.data);
 
         this.mynotifs = this.notifications.map(notification => notification.data);
-        console.log("extractedData : ",this.mynotifs);
+     
 
 
        }
