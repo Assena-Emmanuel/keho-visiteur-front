@@ -207,7 +207,6 @@ export default {
                     @change="changerStatut(row.index)"
                   >
                   </BFormCheckbox>
-                  <!-- <BFormCheckbox v-model="row.item.statut" class="custom-switch" :checked="row.item.statut === 1" switch>row.item.statut</BFormCheckbox> -->
                 </template>
 
                 <template #cell(Actions)="row">
