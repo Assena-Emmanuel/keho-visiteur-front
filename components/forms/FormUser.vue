@@ -1,19 +1,31 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
-
+import apiClient from "~/components/api/intercepteur";
+import { useAuthStore } from "~/stores/auth.js";
+import { data } from "../parametres/useData";
 
 export default{
   setup() {
-    return { v$: useVuelidate() };
+    const authStore = useAuthStore(); // Initialisation du store
+      const index = localStorage.getItem('edit')
+      return { v$: useVuelidate(), authStore, index};
+    },
+  props: {
+    modelValue: Boolean,
+    isEditMode: Boolean,
+    selectedIndex: Number,  // L'index de l'élément à éditer
+    data: Object,
+  
   },
   data(){
+
     return{
         progressBarValue: 34,
         activeTab: 1,
         activeTabArrow: 2,
         activeTabprofessionnelle: false,
-        nom: "",
+        nom: this.index.index || '',
         prenom: "",
         civilite: "",
         role: "",
@@ -27,9 +39,6 @@ export default{
         departement: "",
         service: "",
         processing: false,
-        submitted: false,
-        submitted: false,
-        statut: "ACTIVE",
         submitted: false,
         isEditMode: false
     }
@@ -63,20 +72,54 @@ export default{
       service: {
         required
       },
-      photo:{required},
       role:{required},
    
     },
+ 
 
-  props: {
-    modelValue: Boolean,
-    isEditMode: Boolean,
-    selectedIndex: Number,  // L'index de l'élément à éditer
-    data: Array,
   
+    mounted() {
+  
+    // recuperer tous les departement
+    // this.toutesCategories("DPT")
+    // .then(departements => {
+    //   this.selectDepartements = departements;
+    // })
+    // .catch(error => {
+    //   console.error('Erreur lors de la récupération du departement:', error);
+    // });
+
+    // // recuperer tous les services
+    // this.toutesCategories("SRV")
+    // .then(services => {
+    //   this.selectServices = services;
+    // })
+    // .catch(error => {
+    //   console.error('Erreur lors de la récupération du service:', error);
+    // });
+
   },
 
+
+
   methods:{
+
+    // async toutesCategories(slug) {
+    //   try {
+    //     const response = await apiClient.get(`/categorie_by_slug/${slug}`, {},{
+    //       headers: { 
+    //         'Authorization': `Bearer ${authStore.token}`, 
+    //       }
+    //     });
+    //      if(!response.data.error){
+    //       return response.data.data
+    //      }
+        
+    //   } catch (error) {
+    //     console.error('Error fetching Departement-----:', error);
+    //   }
+    // },
+
     handleFileUpload(event) {
       // Récupérer le fichier sélectionné
       this.photo = event.target.files[0];
@@ -98,13 +141,13 @@ export default{
     },
     onNext() {
       this.next = true
+      console.log("---------nom!: ")
       this.v$.$touch();
       if( 
         this.v$.email.$error || 
         this.v$.nom.$error || 
         this.v$.prenom.$error || 
         this.v$.civilite.$error || 
-        this.photo=="" || 
         this.v$.mobile1.$error){
 
           this.activeTabprofessionnelle = false
@@ -147,10 +190,25 @@ export default{
     },
     resetForm() {
       this.submitted = false;
-      // Reset validation (if using Vuelidate or similar)
-      if (this.$v) {
-        this.$v.$reset();
-      }
+      this.v$.$reset(); // Cela réinitialise toutes les validations
+
+  // Si tu veux aussi réinitialiser les champs du formulaire à leur état initial :
+  Object.assign(this, {
+    nom: "",
+    prenom: "",
+    civilite: "",
+    role: "",
+    email: "",
+    mobile1: "",
+    mobile2: "",
+    photo: "",
+    // Infos professionnelles
+    matricule: "",
+    codeVisite: "",
+    departement: "",
+    service: "",
+    statut: "",
+  });
     },
   }
 }
@@ -161,7 +219,7 @@ export default{
       size="lg"
       :modelValue="modelValue" 
       @update:modelValue="$emit('update:modelValue', $event)"
-      :title="isEditMode ? `Modifier les informations de l'Utilisateur ${selectedIndex}` : 'Création d\'Utilisateur'" 
+      :title="isEditMode ? `Modifier les informations de l'Utilisateur ${data.nom}` : 'Création d\'Utilisateur'" 
       title-class="font-18" 
       hide-footer
   >
@@ -202,9 +260,9 @@ export default{
                         'is-invalid': next && v$.civilite.$error
                       }">
                         <option value="" selected>civilité...</option>
-                        <option value="MONSIEUR">MONSIEUR</option>
-                        <option value="MADAME">MADAME</option>
-                        <option value="MADEMOISELLE">MADEMOISELLE</option>
+                        <option value="M." :selected="civilite === 'M.'">M.</option>
+                        <option value="Mme" :selected="civilite === 'Mme'">Mme</option>
+                        <option value="Mlle" :selected="civilite === 'Mlle'">Mlle</option>
                       </select>
                       <div v-if="next && v$.civilite.$error" class="invalid-feedback">
                         <span v-if="v$.civilite.required.$invalid">Civilité obligatoire
@@ -284,33 +342,15 @@ export default{
                       maxlength="10" 
                     />
                   </BCol>
-                  <BCol sm="3" class="mb-3">
-                    <label for="statut" style="font-size: 12px; font-weight: bolder" >Statut</label>
-                    <div class="input-group">
-                      <select v-model="statut" id="statut" class="form-select border border-secondary rounded-2" aria-label="Default select example">
-                        <option value="ACTIVE">ACTIVE</option>
-                        <option value="DESACTIVE">DESACTIVE</option>
-
-                      </select>
-                      <!-- <div v-if="submitted && v$.service.$error" class="invalid-feedback">
-                        <span v-if="v$.service.required.$invalid">Service obligatoire
-                        </span>
-                      </div> -->
-                    </div>
-                  </BCol>
+                  
                   <BCol sm="3" class="mb-3">
                     <label for="photo" style="font-size: 12px; font-weight: bolder">Photo</label>
                     <input 
                       @change="handleFileUpload" 
                       type="file" 
                       class="form-control border border-secondary rounded-2" 
-                      :class="{'is-invalid': next && photo == ''}"
                       id="photo" 
                     />
-                    <div v-if="next && photo == ''" class="invalid-feedback">
-                        <span v-if="photo == ''">Photo obligatoire
-                        </span>
-                      </div>
                   </BCol>
                   <div class="d-flex justify-content-end mt-5">
                     <BButton variant="primary" class="px-5" @click="onNext">

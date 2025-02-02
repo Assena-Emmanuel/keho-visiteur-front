@@ -1,11 +1,18 @@
 <script>
-import { useVuelidate } from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
 import { capitalize } from "vue";
+import apiClient from "~/components/api/intercepteur";
+import { useAuthStore } from "~/stores/auth.js";
+
+
 /**
  * Advanced-table component
  */
 export default {
+  setup() {
+    const authStore = useAuthStore(); 
+
+      return {authStore };
+    },
   data() {
     return {
       submitted: false,
@@ -87,9 +94,42 @@ export default {
 
   methods: {
     // Changer le statut de l'utilisateur
-    changerStatut(index){
-      const user = this.data[index]
-      console.log(user.nom +" :"+ user.uuid)
+    async changerStatut(index) {
+      const user = this.data[index];
+
+      try {
+        // Récupérer les informations de l'utilisateur
+        const userResponse = await apiClient.get(
+          `/user/${user.uuid}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${this.authStore.token}`,
+            },
+          }
+        );
+        
+        console.log('Utilisateur récupéré :', userResponse.data);
+        const user_get = userResponse.data.data;
+
+        // Maintenant, tu peux changer le statut de l'utilisateur
+        const statutResponse = await apiClient.post(
+          `/user/active/${user_get.uuid}`,
+          { active: user_get.statut === 1 ? 0 : 1 }, // Bascule le statut
+          {
+            headers: {
+              'Authorization': `Bearer ${this.authStore.token}`,
+            },
+          }
+        );
+
+        // Log de la réponse de changement de statut
+        console.log("Statut changé avec succès : ", statutResponse);
+        // Tu peux aussi mettre à jour l'interface utilisateur ici
+
+      } catch (error) {
+        // Gérer les erreurs
+        console.error("Erreur lors du changement de statut : ", error);
+      }
     },
 
     onFiltered(filteredItems) {
@@ -111,7 +151,7 @@ export default {
       
     },
     handleEdit(index, data) {
-        localStorage.setItem('edit', {row: data[index], index})
+        localStorage.setItem('edit', {row: data[index], index: index })
         this.$emit('edit', {row: data[index], index});
 
       },

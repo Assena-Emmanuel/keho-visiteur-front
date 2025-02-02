@@ -204,14 +204,14 @@ export default{
           <div class="col-md-8">
             <h4>{{ data.data["Civilité"] }} {{ data.data["Nom"] }} {{ data.data["Prénoms"] }}</h4>
             <div class="mb-1"><span class="border border-secondary p-1 rounded-3">EMPLOYE</span></div>
-            <BBadge v-if="data.data['Statut']" variant="success">Activé</BBadge>
+            <BBadge v-if="data.data.statut" variant="success">Activé</BBadge>
             <BBadge v-if="!data.data['Statut']" variant="danger">Désactivé</BBadge>
           </div>
         </div>
         <div class="row mb-3">
           
           <div class="col-md-6">
-            <strong>Mobile 1:</strong> <span>{{ data.data["Tel 1"] }}</span>
+            <strong>Mobile 1:</strong> <span>{{ data.data.telefone1 }}</span>
           </div>
           <div class="col-md-6">
             <strong>Mobile 2:</strong> <span>{{ data.data["Tel 2"] }}</span>

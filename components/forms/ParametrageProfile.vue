@@ -116,7 +116,7 @@ export default {
       console.error('Erreur lors de la récupération du departement:', error);
     });
 
-    // recuperer tous les departement
+    // recuperer tous les services
     this.toutesCategories("SRV")
     .then(services => {
       this.selectServices = services;
