@@ -1,72 +1,94 @@
 <script>
+import apiClient from "~/components/api/intercepteur";
+import { useAuthStore } from "~/stores/auth.js";
+
+
 export default{
+    setup(){
+        const authStore = useAuthStore();
+        const config = useRuntimeConfig(); 
+
+        return { authStore, config };
+    },
     data(){
         return{
+        all_users: {},
+        token: this.authStore.token,
         title: 'Liste des Utilisateurs',
+        isEdit: false,
+        isLoading: true,
         modal: false,
         isEditMode: false,  // Mode de modification ou ajout
         selectedIndex: null,  // Index de l'élément sélectionné pour la modification
+        selectedRow: null,
         data: [
-            {
-                "Civilité": "M.",
-                "Nom": "Dupont",
-                "Prénoms": "Jean Michel",
-                "E-mail": "jean.dupont@example.com",
-                "Tel 1": "0712131415",
-                "Tel 2": "0505060607",
-                "Département": "Technologie",
-                "Service": "Informatique",
-                "Matricule": "AAA111",
-                "Code Visite": "U001",
-                "Statut": true,
-            },
-            {
-                "Civilité": "Mme",
-                "Nom": "Durand",
-                "Prenoms": "Sophie Anne",
-                "E-mail": "sophie.durand@example.com",
-                "Tel 1": "0598765432",
-                "Tel 2": "0123546789",
-                "Département": "Technologie",
-                "Service": "Informatique",
-                "Matricule": "AAA111",
-                "Code Visite": "U001",
-                "Statut": false,
-            }
+            
         ],
 
-        fields: [
-            {key: "Civilité"},
-            {key: "Nom"},
-            {key: "Prenoms"},
-            {key: "E-mail"},
-            {key: "Tel 1"},
-            {key: "Tel 2"},
-            {key: "Statut"},
-            {key:"Actions"},
-
-        ]
+        fields: []
     }
+    },
+    async mounted() {
+        await this.allUsers()
     },
     props:{
         typeForme: String,
     },
 
     methods: {
-        openModal(isEditMode, index = null, type) {
+        openModal(isEditMode, row=null, index = null, type) {
             this.isEditMode = isEditMode;
             this.selectedIndex = index;
-            this.modal = true; 
+            this.selectedRow = row;
+            this.modal = true;
             this.typeForme = type
         },
 
         openAddModal(){
             this.modal = !this.modal
             this.isEditMode = false
+        },
+
+        async allUsers() {
+        try {
+            this.isLoading = true
+            this.fields = [
+                {key: "civilite"},
+                {key: "nom"},
+                {key: "prenom"},
+                {key: "email"},
+                {key: "telephone1"},
+                {key: "telephone2"},
+                {key: "statut"},
+                {key:"Actions"},
+            ]
+            const response = await apiClient.get(`/user`, {
+            headers: {
+                'Authorization': `Bearer ${this.token}`,
+            },
+            });
+
+            if (!response.data.error) {
+                this.data = response.data.data
+                console.log("Liste des utilisateurs récupérée :", response.data);
+            }
+
+        } catch (error) {
+            if (error.response && error.response.status === 401) {
+            console.error("Erreur 401 : Jeton invalide ou utilisateur non authentifié.");
+            } else {
+            console.error("Erreur lors de la récupération des utilisateurs :", error);
+            }
+
+        }finally {
+            this.isLoading = false; // Fin du chargement
         }
 
-    }
+        }
     
+}
+
+
 }
 </script>
 <template>
@@ -79,6 +101,7 @@ export default{
             @update:modelValue="modal = $event"
             :isEditMode="isEditMode"
             :selectedIndex="selectedIndex" 
+            :data="selectedRow"
         />
 
     </div>
@@ -90,7 +113,8 @@ export default{
         :title="title" 
         :show-addbtn="true" 
         :typeForme="'utilisateur'" 
-        @edit="openModal(true, $event.index, $event.type)"
+        :is-loading="isLoading"
+        @edit="openModal(true, $event.row, $event.index)"
     />
 </div>
 </template>

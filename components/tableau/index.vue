@@ -12,7 +12,7 @@ export default {
       dataDetail: {},
       detailModal: false,
       localModal: this.modal,
-
+      isStatutActive: false,
       totalRows: 1,
       currentPage: 1,
       perPage: 5,
@@ -31,9 +31,20 @@ export default {
     typeForme: String,
     data: Array,
     modal: Boolean,
+    isLoading: Boolean,
   },
 
   computed: {
+
+    isStatutActive: {
+      get() {
+        return this.row.item.statut === 1; // Convert to boolean
+      },
+      set(value) {
+        this.row.item.statut = value ? 1 : 0; // Convert back to numeric
+      },
+    },
+
     /**
      * Dynamically generate filterOn based on fields
      */
@@ -75,9 +86,12 @@ export default {
   },
 
   methods: {
-    /**
-     * Search the table data with search input
-     */
+    // Changer le statut de l'utilisateur
+    changerStatut(index){
+      const user = this.data[index]
+      console.log(user.nom +" :"+ user.uuid)
+    },
+
     onFiltered(filteredItems) {
       // Update totalRows and reset to first page after filtering
       this.totalRows = filteredItems.length;
@@ -97,7 +111,8 @@ export default {
       
     },
     handleEdit(index, data) {
-        this.$emit('edit', data[index], );
+        localStorage.setItem('edit', {row: data[index], index})
+        this.$emit('edit', {row: data[index], index});
 
       },
       confirmDelete(code) {
@@ -135,6 +150,10 @@ export default {
 
 
 <template>
+  <div v-if="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
   <div>
     <BRow>
       <BCol cols="12">
@@ -167,6 +186,7 @@ export default {
               </BCol>
             </BRow>
             <div class="table-responsive mb-0">
+            
               <BTable 
                 :items="filteredData" 
                 :fields="fields" 
@@ -177,9 +197,17 @@ export default {
                 v-model:sort-desc.sync="sortDesc" 
                 @filtered="onFiltered" 
               >
-                <template #cell(Statut)="row">
-                  <span v-if="row.item.Statut" class="badge rounded-pill text-bg-success">activé</span>
-                  <span v-if="!row.item.Statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
+                <template #cell(statut)="row">
+                  <BFormCheckbox 
+                    v-model="row.item.statut" 
+                    class="custom-switch" 
+                    switch
+                    :value="1" 
+                    :unchecked-value="0"
+                    @change="changerStatut(row.index)"
+                  >
+                  </BFormCheckbox>
+                  <!-- <BFormCheckbox v-model="row.item.statut" class="custom-switch" :checked="row.item.statut === 1" switch>row.item.statut</BFormCheckbox> -->
                 </template>
 
                 <template #cell(Actions)="row">
@@ -220,3 +248,35 @@ export default {
     </BRow>
   </div>
 </template>
+<style scoped>
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
