@@ -5,14 +5,33 @@ import HederLogo from "~/components/layouts/common/HeaderLogo.vue";
 import AppList from "~/components/layouts/common/AppList.vue";
 import Notifications from "~/components/layouts/common/Notifications.vue";
 import Profile from "~/components/layouts/common/Profile.vue";
+<<<<<<< HEAD
+import { useUserStore } from '@/stores/user';
+=======
+import { useAuthStore } from '~/stores/auth';
+>>>>>>> 1711b80159c1652ec637dd733d324dfc391af93a
 
 
 export default {
+  setup(){
+    const authStore = useAuthStore(); // Initialisation du store
+    const config = useRuntimeConfig(); // Récupération de la config Nuxt
+
+    return { authStore, config };
+  },
   data() {
+    
+
+
     return {
       parametres: ["Paramètre des Visités, Paramètre des Visiteurs, "],
       value: null,
-      config: useRuntimeConfig()
+      config: useRuntimeConfig(),
+<<<<<<< HEAD
+      user: null,
+=======
+      user: {}
+>>>>>>> 1711b80159c1652ec637dd733d324dfc391af93a
     };
   },
   components: {
@@ -24,11 +43,27 @@ export default {
     Notifications,
     Profile
   },
-  // mounted() {
-  //   this.value = this.languages.find((x) => x.language === this.$i18n.locale);
-  //   this.text = this.value.title;
-  //   this.flag = this.value.flag;
-  // },
+<<<<<<< HEAD
+  mounted() {
+    const userStore = useUserStore()
+    this.user = userStore.user;
+  },
+
+  computed(){
+    const userStore = useUserStore()
+    this.user = userStore.user
+  },
+
+=======
+
+  computed: {
+    user() {
+      return this.authStore.user;
+    }
+  },
+
+>>>>>>> 1711b80159c1652ec637dd733d324dfc391af93a
+
   methods: {
     toggleMenu() {
       this.$parent.toggleMenu();
@@ -89,14 +124,14 @@ export default {
           </BButton>
           <!-- <AppSearch /> -->
         </div>
-
+    
         <div class="d-flex gap-3">
           <LayoutsCommonParametreDropdown/>
           <Notifications />
            <div class="d-flex align-items-center">
-            <button @click="toggleRightSidebar" class="btn btn-outline-secondary "  style="width: 100%; padding: 1px 3px;">
-              <img class="rounded-circle header-profile-user" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
-              <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">Assena emmanuel</span>
+            <button @click="toggleRightSidebar" class="btn btn-outline-secondary " v-if="user"  style="width: 100%; padding: 1px 3px;">
+              <img class="rounded-circle header-profile-user" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
+              <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">{{ user.nom + ' ' + user.prenom }}</span>
            </button>
            </div>
 

@@ -2,21 +2,50 @@ export const menuItems = [
   {
     id: 2,
     label: "TABLEAU DE BORD",
-    icon: "uil-home-alt",
-    link: "/"
+    icon: {
+      active: "/images/sideBarIcon/dashboard.png",
+      desactive: "/images/sideBarIcon/dashboard-desactive.png",
+    },
+    link: "/dashboard"
   },
   {
     id: 4,
     label: "Mon Agenda",
-    icon: "uil-calender",
+    icon: {
+      active: "/images/sideBarIcon/calendrier.png",
+      desactive: "/images/sideBarIcon/calendrier-desactive.png",
+    },
     link: "/agenda"
   },
   {
     id: 4,
     label: "Visiteurs",
-    icon: "uil-users-alt",
-    link: "/dashboard/visiteur"
+    icon:{
+      active: "/images/sideBarIcon/visiteur.png",
+      desactive: "/images/sideBarIcon/visiteur-desactive.png",
+    },
+    link: "/visiteur"
   },
+  {
+    id: 4,
+    label: "Mes Visiteurs",
+    icon:{
+      active: "/images/sideBarIcon/visiteur.png",
+      desactive: "/images/sideBarIcon/visiteur-desactive.png",
+    },
+    link: "/mes-visiteurs"
+  },
+  {
+    id: 4,
+    label: "Historique",
+    icon:{
+      active: "/images/sideBarIcon/history.png",
+      desactive: "/images/sideBarIcon/history-desactive.png",
+    },
+    link: "/historique"
+  },
+  
+ 
   // {
   //   id: 25,
   //   label: "menuitems.pages.text",

@@ -1,6 +1,8 @@
 <script>
 import { useLayoutStore } from "~/stores/layout";
+import apiClient from "~/components/api/intercepteur";
 import RadioGroup from "~/components/common/RadioGroup.vue";
+import { useAuthStore } from '~/stores/auth';
 import {
   layoutOptions,
   widthOptions,
@@ -11,13 +13,19 @@ import {
 // import { NuxtLink } from "#build/components";
 
 export default {
+  setup(){
+    return {authStore: useAuthStore()}
+  },
   data() {
+    const authStore = useAuthStore()
     return {
       layoutOptions,
       widthOptions,
       sideBarTypeOptions,
       topBarOptions,
-      layoutModeOptions
+      layoutModeOptions,
+      user: authStore.user,
+      token: authStore.token,
     };
   },
   components: {
@@ -75,14 +83,58 @@ export default {
       }
     }
   },
+
+  
   mounted() {
     this.addEventListener();
+<<<<<<< HEAD
+    let dataUser = localStorage.getItem('user')
+    this.user = JSON.parse(dataUser)
+=======
+    // let dataUser = localStorage.getItem('user')
+    // this.user = JSON.parse(dataUser)
+>>>>>>> 1711b80159c1652ec637dd733d324dfc391af93a
   },
+
+
   methods: {
-    deconnexion(){
-      this.$router.push({path: "/login"})
-      this.hide()
-    },
+    async deconnexion(){
+      try {
+          // const token = useCookie("token")
+          await  apiClient.post('/auth/logout', {}, {
+              headers: {
+                Authorization: `Bearer ${this.token}`, // Utiliser le token dans l'en-tête Authorization
+              },
+            }).then(response => {
+              this.authStore.logout()
+              
+<<<<<<< HEAD
+              const userStore = useUserStore()
+              userStore.clearUser()
+=======
+>>>>>>> 1711b80159c1652ec637dd733d324dfc391af93a
+              
+              // Rediriger vers la page enregistrée ou vers /dashboard par défaut
+              this.$router.push('/login');
+
+            })
+            .catch(error => {
+                console.error('Error fetching user info:', error);
+            });
+
+        await apiClient.post('/auth/logout'); // Appel à l'API pour invalider le token
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        delete apiClient.defaults.headers.common['Authorization'];
+        console.log('Déconnexion réussie');
+         // Redirection vers la page de connexion
+      this.$router.push('/login');
+      } catch (error) {
+        console.error('Erreur lors de la déconnexion:', error);
+        throw error;
+      }
+      
+  },
     profil(){
       this.$router.push({path: "/forms/parametrage-profile"})
       this.hide()
@@ -122,10 +174,10 @@ export default {
         </div>
         <div class="p-3">
           <div class="text-center">
-            <img class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" src="/images/users/avatar-4.jpg" alt="Header Avatar" />
-            <div class="ms-1 fw-medium font-size-12">Assena Emanuel yao</div>
-            <div class="ms-1 fw-medium font-size-12 text-primary">assenaemmanuel3@outlook.com</div>
-            <div><BBadge variant="secondary">Administrateur</BBadge></div>
+            <img class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
+            <div class="ms-1 fw-medium font-size-12">{{ user.nom +' '+ user.prenom}}</div>
+            <div class="ms-1 fw-medium font-size-12 text-primary">{{user.email}}</div>
+            <div><BBadge variant="secondary">{{ user.role.libelle }}</BBadge></div>
           </div>
           <div class="mt-5">
             <button class="btn  btnParam" @click="profil">

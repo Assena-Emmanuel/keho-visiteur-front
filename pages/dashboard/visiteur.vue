@@ -1,28 +1,32 @@
 <script>
-import Visiteur from '~/components/dashboard/Visiteur.vue';
+import "simplebar";
+import Visiteur from "~/components/dashboard/Visiteur.vue";
+
+
 export default {
-  components: {
-    Visiteur
-  },
   data() {
     return {
+      title: "Visiteur",
       items: [
         {
-          text: "Apps",
+          text: "Visiteur"
         },
         {
-          text: "Calendar",
+          text: "Visiteur",
           active: true
         }
-      ],
-      
+      ]
     };
-  }
+  },
+  // components:{
+  //   Visiteur,
+  // }
 };
 </script>
 
 <template>
   <SiteHeader :title="title" />
-  <PageHeader />
-  <Visiteur/>
+  <PageHeader :title="title" :items="items" />
+  
+  <DashboardVisiteur />
 </template>

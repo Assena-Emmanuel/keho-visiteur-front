@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #msg{
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            align-items: center;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../public/images/bg-qrcode.png');
+            background-position: center;
+        }
+
+        #qr-topbar{
+            border-radius: 5px;
+        }
+
+        .logo{
+            display: flex;
+            justify-content: center;
+        }
+
+        @media (max-width: 576px) {
+          #qr-topbar{
+            margin-top: 10em;
+          }
+        }
+        
+        @media (min-width: 768px) and (max-width: 991px) {
+          #qr-topbar{
+            margin-top: 8em;
+          }
+        }
+        
+        @media (min-width: 992px) {
+         
+        }
+        
+    </style>
+</head>
+<body>
+    <section>
+        <div id="msg">
+            <div
+                style="background-color: white; width: 300px;"
+                id="qr-topbar"
+            >
+                <div>
+                    
+                    <div class="logo">
+                        <div>
+                            <img src="../public/images/total.jpg" alt="logo-light" height="150" />
+                        </div>
+                    </div>
+                    <div style="margin: 2em 0 5em 0; text-align: center;">
+                        <h5 class="fw-bold" style="color: #0052a5; font-size: large;">Merci pour votre visite<br>  chaleureuse.</h5>
+                        <div style="margin-top: 3em;">
+                            <h4 style="color: #00b140;">AUREVOIR</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+      
+    
+    
+    
+    
+    
+</body>
+</html>

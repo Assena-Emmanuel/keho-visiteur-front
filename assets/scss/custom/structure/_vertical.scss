@@ -169,7 +169,7 @@
 }
 
 .mm-active {
-  color: var(--#{$prefix}sidebar-menu-item-active-color) !important;
+  color: 'var(--#{$prefix}sidebar-menu-item-active-color)' !important;
 
   > a {
     background-color: var(--#{$prefix}sidebar-menu-item-active-bg-color);

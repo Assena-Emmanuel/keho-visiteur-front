@@ -1,6 +1,10 @@
-<script>
+<script setup>
+import { ref, watch } from 'vue';
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import apiClient from '~/components/api/intercepteur';
+import { useAuthStore } from '~/stores/auth.js';
+import Swal from 'sweetalert2';
 
 
 export default{
@@ -13,13 +17,13 @@ export default{
         activeTab: 1,
         activeTabArrow: 2,
         activeTabprofessionnelle: false,
-        nom: "",
-        prenom: "",
-        civilite: "",
+        nom: '',
+        prenom: '',
+        civilite: '',
         role: "",
-        email : "",
-        mobile1: "",
-        mobile2: "",
+        email : '',
+        mobile1: '',
+        mobile2: '',
         photo: "",
         // infos professionnelles
         matricule: "",
@@ -68,6 +72,28 @@ export default{
    
     },
 
+    watch: {
+    // Met à jour les données locales lorsque "data" change (utile pour le mode édition)
+    data: {
+      immediate: true,
+      handler(newData) {
+        if (Array.isArray(newData) && this.selectedIndex != null) {
+          const selectedData = newData[this.selectedIndex] || {};
+          this.nom = selectedData.nom || "";
+          this.prenom = selectedData.prenom || "";
+          this.civilite = selectedData.civilite || "";
+          this.email = selectedData.email || "";
+          this.mobile1 = selectedData.mobile1 || "";
+          this.mobile2 = selectedData.mobile2 || "";
+          this.photo = selectedData.photo || "";
+          this.matricule = selectedData.matricule || "";
+          this.codeVisite = selectedData.codeVisite || "";
+          this.departement = selectedData.departement || "";
+          this.service = selectedData.service || "";
+        }
+      },
+    },
+
   props: {
     modelValue: Boolean,
     isEditMode: Boolean,
@@ -75,7 +101,8 @@ export default{
     data: Array,
   
   },
-
+  mounted(){
+  },
   methods:{
     handleFileUpload(event) {
       // Récupérer le fichier sélectionné
@@ -93,84 +120,264 @@ export default{
     },
 
 
-    toggleTabWizard(tab) {
-      this.activeTabArrow = tab;
-    },
-    onNext() {
-      this.next = true
-      this.v$.$touch();
-      if( 
-        this.v$.email.$error || 
-        this.v$.nom.$error || 
-        this.v$.prenom.$error || 
-        this.v$.civilite.$error || 
-        this.photo=="" || 
-        this.v$.mobile1.$error){
-
-          this.activeTabprofessionnelle = false
-      }else{
-        this.activeTabprofessionnelle = true
-        this.next = false
-        this.toggleWizard(2, 100)
+// Fonction asynchrone pour récupérer l'utilisateur par uuid
+async function getUser(uuid) {
+  loading.value = true;
+  try {
+    const response = await apiClient.get(`/user/${uuid}`, {
+      headers: { 
+        'Authorization': `Bearer ${authStore.token}`,  // Utilise `this.token` si `this` est disponible
       }
-    },
-    onSave(){
-      this.submitted = true;
-      this.v$.$touch();
-      if( 
-        this.v$.codeVisite.$error || 
-        this.v$.departement.$error || 
-        this.v$.service.$error || 
-        this.v$.role.$error || 
-        this.v$.matricule.$error
-        ){
-          return
-      }else{
-        this.successmsg()
+    });
 
-        this.civilite = ""
-        this.nom = ""
-        this.prenom = ""
-        this.email = ""
-        this.mobile1 = ""
-        this.mobile2 = ""
-        this.statut = ""
-        this.photo = ""
+    if (!response.data.error) {
+      return response.data.data;  // Retourne les données de l'utilisateur
+    }
+  } catch (error) {
+    console.error('Error fetching user:', error);
+  }finally{
+    loading.value = false; 
+  }
+    }
+}
 
-        // Info professionnelles
-        this.matricule = ""
-        this.codeVisite = ""
-        this.departement = ""
-        this.service = ""
-        this.role = ""
+// Méthodes
+const handleFileUpload = (event) => {
+  photo.value = event.target.files[0];
+};
+
+
+
+const toggleWizard = (tab, value) => {
+  activeTab.value = tab;
+  progressBarValue.value = value;
+};
+
+const successmsg = (message, type = 'success') => {
+  Swal.fire('Succès!', `${message}!`, `${type}`);
+};
+
+const toggleTabWizard = (tab) => {
+  activeTabArrow.value = tab;
+};
+
+
+async function toutesCategories(slug) {
+  try {
+    const response = await apiClient.get(`/categorie_by_slug/${slug}`, {
+      headers: { 
+        'Authorization': `Bearer ${authStore.token}`,  // Utilise `this.token` si `this` est disponible
       }
-    },
-    resetForm() {
-      this.submitted = false;
-      // Reset validation (if using Vuelidate or similar)
-      if (this.$v) {
-        this.$v.$reset();
-      }
-    },
+    });
+
+    if (!response.data.error) {
+      return response.data.data;
+    }
+  } catch (error) {
+    console.error('Error fetching Departement-----:', error);
   }
 }
+
+// Recuperer la liste des roles
+async function roles() {
+
+  try {
+    const response = await apiClient.get(`/role`, {
+      headers: { 
+        'Authorization': `Bearer ${authStore.token}`, 
+      }
+    });
+
+    if (!response.data.error) {
+      return response.data.data;
+    }
+  } catch (error) {
+    console.error('Erreur durant la recuperation des role-----:', error);
+  }
+}
+
+
+onMounted(async () => {
+
+  try {
+    // Récupérer tous les départements
+    const departements = await toutesCategories("DPT");
+    selectDepartements.value = departements;  // Assignation à la référence
+
+    // Récupérer tous les services
+    const services = await toutesCategories("SRV");
+    selectServices.value = services;  // Assignation à la référence
+
+    // Récupérer tous les rôles
+    selectRoles.value = await roles();
+  
+
+  } catch (error) {
+    console.error('Erreur lors de la récupération des données:', error);
+  }
+});
+
+
+const onNext = () => {
+  next.value = true
+  v$.value.$touch();
+  console.log("(----------------------------): "+v$.value.$touch())
+  
+  if (
+    v$.value.e_mail.$error ||
+    v$.value.nom.$error ||
+    v$.value.prenom.$error ||
+    v$.value.telephone1.$error ) {
+
+    activeTabprofessionnelle.value = false;
+
+  } else {
+    activeTabprofessionnelle.value = true;
+    next.value = false
+    toggleWizard(2, 100);
+
+  }
+};
+
+const onSave = () => {
+  submitted.value = true;
+  v$.value.$touch();
+  if (
+    v$.value.codeVisite.$error ||
+    v$.value.departement.$error ||
+    v$.value.service.$error ||
+    v$.value.role.$error ||
+    v$.value.matricule.$error
+  ) {
+    return;
+  } else {
+    successmsg();
+    resetForm();
+  }
+};
+
+// Modifier les données du user
+const onUpdateUser = async () => {
+  submitted.value = true;
+
+  // Toucher tous les champs pour les valider
+  v$.value.$touch();
+
+  // Vérification des erreurs de validation
+  if (
+    v$.value.codeVisite.$error ||
+    v$.value.departement.$error ||
+    v$.value.service.$error ||
+    v$.value.role.$error ||
+    v$.value.matricule.$error
+  ) {
+    // Si des erreurs existent, on arrête la soumission
+    return;
+  } else {
+    loadingEdit.value = true;
+    
+    try {
+      // Effectuer l'appel API pour récupérer les données de l'utilisateur
+      const formData = new FormData();
+          
+      // Ajout des champs à envoyer
+      formData.append('nom', nom.value);
+      formData.append('prenom', prenom.value);
+      formData.append('email', email.value);
+      formData.append('telephone1', telephone1.value);
+      formData.append('telephone2', telephone2.value);
+      formData.append('civilite', civilite.value);
+      formData.append('matricule', matricule.value);
+      formData.append('departement_id', departement.value);
+      formData.append('service_id', service.value);
+
+      // Vérification de l'image et ajout si elle est présente
+      if (photo.value) {
+        formData.append('image', photo.value);  
+      }
+
+      const response = await apiClient.post(`/user/${uuid.value}`, formData, {
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`,  // Utilisation du token d'authentification
+        }
+      });
+
+      // Vérification de la réponse
+      if (!response.data.error) {
+        successmsg(response.data.message);  
+        resetForm(); 
+      } else {
+        // Gérer un cas d'erreur côté API (si `response.data.error` est vrai)
+        console.error("Erreur lors de la mise à jour de l'utilisateur:", response.data.error);
+
+      }
+    } catch (error) {
+      // En cas d'erreur réseau ou autre, on l'affiche dans la console
+      console.error("Erreur lors de la mise à jour de l'utilisateur1 :", error);
+
+    } finally {
+      // Fin du processus de chargement
+      loadingEdit.value = false;
+    }
+  }
+};
+
+
+const emit = defineEmits();
+// reinitialiser le modal durant la fermeture
+
+const resetForm = () => {
+  submitted.value = false;
+  emit('update:isOpen', false);
+  emit('update:uuid', null);
+  toggleWizard(1, 26);
+  activeTabprofessionnelle.value = false;
+  if (v$.value) {
+    v$.value.$reset();  // Réinitialise les validations
+  } else {
+    console.error("v$ n'est pas défini");
+  }
+
+
+  // Réinitialisation des champs
+  nom.value = '';
+  prenom.value = '';
+  civilite.value = '';
+  role.value = '';
+  e_mail.value = '';
+  telephone1.value = '';
+  telephone2.value = '';
+  photo.value = null;
+  matricule.value = '';
+  codeVisite.value = '';
+  departement.value = '';
+  service.value = '';
+};
 </script>
+
+
 <template>
   <BModal 
       @hide="resetForm" 
       size="lg"
       :modelValue="modelValue" 
       @update:modelValue="$emit('update:modelValue', $event)"
-      :title="isEditMode ? `Modifier les informations de l'Utilisateur ${selectedIndex}` : 'Création d\'Utilisateur'" 
+      :title="isEditMode ? `Modifier les informations ${(data.nom).toUpperCase()}` : 'Création d\'Utilisateur'" 
       title-class="font-18" 
       hide-footer
+      no-close-on-backdrop
   >
-  <BForm action="#">
+  <div v-if="loading" class="loading-ellipses">
+    <span class="dot font-10">.</span>
+    <span class="dot">.</span>
+    <span class="dot">.</span>
+  </div>
+  <BForm action="#" v-else>
             <div id="custom-progress-bar" class="progress-nav mb-4">
               <div class="progress">
                 <div class="progress-bar" role="progressbar" :style="`width: ${progressBarValue}%;`" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
               </div>
-
+              
               <ul class="nav nav-pills d-flex justify-content-evenly wizard-steps" role="tablist">
                 <li class="nav-item" role="presentation">
                   <button class="nav-link wizard-step" id="pills-gen-info-tab" type="button" role="tab" :class="{ 
@@ -195,16 +402,15 @@ export default{
               <div class="tab-pane fade" :class="activeTab == 1 && 'show active'" id="pills-gen-info" role="tabpanel" aria-labelledby="pills-gen-info-tab">
                 <BRow class="mt-3 mb-4">
                   <h4 class="text-center font-size-20 mb-5">Informations Personnelles</h4>
-                  <BCol sm="3" class="mb-3">
+                  <BCol sm="2" class="mb-3">
                     <label for="civilite" style="font-size: 12px; font-weight: bolder">Civilité</label>
                     <div class="input-group">
                       <select v-model="civilite" id="civilite" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': next && v$.civilite.$error
                       }">
-                        <option value="" selected>civilité...</option>
-                        <option value="MONSIEUR">MONSIEUR</option>
-                        <option value="MADAME">MADAME</option>
-                        <option value="MADEMOISELLE">MADEMOISELLE</option>
+                        <option value="M." :selected="civilite === 'M.'">M.</option>
+                        <option value="Mme" :selected="civilite === 'Mme'">Mme</option>
+                        <option value="Mlle" :selected="civilite === 'Mlle'">Mlle</option>
                       </select>
                       <div v-if="next && v$.civilite.$error" class="invalid-feedback">
                         <span v-if="v$.civilite.required.$invalid">Civilité obligatoire
@@ -246,71 +452,53 @@ export default{
                     </div>
                     </div>
                   </BCol>
-                  <BCol sm="3" class="mb-3">
+                  <BCol sm="4" class="mb-3">
                     <label for="email" style="font-size: 12px; font-weight: bolder">E-mail</label>
-                    <input v-model="email" type="email" class="form-control border border-secondary rounded-2" id="email" :class="{
-                      'is-invalid': next && v$.email.$error
+                    <input v-model="e_mail" type="email" class="form-control border border-secondary rounded-2" id="email" :class="{
+                      'is-invalid': next && v$.e_mail.$error
                     }" />
-                    <div v-if="next && v$.email.$error" class="invalid-feedback">
-                      <span v-if="v$.email.email.$invalid">Email invalide
+                    <div v-if="next && v$.e_mail.$error" class="invalid-feedback">
+                      <span v-if="v$.e_mail.email.$invalid">Email invalide
                       </span>
-                      <span v-if="v$.email.required.$invalid">Email obligatoire
+                      <span v-if="v$.e_mail.required.$invalid">Email obligatoire
                       </span>
                     </div>
                   
                   </BCol>
                   <BCol sm="3" class="mb-3">
                     <label for="mobile1" style="font-size: 12px; font-weight: bolder">Tel. Mobile</label>
-                    <input v-model="mobile1" 
+                    <input v-model="telephone1" 
                       type="tel" 
                       class="form-control border border-secondary rounded-2" 
                       id="mobile1" 
-                      :class="{'is-invalid': next && v$.mobile1.$error}"
-                      @input="mobile1 = $event.target.value.replace(/\D/g, '')" 
+                      :class="{'is-invalid': next && v$.telephone1.$error}"
+                      @input="telephone1 = $event.target.value.replace(/\D/g, '')" 
                       maxlength="10" 
                     />
-                    <div v-if="next && v$.mobile1.$error" class="invalid-feedback">
-                      <span v-if="v$.mobile1.required.$invalid">Numéro obligatoire</span>
+                    <div v-if="next && v$.telephone1.$error" class="invalid-feedback">
+                      <span v-if="v$.telephone1.required.$invalid">Numéro obligatoire</span>
                     </div>
                   </BCol>
 
                   <BCol sm="3" class="mb-3">
                     <label for="mobile2" style="font-size: 12px; font-weight: bolder">Autre Tel. Mobile</label>
-                    <input v-model="mobile2" 
+                    <input v-model="telephone2" 
                       type="tel" 
                       class="form-control border border-secondary rounded-2" 
                       id="mobile2" 
-                      @input="mobile2 = $event.target.value.replace(/\D/g, '')" 
+                      @input="telephone2 = $event.target.value.replace(/\D/g, '')" 
                       maxlength="10" 
                     />
                   </BCol>
-                  <BCol sm="3" class="mb-3">
-                    <label for="statut" style="font-size: 12px; font-weight: bolder" >Statut</label>
-                    <div class="input-group">
-                      <select v-model="statut" id="statut" class="form-select border border-secondary rounded-2" aria-label="Default select example">
-                        <option value="ACTIVE">ACTIVE</option>
-                        <option value="DESACTIVE">DESACTIVE</option>
-
-                      </select>
-                      <!-- <div v-if="submitted && v$.service.$error" class="invalid-feedback">
-                        <span v-if="v$.service.required.$invalid">Service obligatoire
-                        </span>
-                      </div> -->
-                    </div>
-                  </BCol>
-                  <BCol sm="3" class="mb-3">
+                  
+                  <BCol sm="6" class="mb-3">
                     <label for="photo" style="font-size: 12px; font-weight: bolder">Photo</label>
                     <input 
                       @change="handleFileUpload" 
                       type="file" 
                       class="form-control border border-secondary rounded-2" 
-                      :class="{'is-invalid': next && photo == ''}"
                       id="photo" 
                     />
-                    <div v-if="next && photo == ''" class="invalid-feedback">
-                        <span v-if="photo == ''">Photo obligatoire
-                        </span>
-                      </div>
                   </BCol>
                   <div class="d-flex justify-content-end mt-5">
                     <BButton variant="primary" class="px-5" @click="onNext">
@@ -326,6 +514,29 @@ export default{
               <div class="tab-pane fade" :class="activeTab == 2 && 'show active'" id="steparrow-description-info" role="tabpanel" aria-labelledby="steparrow-description-info-tab">
                 <BRow>
                   <h4 class="text-center font-size-20 mb-5">Informations Professionnelles</h4>
+
+                  <BCol sm="6" class="mb-3">
+                    <label for="role" style="font-size: 12px; font-weight: bolder">Rôle</label>
+                    <div class="input-group">
+                      <select v-model="role" id="role" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
+                        'is-invalid': submitted && v$.role.$error}"
+                      >
+                        <option 
+                          v-for="role in selectRoles" 
+                          :key="role.id" 
+                          :value="role.id"
+                        >
+
+                        {{ role.libelle }}
+
+                        </option> 
+                      </select>
+                      <div v-if="submitted && v$.role.$error" class="invalid-feedback">
+                        <span v-if="v$.role.required.$invalid">Service obligatoire
+                        </span>
+                      </div>
+                    </div>
+                  </BCol>
                   <BCol sm="3" class="mb-3">
                     <label for="nom" style="font-size: 12px; font-weight: bolder">Matricule</label>
                     <div class="input-group">
@@ -360,15 +571,23 @@ export default{
                       </div>
                     </div>
                   </BCol>
-                  <BCol sm="3" class="mb-3">
+                  
+                  
+                  <BCol sm="6" class="mb-3">
                     <label for="departement" style="font-size: 12px; font-weight: bolder">Département</label>
                     <div class="input-group">
                       <select v-model="departement" id="departement" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': submitted && v$.departement.$error}"
                       >
-                        <option value="">Département...</option>
-                        <option value="RH">DEPARTEMENT DES RESSOURCES HUMAINES (RH)</option>
-                        <option value="IT">DEPARTEMENT INFORMATIQUE (IT)</option>
+                        <option 
+                          v-for="departement in selectDepartements" 
+                          :key="departement.code" 
+                          :value="departement.id"
+                        >
+                        
+                          {{ departement.libelle }}
+                        
+                        </option>
 
                       </select>
                       <div v-if="submitted && v$.departement.$error" class="invalid-feedback">
@@ -377,34 +596,24 @@ export default{
                       </div>
                     </div>
                   </BCol>
-                  <BCol sm="3" class="mb-3">
+                  <BCol sm="6" class="mb-3">
                     <label for="service" style="font-size: 12px; font-weight: bolder">Service</label>
                     <div class="input-group">
                       <select v-model="service" id="service" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': submitted && v$.service.$error}"
                       >
-                        <option value="">SERVICE...</option>
-                        <option value="RECRUTEMENT">RECRUTEMENT</option>
-                        <option value="SUPPORT TECHNIQUE">SUPPORT TECHNIQUE</option> 
+                        <option 
+                          v-for="service in selectServices" 
+                          :key="service.id" 
+                          :value="service.id"
+                        >
+
+                        {{ service.libelle }}
+
+                        </option> 
                       </select>
                       <div v-if="submitted && v$.service.$error" class="invalid-feedback">
                         <span v-if="v$.service.required.$invalid">Service obligatoire
-                        </span>
-                      </div>
-                    </div>
-                  </BCol>
-                  <BCol sm="3" class="mb-3">
-                    <label for="role" style="font-size: 12px; font-weight: bolder">Rôle</label>
-                    <div class="input-group">
-                      <select v-model="role" id="role" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.role.$error}"
-                      >
-                        <option value="">SERVICE...</option>
-                        <option value="RECRUTEMENT">RECRUTEMENT</option>
-                        <option value="SUPPORT TECHNIQUE">SUPPORT TECHNIQUE</option> 
-                      </select>
-                      <div v-if="submitted && v$.role.$error" class="invalid-feedback">
-                        <span v-if="v$.role.required.$invalid">Service obligatoire
                         </span>
                       </div>
                     </div>
@@ -414,7 +623,14 @@ export default{
                     <BButton v-if="!isEditMode" variant="primary" class="ms-2" @click="onSave">
                       <span class="px-md-5">Enregistrer</span>
                     </BButton>
-                    <BButton v-if="isEditMode" @click="onUpdateUser" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+                    <BButton
+                       v-if="isEditMode" 
+                       @click="onUpdateUser" 
+                       variant="primary" 
+                       class="w-sm waves-effect waves-light btn btn-sm" 
+                       :loading="loadingEdit" 
+                        loading-text="Modification"
+                    >
                       <span class="px-md-5">Modifier</span>
                     </BButton>
                   </div>
@@ -489,4 +705,37 @@ export default{
     }
   }
 }
+</style>
+<style scoped>
+.loading-ellipses {
+  font-size: 20px;
+  color: #3498db;
+  text-align: center;
+}
+
+.dot {
+  animation: blink 1s infinite;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes blink {
+  0%, 20% {
+    opacity: 0;
+  }
+  50%, 100% {
+    opacity: 1;
+  }
+}
+
 </style>

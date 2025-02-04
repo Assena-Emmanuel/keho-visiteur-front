@@ -2,8 +2,11 @@
 export default defineNuxtConfig({
   plugins: [
     '~/plugins/sweetalert.ts',
+    '~/plugins/qrcode-reader.js',
+   '~/plugins/vue-cal.js',
+   '~/plugins/vue-awesome-paginate.js',
+   '~/plugins/piniaPersistedState',
   ],
-
   app: {
     head: {
       htmlAttrs: { dir: "ltr", lang: "fr" },
@@ -15,11 +18,20 @@ export default defineNuxtConfig({
         },
         { name: "author", content: "Themesbrand" }
       ],
-      link: [{ rel: "icon", type: "image/ico", href: "/images/total-sans-arriere-plan.png" }]
+      link: [
+        { 
+          rel: "icon", type: "image/ico", 
+          href: "/images/total-sans-arriere-plan.png" 
+        },
+        { 
+          rel: "stylesheet", 
+          href: "https://unpkg.com/vue-cal/dist/vuecal.css" 
+        },
+      ]
     }
   },
 
-  modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts"],
+  modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts", "nuxt-easy-lightbox"],
 
   pinia: {
     autoImports: ["defineStore", ["defineStore", "definePiniaStore"]]
@@ -28,7 +40,7 @@ export default defineNuxtConfig({
   css: [
     "bootstrap-vue-next/dist/bootstrap-vue-next.css",
     "~/assets/scss/app.scss",
-    "simplebar/dist/simplebar.css"
+    "simplebar/dist/simplebar.css",
   ],
 
   alias: {
@@ -38,19 +50,20 @@ export default defineNuxtConfig({
 
   googleFonts: {
     families: {
-      Poppins: [300, 400, 500, 600, 700],
-      Inter: [300, 400, 500, 600, 700],
-      "Open+Sans": [300, 400, 500, 600, 700],
-      Nunito: [300, 400, 500, 600, 700],
-      Karla: [300, 400, 500, 600, 700],
-      Gantari: [300, 400, 500, 600, 700]
+      Poppins: [200, 300, 400, 500, 600],
+      Inter: [200, 300, 400, 500, 600],
+      "Open+Sans": [200, 300, 400, 500, 600],
+      Nunito: [200, 300, 400, 500, 600],
+      Karla: [200, 300, 400, 500, 600],
+      Gantari: [200, 300, 400, 500, 600]
     },
     display: "swap"
   },
 
   runtimeConfig: {
     public: {
-      auth: "fakebackend"
+      auth: "fakebackend",
+      API_URL: "https://keho-visitors.local/api"
     }
   },
 

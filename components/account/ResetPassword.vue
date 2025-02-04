@@ -1,6 +1,8 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
+import apiClient from "../api/intercepteur";
+
 export default {
   setup() {
     return { v$: useVuelidate() };
@@ -35,7 +37,7 @@ export default {
     togglePasswordCfVisibility() {
       this.passwordCfVisible = !this.passwordCfVisible;
     },
-    onReset() {
+    async onReset() {
       this.submitted = true;
       this.isSuccess = false;
       this.v$.$touch();
@@ -43,14 +45,42 @@ export default {
         return;
       } else {
         if(this.password !== this.confirmPassword){
+            this.password = ""
+            this.confirmPassword = ""
             this.isDif = true
         }else{
             this.isSuccess = true;
             localStorage.setItem("isOk", true)
-            this.$router.push({
-            path: "/login"
-            });
-        }
+            const otp = localStorage.getItem("otp")
+
+            try{
+                this.processing = true;
+                await apiClient.post("/user/initpwd",
+                    {
+                      otp_code: otp,
+                      password: this.password,
+                      password_confirmation: this.confirmPassword,
+                    }
+                )
+                .then(response => {
+                  let data = response.data; 
+                  console.log(data)
+
+                  if(data.error){
+                    this.isError = true
+                    this.msgError = data.message
+                    return
+                  }else{
+                    this.$router.push("/login")
+                  }
+                  
+                  
+                })
+              }catch(error){
+                console.log(error)
+              }
+
+            }
         
       }
     }
@@ -101,7 +131,7 @@ export default {
                         class="form-control" 
                         id="usercpassword" 
                         placeholder="Confirmez le mot de passe" 
-                        :class="{'is-invalid': submitted || isDif && v$.password.$error }" 
+                        :class="{'is-invalid': submitted && isDif && v$.password.$error }" 
                       />
                       <span class="input-group-text" @click="togglePasswordCfVisibility">
                         <i :class="passwordCfVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>

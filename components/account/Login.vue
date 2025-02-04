@@ -1,22 +1,25 @@
 <script>
-import axios from "axios";
+import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 
 export default {
   setup() {
-    return { v$: useVuelidate() };
+    return { v$: useVuelidate(), authStore: useAuthStore() };
   },
   data() {
     return {
-      email: "admin@themesbrand.com",
-      password: "123456",
+      dismissibleAlert: true,
+      email: "ibrahim1155@outlook.com",
+      password: "1P@ssword",
       isRemember: true,
       processing: false,
       errorMsg: "",
       submitted: false,
       showAlert: localStorage.getItem('isOk') || false,
       passwordVisible: false,
+      dismissCountDown: 10000,
+      countdown: 0,
     };
   },
   validations: {
@@ -31,6 +34,7 @@ export default {
   mounted() {
     // Vide le localStorage lorsque ce composant est monté
     localStorage.removeItem('email');
+    
   },
   methods: {
     togglePasswordVisibility() {
@@ -41,6 +45,7 @@ export default {
       localStorage.removeItem("isOk")
     },
     async onLogin() {
+      
       this.submitted = true;
       this.v$.$touch();
       if (this.v$.$invalid) {
@@ -49,27 +54,47 @@ export default {
         this.errorMsg = "";
         try {
           this.processing = true;
-          const { data } = await axios.post(
-            "https://api-node.themesbrand.website/auth/signin",
+
+          const { data } = await apiClient.post(
+            "/auth/login",
             {
               email: this.email,
               password: this.password
             }
           );
-          const status = data.status;
-          const response = data.data;
-          if (status === "success") {
-            localStorage.setItem("user", JSON.stringify(response));
-            localStorage.removeItem("isOk")
-            this.$router.push({
-              path: "/dashboard"
+          const token = data.access_token;
+ 
+          if (token) {
+            this.authStore.setToken(token)
+            // accessToken.value = token;
+
+            apiClient.post('/auth/me', {}, {
+              headers: {
+                Authorization: `Bearer ${token}`, // Utiliser le token dans l'en-tête Authorization
+              },
+            }).then(response => {
+              const user = response.data
+              console.log("-----------------------------user log:"+JSON.stringify(user))
+
+              const auth = useUserStore()
+              auth.setUser(user)
+              // Rediriger vers la page enregistrée ou vers /dashboard par défaut
+              
+              this.$router.push('/dashboard');
+
+            })
+            .catch(error => {
+                this.errorMsg = "E-mail ou mot de passe incorrect";
+                console.error('Error fetching user info:', error);
+                return
             });
-          } else {
-            this.errorMsg = response;
-          }
+
+          } 
         } catch (error) {
+          console.log("------------------------------token:"+token)
+          this.errorMsg = "Erreur de connexion";
           console.error("failed at onLogin", { error });
-          localStorage.removeItem("user");
+
         } finally {
           this.processing = false;
         }
@@ -77,6 +102,7 @@ export default {
     }
   }
 };
+
 </script>
 
 <template>
@@ -84,10 +110,24 @@ export default {
       <BCard class="card-auth-login">
         <BCardBody>
           <div>
-            <div v-if="showAlert" class="alert alert-success alert-dismissible fade show font-size-13">
+            <!-- <div v-if="showAlert" class="alert alert-success alert-dismissible fade show font-size-13">
                 Mot de passe réinitialisé avec succes!
                 <button type="button" class="btn-close" @click="dismissAlert"></button>
-            </div>
+            </div> -->
+            <BAlert v-if="errorMsg" variant="danger" v-model="dismissibleAlert" dismissible>
+              <p class="">{{ errorMsg }}</p>
+            </BAlert>
+
+            <!-- <BAlert
+              v-model="dismissCountDown"
+              dismissible
+              variant="danger"
+              @close-countdown="countdown = $event"
+            >
+              <p class="">{{ errorMsg }}</p>
+              <BProgress variant="warning" :max="dismissCountDown" :value="countdown" height="4px" />
+            </BAlert> -->
+
               <div class="mb-3">
                 <label for="email" class="font-size-12 text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
                 <input v-model="email" type="text" class="form-control form-control-sm login-input" id="email" placeholder="Votre email" :class="{
@@ -127,8 +167,6 @@ export default {
                 </div>
               </div>
 
-
-              <div class="mt-3 text-danger">{{ errorMsg }}</div>
               
 
               <div class="d-flex justify-content-center mt-4">
@@ -145,7 +183,7 @@ export default {
         <BButton 
           variant="success"
           :loading="processing" 
-          loading-text="Chargement" 
+          loading-text="connexion" 
           :class="['btn-bg', processing ? 'btn-loading' : '']"  
           :disabled="processing" 
           @click="onLogin">

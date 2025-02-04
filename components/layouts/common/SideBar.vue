@@ -203,13 +203,26 @@ export default {
                 <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ $t(item.badge.text) }}</span>
               </a>
 
-              <nuxt-link :to="item.link" v-if="!hasItems(item)" class="side-nav-link-ref">
+              <!-- <nuxt-link :to="item.link" v-if="!hasItems(item)" class="side-nav-link-ref">
                 <i :class="`${item.icon}`" v-if="item.icon"></i>
+                <img src="/images/sideBarIcon/dashboard.png" width="30px" class="me-2" alt="">
+                <img src="/images/sideBarIcon/dashboard-des.png" width="30px" class="me-2" alt="">
                 <span>{{ $t(item.label) }}</span>
                 <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ $t(item.badge.text) }}</span>
+              </nuxt-link> -->
+
+              <nuxt-link :to="item.link" v-if="!hasItems(item)" class="side-nav-link-ref">
+                  <img 
+                    v-if="item.icon" 
+                    :src="$route.path === item.link ? item.icon.active : item.icon.desactive" 
+                    width="25px" class="me-2" alt=""
+                  >
+                  <!-- <img v-else :src="`${item.icon.desactive}`" width="30px" class="me-2" alt=""> -->
+                  <span :style="{color : $route.path === item.link ? '#378DEA':'#878787' }">{{ $t(item.label) }}</span>
+                  <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ $t(item.badge.text) }}</span>
               </nuxt-link>
 
-              <ul v-if="hasItems(item)" class="sub-menu" aria-expanded="false">
+              <!-- <ul v-if="hasItems(item)" class="sub-menu" aria-expanded="false">
                 <li v-for="(subitem, index) of item.subItems" :key="index">
                   <nuxt-link :to="subitem.link" v-if="!hasItems(subitem)" class="side-nav-link-ref">{{ $t(subitem.label) }}</nuxt-link>
                   <a v-if="hasItems(subitem)" class="side-nav-link-a-ref has-arrow" href="javascript:void(0);">{{ $t(subitem.label) }}</a>
@@ -219,7 +232,7 @@ export default {
                     </li>
                   </ul>
                 </li>
-              </ul>
+              </ul> -->
             </li>
           </template>
         </ul>
