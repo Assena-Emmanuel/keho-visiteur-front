@@ -68,7 +68,6 @@ export default{
 
             if (!response.data.error) {
                 this.data = response.data.data
-                console.log("---------------Liste des utilisateurs récupérée :", JSON.stringify(response.data));
             }
 
         } catch (error) {
@@ -100,7 +99,7 @@ export default{
             :uuid="selectedRow"
             @update:isOpen="modal = $event"
             @update:uuid="modal = $event"
-            @close="selectedUserId = null"
+
         />
     </div>
 
@@ -110,7 +109,7 @@ export default{
         :data="data" 
         :title="title" 
         :show-addbtn="true" 
-        :typeForme="'utilisateur'" 
+        :typeForme="'user'" 
         :is-loading="isLoading"
         @data-selected="handleDataSelected"
     />

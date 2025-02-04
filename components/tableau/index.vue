@@ -4,6 +4,7 @@ import { capitalize } from "vue";
 import apiClient from "~/components/api/intercepteur";
 import { useAuthStore } from "~/stores/auth.js";
 import Swal from 'sweetalert2';
+
 // Props
 const props = defineProps({
   fields: Array,
@@ -23,7 +24,7 @@ const authStore = useAuthStore();
 
 // Refs
 const submitted = ref(false);
-const loadingDetail = ref(false);
+
 const detailModal = ref(false);
 const localModal = ref(props.modal);
 const isStatutActive = ref(false);
@@ -35,6 +36,9 @@ const filter = ref('');
 const sortBy = ref('age');
 const sortDesc = ref(false);
 const detailUser = ref(null)
+const uuid = ref(null)
+const idDepartement = ref(null)
+const typeForme = ref(null)
 
 // Computed properties
 const filterOn = computed(() => props.fields.map(field => field.key));
@@ -60,6 +64,8 @@ watch(() => props.modal, (newVal) => {
 // Lifecycle hooks
 onMounted(() => {
   totalRows.value = props.data.length;
+  typeForme.value = props.typeForme
+  
 });
 
 // Methods
@@ -94,34 +100,36 @@ const onFiltered = (filteredItems) => {
   currentPage.value = 1;
 };
 
-const showDetailsModal = async (id, data, typeForm) => {
+const showDetailsModal = (row) => {
   
-  const uuid = data[id].uuid
   detailModal.value = true
-  loadingDetail.value = true;
-  try {
-    const response = await apiClient.get(`/user/${uuid}`, {
-      headers: { 
-        'Authorization': `Bearer ${authStore.token}`,  // Utilise `this.token` si `this` est disponible
-      }
-    });
 
-    if (!response.data.error) {
-      detailUser.value = response.data.data; 
-    }
-  } catch (error) {
-    console.error('Error fetching user:', error);
-  }finally{
-    loadingDetail.value = false; 
+  // Afficher le modal en fonction du type de gestion
+  if(typeForme.value == "departement"){
+    idDepartement.value = row.id
+
+  }else if(typeForme.value == "user"){
+    uuid.value = row.uuid
+
+  }else if(typeForme.value == "servie"){
+    uuid.value = row.id
+
   }
+
 };
 
 // Méthode pour émettre l'événement
-const handleEdit = (index, data) => {
-  if(data[index]){
-    emit('data-selected', { uuid: data[index].uuid});
-  }else{
-    alert("error")
+const handleEdit = (row) => {
+
+  if(typeForme.value == "departement"){
+    emit('data-selected', { id: row.id});
+
+  }else if(typeForme.value == "user"){
+    emit('data-selected', { uuid: row.uuid});
+
+  }else if(typeForme.value == "servie"){
+    uuid.value = row.id
+
   }
   
 };
@@ -173,74 +181,9 @@ const capitalizeText = (text) => {
             <BCardTitle>{{ title }}</BCardTitle>
 
             <!-- Modal Détail -->
-            <BModal @hide="hideModal" v-model="detailModal" :title="`Détail ${capitalize(typeForme)}`" hide-footer>
-                <!-- <TableauDetail :dataUser="dataDetail" /> -->
-
-              <div v-if="loadingDetail" class="loading-ellipses">
-                <span class="dot font-10">.</span>
-                <span class="dot">.</span>
-                <span class="dot">.</span>
-              </div>
-
-              <div v-if="detailUser" class="detail-container">
-  <div class="row align-items-center mb-3">
-    <div class="col-md-4 text-center">
-      <img 
-        :src="`data:${detailUser.imageType};base64,${detailUser.image}`"  
-        alt="Photo" 
-        class="user-image"
-      >
-    </div>
-    <div class="col-md-8">
-      <h4 class="user-name">{{ detailUser.civilite }} {{ detailUser.nom }} {{ detailUser.prenom }}</h4>
-      <div class="mb-2">
-        <span class="badge badge-role">
-          <i class="fas fa-user-tie"></i> EMPLOYÉ
-        </span>
-      </div>
-      <BBadge :variant="detailUser.statut ? 'success' : 'danger'" class="status-badge">
-        {{ detailUser.statut ? 'Activé' : 'Désactivé' }}
-      </BBadge>
-    </div>
-  </div>
-
-  <div class="separator"></div>
-
-  <div class="row">
-    <div class="col-md-6 info-item">
-      <i class="fas fa-mobile-alt"></i> <strong>Mobile 1:</strong> {{ detailUser.telephone1 }}
-    </div>
-    <div class="col-md-6 info-item">
-      <i class="fas fa-mobile-alt"></i> <strong>Mobile 2:</strong> {{ detailUser.telephone2 }}
-    </div>
-    <div class="col-md-12 info-item">
-      <i class="fas fa-envelope"></i> <strong>Email:</strong> {{ detailUser.email }}
-    </div>
-  </div>
-
-  <div class="separator"></div>
-
-  <div class="row">
-    <div class="col-md-6 info-item">
-      <i class="fas fa-building"></i> <strong>Département:</strong> {{ detailUser.visite ? detailUser.visite.departement.libelle : "" }}
-    </div>
-    <div class="col-md-6 info-item">
-      <i class="fas fa-briefcase"></i> <strong>Service:</strong> {{detailUser.visite ? detailUser.visite.service.libelle : "" }}
-    </div>
-  </div>
-
-  <div class="separator"></div>
-
-  <div class="row">
-    <div class="col-md-6 info-item">
-      <i class="fas fa-qrcode"></i> <strong>Code Visite:</strong> {{detailUser.visite ?  detailUser.visite.code_visite : "" }}
-    </div>
-    <div class="col-md-6 info-item">
-      <i class="fas fa-id-card"></i> <strong>Matricule:</strong> {{detailUser.visite ?  detailUser.visite.matricule : "" }}
-    </div>
-  </div>
-</div>
-
+            <BModal @hide="hideModal" v-if="detailModal" v-model="detailModal" :title="`Détail ${capitalize(typeForme)}`" hide-footer>
+              <TableauDetailUser :uuid="uuid" v-if="typeForme == 'user'" />
+              <TableauDetailDepartement :id="idDepartement" v-if="typeForme == 'departement'"/>
             </BModal>
 
 
@@ -291,13 +234,13 @@ const capitalizeText = (text) => {
 
                 <template #cell(Actions)="row">
                     <div class="d-flex gap-1">
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 text-primary d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)">
+                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 text-primary d-flex justify-content-center align-items-center" @click="handleEdit(row.item)">
                             <i class="fas fa-edit" ></i>
                         </BButton>
                         <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
                           <i class="uil uil-trash-alt font-size-15"></i>
                         </BButton>
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex justify-content-center align-items-center" @click="showDetailsModal(row.index, data, typeForme)">
+                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex justify-content-center align-items-center" @click="showDetailsModal(row.item)">
                           <i class="fas fa-eye"></i>
                         </BButton>
                     </div>
@@ -357,88 +300,5 @@ const capitalizeText = (text) => {
   to {
     transform: rotate(360deg);
   }
-}
-</style>
-<style scoped>
-.loading-ellipses {
-  font-size: 40px; /* Taille augmentée */
-  color: #3498db;
-  text-align: center;
-  font-weight: bold;
-}
-
-.dot {
-  animation: blink 1s infinite;
-  margin: 0 5px; /* Espacement entre les points */
-}
-
-.dot:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.dot:nth-child(2) {
-  animation-delay: 0.3s;
-}
-
-.dot:nth-child(3) {
-  animation-delay: 0.6s;
-}
-
-@keyframes blink {
-  0%, 20% {
-    opacity: 0;
-  }
-  50%, 100% {
-    opacity: 1;
-  }
-}
-</style>
-<style scoped>
-.detail-container {
-  background: #f8f9fa; /* Gris clair */
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.user-image {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 3px solid #3498db;
-}
-
-.user-name {
-  font-weight: bold;
-  font-size: 1.5rem;
-}
-
-.badge-role {
-  background: #6c757d;
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  border-radius: 10px;
-  color: white;
-}
-
-.status-badge {
-  font-size: 0.9rem;
-  padding: 6px 10px;
-}
-
-.info-item {
-  margin-bottom: 10px;
-  font-size: 1rem;
-}
-
-.info-item i {
-  color: #3498db;
-  margin-right: 6px;
-}
-
-.separator {
-  border-top: 2px dashed #ddd;
-  margin: 15px 0;
 }
 </style>

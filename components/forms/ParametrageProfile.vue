@@ -275,7 +275,6 @@ export default {
               }
 
             }).then(reponse =>{
-              console.log('reponse:-----------:'+JSON.stringify(reponse))
               if(!reponse.data.error){ 
               
               apiClient.post('/auth/me', {}, {

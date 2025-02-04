@@ -13,6 +13,8 @@ const authStore = useAuthStore();
 // Réactifs
 const loading = ref(false); 
 const loadingEdit = ref(false); 
+const loadingCreer = ref(false); 
+
 const progressBarValue = ref(34);
 const activeTab = ref(1);
 const activeTabArrow = ref(2);
@@ -191,7 +193,6 @@ onMounted(async () => {
 const onNext = () => {
   next.value = true
   v$.value.$touch();
-  console.log("(----------------------------): "+v$.value.$touch())
   
   if (
     v$.value.e_mail.$error ||
@@ -209,7 +210,7 @@ const onNext = () => {
   }
 };
 
-const onSave = () => {
+const onSave = async () => {
   submitted.value = true;
   v$.value.$touch();
   if (
@@ -221,6 +222,69 @@ const onSave = () => {
   ) {
     return;
   } else {
+
+    this.loadingCreer = true;
+        try{
+
+          const formData = new FormData();
+          
+          // Ajout des champs à envoyer
+          formData.append('nom', this.nom);
+          formData.append('prenom', this.prenom);
+          formData.append('email', this.email);
+          formData.append('telephone1', this.mobile1);
+          formData.append('telephone2', this.mobile2);
+          formData.append('civilite', this.civilite);
+          formData.append('matricule', this.matricule);
+          formData.append('departement_id', this.userDepartement);
+          formData.append('service_id', this.userService);
+
+          // Vérification de l'image et ajout si elle est présente
+          if (this.photo) {
+            formData.append('image', this.photo);  // Ici, `this.photo` doit être un fichier valide (par exemple, un objet `File`)
+          }
+
+          await apiClient.post(
+            `/user/${this.user.uuid}`,formData,
+            {
+
+              headers: { 
+                'Authorization': `Bearer ${this.token}`, 
+              }
+
+            }).then(reponse =>{
+              if(!reponse.data.error){ 
+              
+              apiClient.post('/auth/me', {}, {
+                headers: { Authorization: `Bearer ${this.token}` },
+              }).then(response=>{
+
+                console.log("Utilisateur récupéré:", response.data);
+
+                this.authStore.setUser(response.data);
+                this.updateUserInfo(response.data)
+              }
+
+              )
+              
+
+              this.alertMessage(reponse.data.message, 'success')
+
+            }
+                
+
+
+        })
+          }catch (error) {
+            console.error("Erreur lors de la creation de l'utilisateur :", error);
+        }finally{
+          this.loadingCreer = false
+        }
+
+
+
+
+
     successmsg();
     resetForm();
   }
@@ -258,6 +322,7 @@ const onUpdateUser = async () => {
       formData.append('telephone2', telephone2.value);
       formData.append('civilite', civilite.value);
       formData.append('matricule', matricule.value);
+      formData.append('role_id', role.value);
       formData.append('departement_id', departement.value);
       formData.append('service_id', service.value);
 
@@ -336,11 +401,11 @@ const resetForm = () => {
       hide-footer
       no-close-on-backdrop
   >
-  <div v-if="loading" class="loading-ellipses">
-    <span class="dot font-10">.</span>
-    <span class="dot">.</span>
-    <span class="dot">.</span>
-  </div>
+  <div v-if="loadingDetail" class="loading-ellipses">
+        <span class="dot">.</span>
+        <span class="dot">.</span>
+        <span class="dot">.</span>
+    </div>
   <BForm action="#" v-else>
             <div id="custom-progress-bar" class="progress-nav mb-4">
               <div class="progress">
@@ -678,13 +743,15 @@ const resetForm = () => {
 </style>
 <style scoped>
 .loading-ellipses {
-  font-size: 20px;
+  font-size: 40px; /* Taille augmentée */
   color: #3498db;
   text-align: center;
+  font-weight: bold;
 }
 
 .dot {
   animation: blink 1s infinite;
+  margin: 0 5px; /* Espacement entre les points */
 }
 
 .dot:nth-child(1) {
@@ -707,5 +774,4 @@ const resetForm = () => {
     opacity: 1;
   }
 }
-
 </style>
