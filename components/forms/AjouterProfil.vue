@@ -43,7 +43,6 @@ export default {
         if(this.code !== this.libelle){
             this.isDif = true
         }else{
-            alert(`last: ${this.description} - new: ${this.code} - cnew: ${this.libelle}`)
             this.isSuccess = true;
             this.description = ""
             this.code = "",

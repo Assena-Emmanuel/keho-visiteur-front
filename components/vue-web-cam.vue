@@ -142,7 +142,7 @@ export default {
         }
 
       } catch (error) {
-        alert(error.message);
+        console.error(error.message);
       }
     },
 
@@ -163,7 +163,7 @@ export default {
           this.appareilVerso = !this.appareilVerso
         }
       } catch (error) {
-        alert(error.message);
+        console.error(error.message);
       }
     },
 
