@@ -33,7 +33,6 @@ export default{
   },
   mounted(){
     if(this.dataUpdate){
-      alert("ok")
     }
   },
   methods:{

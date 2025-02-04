@@ -6,7 +6,10 @@ import { useUserStore } from '@/stores/user';
 
 export default {
   setup() {
-      return { v$: useVuelidate() };
+    const authStore = useAuthStore(); // Initialisation du store
+    const config = useRuntimeConfig();
+
+      return { v$: useVuelidate(), authStore, config  };
     },
   data() {
     return {
@@ -39,6 +42,11 @@ export default {
         next: false,
         statut: ""
     };
+  },
+  computed:{
+    user() {
+      return this.authStore.user;
+    }
   },
   validations: {
       email: {
@@ -122,8 +130,24 @@ export default {
     const userStore = useUserStore()
     this.user = userStore.user
   },
- 
+  
   methods: {
+    updateUserInfo(user) {
+      this.civilite = user.civilite || "";  // Mise à jour de la civilité
+      this.nom = user.nom || "";  // Mise à jour du nom
+      this.prenom = user.prenom || "";  // Mise à jour du prénom
+      this.email = user.email || "";  // Mise à jour de l'email
+      this.mobile1 = user.telephone1 || "";  // Mise à jour du premier numéro de téléphone
+      this.mobile2 = user.telephone2 || "";  // Mise à jour du deuxième numéro de téléphone
+      this.statut = user.statut || "";  // Mise à jour du statut
+
+      // Informations professionnelles
+      this.matricule = user.visite ? user.visite.matricule : ""
+      this.codeVisite = user.visite ? user.visite.code_visite :  ""
+      this.userService = user.visite ? user.visite.service_id :  ""
+      this.userDepartement = user.visite? user.visite.departement_id :  ""
+    },
+
     toggleWizard(tab, value) {
       this.activeTab = tab;
       this.progressBarValue = value;
@@ -197,6 +221,49 @@ export default {
           // this.userDepartement = this.user.departement_id || ""
           // this.userService = this.user.service_id || ""
         });
+         if(!response.data.error){
+          return response.data.data
+         }
+        
+      } catch (error) {
+        console.error('Error fetching Departement-----:', error);
+      }
+    },
+
+
+    async categorie(id) {
+      try {
+        console.log(`Requête API pour la catégorie avec l'ID : ${id}`);
+        console.log(`Token utilisé : ${this.token}`);
+        
+        const response = await apiClient.get(`/categorie/${id}`, {
+          headers: { 
+            'Authorization': `Bearer ${this.token}`, 
+          }
+        });
+
+        if (!response.data.error) {
+          return response.data.data.libelle;
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération du service :', error);
+      }
+    }
+,
+
+    alertMessage(message, icon="error") {
+      this.$swal.fire({
+        position: "top",
+        icon: icon,
+        text: message,
+        showConfirmButton: false,
+        timer: 2000,
+        customClass: {
+      popup: 'custom-popup', // Classe personnalisée pour le popup
+      icon: 'custom-icon', // Classe personnalisée pour l'icône
+      title: 'custom-title', // Classe personnalisée pour le titre (si nécessaire)
+    }
+      });
     },
 
 
@@ -217,7 +284,6 @@ export default {
         this.v$.nom.$error || 
         this.v$.prenom.$error || 
         this.v$.civilite.$error || 
-        this.photo=="" || 
         this.v$.mobile1.$error){
 
           this.activeTabprofessionnelle = false
@@ -551,8 +617,8 @@ export default {
                   <BCol sm="3" class="mb-3">
                     <label for="service" style="font-size: 12px; font-weight: bolder">Service</label>
                     <div class="input-group">
-                      <select v-model="service" id="service" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.service.$error}"
+                      <select v-model="userService" id="service" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
+                        'is-invalid': submitted && v$.userService.$error}"
                       >
                         <option value="" selected>Selectionnez...</option>
                         <option 
@@ -591,6 +657,19 @@ export default {
 
 
 <style lang="scss">
+/* Classe pour le popup */
+.custom-popup {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Classe pour l'icône */
+.custom-icon {
+  font-size: 10px;
+  float: left;
+}
+
 .progress-nav {
   position: relative;
   display: flex;

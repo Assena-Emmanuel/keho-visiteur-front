@@ -5,16 +5,33 @@ import HederLogo from "~/components/layouts/common/HeaderLogo.vue";
 import AppList from "~/components/layouts/common/AppList.vue";
 import Notifications from "~/components/layouts/common/Notifications.vue";
 import Profile from "~/components/layouts/common/Profile.vue";
+<<<<<<< HEAD
 import { useUserStore } from '@/stores/user';
+=======
+import { useAuthStore } from '~/stores/auth';
+>>>>>>> 1711b80159c1652ec637dd733d324dfc391af93a
 
 
 export default {
+  setup(){
+    const authStore = useAuthStore(); // Initialisation du store
+    const config = useRuntimeConfig(); // Récupération de la config Nuxt
+
+    return { authStore, config };
+  },
   data() {
+    
+
+
     return {
       parametres: ["Paramètre des Visités, Paramètre des Visiteurs, "],
       value: null,
       config: useRuntimeConfig(),
+<<<<<<< HEAD
       user: null,
+=======
+      user: {}
+>>>>>>> 1711b80159c1652ec637dd733d324dfc391af93a
     };
   },
   components: {
@@ -26,6 +43,7 @@ export default {
     Notifications,
     Profile
   },
+<<<<<<< HEAD
   mounted() {
     const userStore = useUserStore()
     this.user = userStore.user;
@@ -36,6 +54,15 @@ export default {
     this.user = userStore.user
   },
 
+=======
+
+  computed: {
+    user() {
+      return this.authStore.user;
+    }
+  },
+
+>>>>>>> 1711b80159c1652ec637dd733d324dfc391af93a
 
   methods: {
     toggleMenu() {

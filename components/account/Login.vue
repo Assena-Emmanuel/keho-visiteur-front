@@ -5,7 +5,7 @@ import { required, email } from "@vuelidate/validators";
 
 export default {
   setup() {
-    return { v$: useVuelidate() };
+    return { v$: useVuelidate(), authStore: useAuthStore() };
   },
   data() {
     return {
@@ -65,16 +65,8 @@ export default {
           const token = data.access_token;
  
           if (token) {
-            const accessToken = useCookie('token', {
-              maxAge: 60 * 60 * 24 * 1, // 1 jour (60 secondes * 60 minutes * 24 heures)
-              path: '/', // Disponible sur tout le site
-              // secure: true, // Assure que le cookie est envoyé sur HTTPS
-              // httpOnly: true, // Empêche l'accès au cookie via JavaScript
-              sameSite: 'Lax', // Aide à prévenir les attaques CSRF
-            });
-            accessToken.value = token;
-
-
+            this.authStore.setToken(token)
+            // accessToken.value = token;
 
             apiClient.post('/auth/me', {}, {
               headers: {
@@ -87,6 +79,7 @@ export default {
               const auth = useUserStore()
               auth.setUser(user)
               // Rediriger vers la page enregistrée ou vers /dashboard par défaut
+              
               this.$router.push('/dashboard');
 
             })
@@ -190,7 +183,7 @@ export default {
         <BButton 
           variant="success"
           :loading="processing" 
-          loading-text="Chargement" 
+          loading-text="connexion" 
           :class="['btn-bg', processing ? 'btn-loading' : '']"  
           :disabled="processing" 
           @click="onLogin">

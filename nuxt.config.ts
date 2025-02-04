@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     '~/plugins/qrcode-reader.js',
    '~/plugins/vue-cal.js',
    '~/plugins/vue-awesome-paginate.js',
+   '~/plugins/piniaPersistedState',
   ],
   app: {
     head: {

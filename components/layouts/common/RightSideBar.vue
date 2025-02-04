@@ -2,6 +2,7 @@
 import { useLayoutStore } from "~/stores/layout";
 import apiClient from "~/components/api/intercepteur";
 import RadioGroup from "~/components/common/RadioGroup.vue";
+import { useAuthStore } from '~/stores/auth';
 import {
   layoutOptions,
   widthOptions,
@@ -12,14 +13,19 @@ import {
 // import { NuxtLink } from "#build/components";
 
 export default {
+  setup(){
+    return {authStore: useAuthStore()}
+  },
   data() {
+    const authStore = useAuthStore()
     return {
       layoutOptions,
       widthOptions,
       sideBarTypeOptions,
       topBarOptions,
       layoutModeOptions,
-      user: {},
+      user: authStore.user,
+      token: authStore.token,
     };
   },
   components: {
@@ -81,25 +87,32 @@ export default {
   
   mounted() {
     this.addEventListener();
+<<<<<<< HEAD
     let dataUser = localStorage.getItem('user')
     this.user = JSON.parse(dataUser)
+=======
+    // let dataUser = localStorage.getItem('user')
+    // this.user = JSON.parse(dataUser)
+>>>>>>> 1711b80159c1652ec637dd733d324dfc391af93a
   },
 
 
   methods: {
     async deconnexion(){
       try {
-          const token = useCookie("token")
+          // const token = useCookie("token")
           await  apiClient.post('/auth/logout', {}, {
               headers: {
-                Authorization: `Bearer ${token.value}`, // Utiliser le token dans l'en-tête Authorization
+                Authorization: `Bearer ${this.token}`, // Utiliser le token dans l'en-tête Authorization
               },
             }).then(response => {
-              const token = useCookie("token")
-              token.value = null
+              this.authStore.logout()
               
+<<<<<<< HEAD
               const userStore = useUserStore()
               userStore.clearUser()
+=======
+>>>>>>> 1711b80159c1652ec637dd733d324dfc391af93a
               
               // Rediriger vers la page enregistrée ou vers /dashboard par défaut
               this.$router.push('/login');
