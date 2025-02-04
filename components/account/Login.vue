@@ -186,7 +186,7 @@ export default {
         <BButton 
           variant="success"
           :loading="processing" 
-          loading-text="Chargement" 
+          loading-text="connexion" 
           :class="['btn-bg', processing ? 'btn-loading' : '']"  
           :disabled="processing" 
           @click="onLogin">

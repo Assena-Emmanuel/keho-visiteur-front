@@ -36,16 +36,14 @@ export default{
     },
 
     methods: {
-        openModal(isEditMode, row=null, index = null, type) {
-            this.isEditMode = isEditMode;
-            this.selectedIndex = index;
-            this.selectedRow = row;
-            this.modal = true;
-            this.typeForme = type
+        handleDataSelected(payload){
+            this.selectedRow = payload.uuid
+            this.modal = true
+            this.isEditMode = !!payload.uuid;
         },
 
         openAddModal(){
-            this.modal = !this.modal
+            this.modal = true
             this.isEditMode = false
         },
 
@@ -70,7 +68,7 @@ export default{
 
             if (!response.data.error) {
                 this.data = response.data.data
-                console.log("Liste des utilisateurs récupérée :", response.data);
+                console.log("---------------Liste des utilisateurs récupérée :", JSON.stringify(response.data));
             }
 
         } catch (error) {
@@ -97,15 +95,15 @@ export default{
         <div class="mb-0">Gestion des Utilisateurs</div>
         <BButton variant="primary" style="width: 100px;" @click="openAddModal" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
         <FormsFormUser 
-            :modelValue="modal"
-            @update:modelValue="modal = $event"
+            :isOpen="modal"
             :isEditMode="isEditMode"
-            :selectedIndex="selectedIndex" 
-            :data="selectedRow"
+            :uuid="selectedRow"
+            @update:isOpen="modal = $event"
+            @update:uuid="modal = $event"
+            @close="selectedUserId = null"
         />
-
     </div>
-    
+
 
     <Tableau 
         :fields="fields" 
@@ -114,7 +112,7 @@ export default{
         :show-addbtn="true" 
         :typeForme="'utilisateur'" 
         :is-loading="isLoading"
-        @edit="openModal(true, $event.row, $event.index)"
+        @data-selected="handleDataSelected"
     />
 </div>
 </template>

@@ -1,190 +1,152 @@
-<script>
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue';
 import { capitalize } from "vue";
 import apiClient from "~/components/api/intercepteur";
 import { useAuthStore } from "~/stores/auth.js";
+import { useEditStore } from '~/stores/editStore';
+import Swal from 'sweetalert2';
+// Props
+const props = defineProps({
+  fields: Array,
+  title: String,
+  showAddbtn: Boolean,
+  typeForme: String,
+  data: Array,
+  modal: Boolean,
+  isLoading: Boolean,
+});
 
+// Emits
+const emit = defineEmits(['data-selected']);
 
-/**
- * Advanced-table component
- */
-export default {
-  setup() {
-    const authStore = useAuthStore(); 
+// Stores
+const authStore = useAuthStore();
+const editStore = useEditStore();
 
-      return {authStore };
-    },
-  data() {
-    return {
-      submitted: false,
-      dataDetail: {},
-      detailModal: false,
-      localModal: this.modal,
-      isStatutActive: false,
-      totalRows: 1,
-      currentPage: 1,
-      perPage: 5,
-      pageOptions: [5, 10, 15, 20],
-      filter: "", 
-      sortBy: "age",
-      sortDesc: false,
-    
+// Refs
+const submitted = ref(false);
+const dataDetail = ref({});
+const detailModal = ref(false);
+const localModal = ref(props.modal);
+const isStatutActive = ref(false);
+const totalRows = ref(1);
+const currentPage = ref(1);
+const perPage = ref(5);
+const pageOptions = ref([5, 10, 15, 20]);
+const filter = ref('');
+const sortBy = ref('age');
+const sortDesc = ref(false);
+
+// Computed properties
+const filterOn = computed(() => props.fields.map(field => field.key));
+
+const rows = computed(() => filteredData.value.length);
+
+const filteredData = computed(() => {
+  if (filter.value) {
+    return props.data.filter(item =>
+      filterOn.value.some(key =>
+        String(item[key]).toLowerCase().includes(filter.value.toLowerCase())
+      )
+    );
+  }
+  return props.data;
+});
+
+// Watchers
+watch(() => props.modal, (newVal) => {
+  localModal.value = newVal;
+});
+
+// Lifecycle hooks
+onMounted(() => {
+  totalRows.value = props.data.length;
+});
+
+// Methods
+const changerStatut = async (index) => {
+  const user = props.data[index];
+
+  try {
+    const userResponse = await apiClient.get(`/user/${user.uuid}`, {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`,
+      },
+    });
+
+    console.log('Utilisateur récupéré :', userResponse.data);
+    const user_get = userResponse.data.data;
+
+    const statutResponse = await apiClient.post(
+      `/user/active/${user_get.uuid}`,
+      { active: user_get.statut === 1 ? 0 : 1 },
+      {
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`,
+        },
+      }
+    );
+
+    console.log('Statut changé avec succès : ', statutResponse);
+  } catch (error) {
+    console.error('Erreur lors du changement de statut : ', error);
+  }
+};
+
+const onFiltered = (filteredItems) => {
+  totalRows.value = filteredItems.length;
+  currentPage.value = 1;
+};
+
+const showDetailsModal = (id, data, typeForm) => {
+  if (typeForm === 'profil') {
+    emit('detail', data[id]);
+  } else {
+
+    detailModal.value = true;
+    dataDetail.value = {
+      data: data[id],
+      formType: typeForm,
     };
-  },
-
-  props: {
-    fields: Array,
-    title: String,
-    showAddbtn: Boolean,
-    typeForme: String,
-    data: Array,
-    modal: Boolean,
-    isLoading: Boolean,
-  },
-
-  computed: {
-
-    isStatutActive: {
-      get() {
-        return this.row.item.statut === 1; // Convert to boolean
-      },
-      set(value) {
-        this.row.item.statut = value ? 1 : 0; // Convert back to numeric
-      },
-    },
-
-    /**
-     * Dynamically generate filterOn based on fields
-     */
-    filterOn() {
-      // Return an array of keys from fields
-      return this.fields.map(field => field.key);
-    },
-
-    /**
-     * Total no. of records
-     */
-    rows() {
-      return this.filteredData.length;
-    },
-
-    /**
-     * Filtered data based on search input
-     */
-    filteredData() {
-      if (this.filter) {
-        return this.data.filter(item =>
-          this.filterOn.some(key =>
-            String(item[key]).toLowerCase().includes(this.filter.toLowerCase())
-          )
-        );
-      }
-      return this.data;
-    }
-  },
-  mounted() {
-    // Set the initial number of items
-    this.totalRows = this.data.length;
-  },
-
-  watch: {
-    modal(newVal) {
-      this.localModal = newVal;  // Mettre à jour la valeur locale lorsque la prop change
-    }
-  },
-
-  methods: {
-    // Changer le statut de l'utilisateur
-    async changerStatut(index) {
-      const user = this.data[index];
-
-      try {
-        // Récupérer les informations de l'utilisateur
-        const userResponse = await apiClient.get(
-          `/user/${user.uuid}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${this.authStore.token}`,
-            },
-          }
-        );
-        
-        console.log('Utilisateur récupéré :', userResponse.data);
-        const user_get = userResponse.data.data;
-
-        // Maintenant, tu peux changer le statut de l'utilisateur
-        const statutResponse = await apiClient.post(
-          `/user/active/${user_get.uuid}`,
-          { active: user_get.statut === 1 ? 0 : 1 }, // Bascule le statut
-          {
-            headers: {
-              'Authorization': `Bearer ${this.authStore.token}`,
-            },
-          }
-        );
-
-        // Log de la réponse de changement de statut
-        console.log("Statut changé avec succès : ", statutResponse);
-        // Tu peux aussi mettre à jour l'interface utilisateur ici
-
-      } catch (error) {
-        // Gérer les erreurs
-        console.error("Erreur lors du changement de statut : ", error);
-      }
-    },
-
-    onFiltered(filteredItems) {
-      // Update totalRows and reset to first page after filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
-    },
-    showDetailsModal(id, data, typeForm){
-      if(typeForm === "profil"){
-        this.$emit('detail', data[id]);
-      }else{
-        this.detailModal = true
-        this.dataDetail = {
-          id: id,
-          data: data[id],
-          formType: typeForm,
-        }
-      }
-      
-    },
-    handleEdit(index, data) {
-        localStorage.setItem('edit', {row: data[index], index: index })
-        this.$emit('edit', {row: data[index], index});
-
-      },
-      confirmDelete(code) {
-      this.$swal.fire({
-        title: 'Êtes-vous sûr?',
-        text: "Cette action est irréversible!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Oui',
-        cancelButtonText: 'Non',
-        reverseButtons: true // Inverser l'ordre des boutons
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Logique pour supprimer l'élément ici
-          this.deleteItem(code);
-
-          this.$swal.fire(
-            'Supprimé!',
-            'Votre élément a été supprimé.',
-            'success'
-          );
-        }
-      });
-    },
-
-    capitalize(text){
-      return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-    },
 
   }
+};
+
+// Méthode pour émettre l'événement
+const handleEdit = (index, data) => {
+  if(data[index]){
+    emit('data-selected', { uuid: data[index].uuid});
+  }else{
+    alert("error")
+  }
+  
+};
+
+const confirmDelete = (code) => {
+  Swal.fire({
+    title: 'Êtes-vous sûr?',
+    text: 'Cette action est irréversible!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Oui',
+    cancelButtonText: 'Non',
+    reverseButtons: true,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      deleteItem(code);
+      useSwal().fire(
+        'Supprimé!',
+        'Votre élément a été supprimé.',
+        'success'
+      );
+    }
+  });
+};
+
+const capitalizeText = (text) => {
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 };
 </script>
 

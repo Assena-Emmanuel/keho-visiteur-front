@@ -1,12 +1,13 @@
-<script>
-import { data } from '../parametres/useData';
+<script setup>
+// Props
+const props = defineProps({
+  data: Object,
+});
 
-export default{
-    props:{
-        data: Object
-    }
-}
+
 </script>
+
+
 <template>
     <div>
         <!-- Détail Service -->
@@ -39,7 +40,7 @@ export default{
                 <!-- En-tête du département -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="text-primary h5">
-                Département: <span class="fw-bold">{{ data.data.Libelle }}</span>
+                Département: <span class="fw-bold">{{ data.nom }}</span>
                 </div>
                 <div class="text-primary h5">
                 Code: <span class="fw-bold">{{ data.data.Code }}</span>
@@ -202,7 +203,7 @@ export default{
             <img src="/images/images.png" alt="Photo" class="img-thumbnail" style="max-width: 100px;">
           </div>
           <div class="col-md-8">
-            <h4>{{ data.data["Civilité"] }} {{ data.data["Nom"] }} {{ data.data["Prénoms"] }}</h4>
+            <h4>{{ data.civilite }} {{ data.nom }} {{ data.prenom }}</h4>
             <div class="mb-1"><span class="border border-secondary p-1 rounded-3">EMPLOYE</span></div>
             <BBadge v-if="data.data.statut" variant="success">Activé</BBadge>
             <BBadge v-if="!data.data['Statut']" variant="danger">Désactivé</BBadge>
