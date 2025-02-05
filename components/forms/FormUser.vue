@@ -7,35 +7,86 @@ import { useAuthStore } from '~/stores/auth.js';
 import Swal from 'sweetalert2';
 
 
-export default{
-  setup() {
-    return { v$: useVuelidate() };
-  },
-  data(){
-    return{
-        progressBarValue: 34,
-        activeTab: 1,
-        activeTabArrow: 2,
-        activeTabprofessionnelle: false,
-        nom: '',
-        prenom: '',
-        civilite: '',
-        role: "",
-        email : '',
-        mobile1: '',
-        mobile2: '',
-        photo: "",
-        // infos professionnelles
-        matricule: "",
-        codeVisite: "",
-        departement: "",
-        service: "",
-        processing: false,
-        submitted: false,
-        submitted: false,
-        statut: "ACTIVE",
-        submitted: false,
-        isEditMode: false
+// Stores
+const authStore = useAuthStore();
+
+// Réactifs
+const loading = ref(false); 
+const loadingEdit = ref(false); 
+const loadingCreer = ref(false); 
+
+const progressBarValue = ref(34);
+const activeTab = ref(1);
+const activeTabArrow = ref(2);
+const activeTabprofessionnelle = ref(false);
+const nom = ref('');
+const prenom = ref('');
+const civilite = ref('');
+const role = ref('');
+const e_mail = ref('');
+const telephone1 = ref('');
+const telephone2 = ref('');
+const photo = ref(null);
+const matricule = ref('');
+const codeVisite = ref('');
+const departement = ref('');
+const service = ref('');
+const processing = ref(false);
+const submitted = ref(false);
+const selectDepartements = ref(null);
+const selectServices = ref(null);
+const selectRoles = ref(null);
+const next = ref(false);
+const uuid = ref(null)
+let data = ref({})
+
+
+// Vuelidate
+const rules = {
+  e_mail: { required, email },
+  nom: { required },
+  prenom: { required },
+  civilite: { required },
+  telephone1: { required },
+  matricule: { required },
+  codeVisite: { required },
+  departement: { required },
+  service: { required },
+  role: { required },
+};
+
+const v$ = useVuelidate(rules, { e_mail, nom, prenom, civilite, telephone1, matricule, codeVisite, departement, service, role });
+
+
+
+// Props
+const props = defineProps({
+  isOpen: Boolean,
+  isEditMode: Boolean,
+  uuid: String,
+});
+
+
+watch(
+  () => props.uuid,  // On surveille la prop `uuid`
+  async (newUuid) => {  // Utilise `async` pour attendre la réponse de `getUser`
+    if (newUuid) {
+      data.value = await getUser(newUuid);  // Attends la réponse avant de mettre à jour `data`
+      if(data.value){
+        nom.value = data.value.nom
+        prenom.value = data.value.prenom
+        e_mail.value = data.value.email
+        telephone1.value = data.value.telephone1
+        telephone2.value = data.value.telephone2
+        civilite.value = data.value.civilite
+        uuid.value = data.value.uuid
+
+        matricule.value = data.value.visite ? data.value.visite.matricule : ""
+        codeVisite.value = data.value.visite ? data.value.visite.code_visite : ""
+        departement.value = data.value.visite ? data.value.visite.departement.libelle : ""
+        service.value = data.value.visite ? data.value.visite.service.libelle : ""
+
+      }
     }
   },
   validations: {
@@ -221,7 +272,6 @@ onMounted(async () => {
 const onNext = () => {
   next.value = true
   v$.value.$touch();
-  console.log("(----------------------------): "+v$.value.$touch())
   
   if (
     v$.value.e_mail.$error ||
@@ -239,7 +289,7 @@ const onNext = () => {
   }
 };
 
-const onSave = () => {
+const onSave = async () => {
   submitted.value = true;
   v$.value.$touch();
   if (
@@ -251,6 +301,69 @@ const onSave = () => {
   ) {
     return;
   } else {
+
+    this.loadingCreer = true;
+        try{
+
+          const formData = new FormData();
+          
+          // Ajout des champs à envoyer
+          formData.append('nom', this.nom);
+          formData.append('prenom', this.prenom);
+          formData.append('email', this.email);
+          formData.append('telephone1', this.mobile1);
+          formData.append('telephone2', this.mobile2);
+          formData.append('civilite', this.civilite);
+          formData.append('matricule', this.matricule);
+          formData.append('departement_id', this.userDepartement);
+          formData.append('service_id', this.userService);
+
+          // Vérification de l'image et ajout si elle est présente
+          if (this.photo) {
+            formData.append('image', this.photo);  // Ici, `this.photo` doit être un fichier valide (par exemple, un objet `File`)
+          }
+
+          await apiClient.post(
+            `/user/${this.user.uuid}`,formData,
+            {
+
+              headers: { 
+                'Authorization': `Bearer ${this.token}`, 
+              }
+
+            }).then(reponse =>{
+              if(!reponse.data.error){ 
+              
+              apiClient.post('/auth/me', {}, {
+                headers: { Authorization: `Bearer ${this.token}` },
+              }).then(response=>{
+
+                console.log("Utilisateur récupéré:", response.data);
+
+                this.authStore.setUser(response.data);
+                this.updateUserInfo(response.data)
+              }
+
+              )
+              
+
+              this.alertMessage(reponse.data.message, 'success')
+
+            }
+                
+
+
+        })
+          }catch (error) {
+            console.error("Erreur lors de la creation de l'utilisateur :", error);
+        }finally{
+          this.loadingCreer = false
+        }
+
+
+
+
+
     successmsg();
     resetForm();
   }
@@ -288,6 +401,7 @@ const onUpdateUser = async () => {
       formData.append('telephone2', telephone2.value);
       formData.append('civilite', civilite.value);
       formData.append('matricule', matricule.value);
+      formData.append('role_id', role.value);
       formData.append('departement_id', departement.value);
       formData.append('service_id', service.value);
 
@@ -367,11 +481,11 @@ const resetForm = () => {
       hide-footer
       no-close-on-backdrop
   >
-  <div v-if="loading" class="loading-ellipses">
-    <span class="dot font-10">.</span>
-    <span class="dot">.</span>
-    <span class="dot">.</span>
-  </div>
+  <div v-if="loadingDetail" class="loading-ellipses">
+        <span class="dot">.</span>
+        <span class="dot">.</span>
+        <span class="dot">.</span>
+    </div>
   <BForm action="#" v-else>
             <div id="custom-progress-bar" class="progress-nav mb-4">
               <div class="progress">
@@ -708,13 +822,15 @@ const resetForm = () => {
 </style>
 <style scoped>
 .loading-ellipses {
-  font-size: 20px;
+  font-size: 40px; /* Taille augmentée */
   color: #3498db;
   text-align: center;
+  font-weight: bold;
 }
 
 .dot {
   animation: blink 1s infinite;
+  margin: 0 5px; /* Espacement entre les points */
 }
 
 .dot:nth-child(1) {
@@ -737,5 +853,4 @@ const resetForm = () => {
     opacity: 1;
   }
 }
-
 </style>
