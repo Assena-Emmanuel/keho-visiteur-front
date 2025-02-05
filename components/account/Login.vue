@@ -74,12 +74,8 @@ export default {
               },
             }).then(response => {
               const user = response.data
-              console.log("-----------------------------user log:"+JSON.stringify(user))
 
-              const auth = useUserStore()
-              auth.setUser(user)
-              // Rediriger vers la page enregistrée ou vers /dashboard par défaut
-              
+              this.authStore.setUser(user)
               this.$router.push('/dashboard');
 
             })
@@ -91,7 +87,6 @@ export default {
 
           } 
         } catch (error) {
-          console.log("------------------------------token:"+token)
           this.errorMsg = "Erreur de connexion";
           console.error("failed at onLogin", { error });
 

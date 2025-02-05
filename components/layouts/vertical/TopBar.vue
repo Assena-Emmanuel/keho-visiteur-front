@@ -5,7 +5,7 @@ import HederLogo from "~/components/layouts/common/HeaderLogo.vue";
 import AppList from "~/components/layouts/common/AppList.vue";
 import Notifications from "~/components/layouts/common/Notifications.vue";
 import Profile from "~/components/layouts/common/Profile.vue";
-import { useUserStore } from '@/stores/user';
+import { useAuthStore } from '~/stores/auth';
 
 
 export default {
@@ -36,13 +36,11 @@ export default {
     Profile
   },
   mounted() {
-    const userStore = useUserStore()
-    this.user = userStore.user;
+    this.user = this.authStore.user;
   },
 
   computed(){
-    const userStore = useUserStore()
-    this.user = userStore.user
+    this.user = this.authStore.user;
   },
 
 

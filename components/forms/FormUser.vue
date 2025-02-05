@@ -1,11 +1,10 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import apiClient from '~/components/api/intercepteur';
 import { useAuthStore } from '~/stores/auth.js';
 import Swal from 'sweetalert2';
-
 
 // Stores
 const authStore = useAuthStore();
@@ -40,8 +39,7 @@ const next = ref(false);
 const uuid = ref(null)
 let data = ref({})
 
-
-// Vuelidate
+// Vuelidate - Validation rules
 const rules = {
   e_mail: { required, email },
   nom: { required },
@@ -57,8 +55,6 @@ const rules = {
 
 const v$ = useVuelidate(rules, { e_mail, nom, prenom, civilite, telephone1, matricule, codeVisite, departement, service, role });
 
-
-
 // Props
 const props = defineProps({
   isOpen: Boolean,
@@ -66,380 +62,137 @@ const props = defineProps({
   uuid: String,
 });
 
+// Watchers
+watch(() => props.uuid, async (newUuid) => {
+  if (newUuid) {
+    data.value = await getUser(newUuid); 
+    if(data.value) {
+      nom.value = data.value.nom;
+      prenom.value = data.value.prenom;
+      e_mail.value = data.value.email;
+      telephone1.value = data.value.telephone1;
+      telephone2.value = data.value.telephone2;
+      civilite.value = data.value.civilite;
+      uuid.value = data.value.uuid;
 
-watch(
-  () => props.uuid,  // On surveille la prop `uuid`
-  async (newUuid) => {  // Utilise `async` pour attendre la réponse de `getUser`
-    if (newUuid) {
-      data.value = await getUser(newUuid);  // Attends la réponse avant de mettre à jour `data`
-      if(data.value){
-        nom.value = data.value.nom
-        prenom.value = data.value.prenom
-        e_mail.value = data.value.email
-        telephone1.value = data.value.telephone1
-        telephone2.value = data.value.telephone2
-        civilite.value = data.value.civilite
-        uuid.value = data.value.uuid
-
-        matricule.value = data.value.visite ? data.value.visite.matricule : ""
-        codeVisite.value = data.value.visite ? data.value.visite.code_visite : ""
-        departement.value = data.value.visite ? data.value.visite.departement.libelle : ""
-        service.value = data.value.visite ? data.value.visite.service.libelle : ""
-
-      }
+      matricule.value = data.value.visite ? data.value.visite.matricule : "";
+      codeVisite.value = data.value.visite ? data.value.visite.code_visite : "";
+      departement.value = data.value.visite ? data.value.visite.departement.libelle : "";
+      service.value = data.value.visite ? data.value.visite.service.libelle : "";
     }
-  },
-  validations: {
-      email: {
-        required,
-        email
-      },
-      nom: {
-        required,
-      },
-      prenom: {
-        required,
-      },
-      civilite: {
-        required,
-      },
-      mobile1: {
-        required,
-      },
-      matricule:{
-        required
-      },
-      codeVisite: {
-        required
-      },
-      departement:{
-        required
-      },
-      service: {
-        required
-      },
-      photo:{required},
-      role:{required},
-   
-    },
+  }
+});
 
-    watch: {
-    // Met à jour les données locales lorsque "data" change (utile pour le mode édition)
-    data: {
-      immediate: true,
-      handler(newData) {
-        if (Array.isArray(newData) && this.selectedIndex != null) {
-          const selectedData = newData[this.selectedIndex] || {};
-          this.nom = selectedData.nom || "";
-          this.prenom = selectedData.prenom || "";
-          this.civilite = selectedData.civilite || "";
-          this.email = selectedData.email || "";
-          this.mobile1 = selectedData.mobile1 || "";
-          this.mobile2 = selectedData.mobile2 || "";
-          this.photo = selectedData.photo || "";
-          this.matricule = selectedData.matricule || "";
-          this.codeVisite = selectedData.codeVisite || "";
-          this.departement = selectedData.departement || "";
-          this.service = selectedData.service || "";
-        }
-      },
-    },
-
-  props: {
-    modelValue: Boolean,
-    isEditMode: Boolean,
-    selectedIndex: Number,  // L'index de l'élément à éditer
-    data: Array,
-  
-  },
-  mounted(){
-  },
-  methods:{
-    handleFileUpload(event) {
-      // Récupérer le fichier sélectionné
-      this.photo = event.target.files[0];
-    },
-
-    toggleWizard(tab, value) {
-      this.activeTab = tab;
-      this.progressBarValue = value;
-    },
-
-    // SweetAlert
-    successmsg() {
-      this.$swal.fire("Succes!", "Modification reussie!", "success");
-    },
-
-
-// Fonction asynchrone pour récupérer l'utilisateur par uuid
+// Méthodes asynchrones
 async function getUser(uuid) {
   loading.value = true;
   try {
     const response = await apiClient.get(`/user/${uuid}`, {
-      headers: { 
-        'Authorization': `Bearer ${authStore.token}`,  // Utilise `this.token` si `this` est disponible
-      }
+      headers: { 'Authorization': `Bearer ${authStore.token}` },
     });
-
     if (!response.data.error) {
-      return response.data.data;  // Retourne les données de l'utilisateur
+      return response.data.data; 
     }
   } catch (error) {
     console.error('Error fetching user:', error);
-  }finally{
+  } finally {
     loading.value = false; 
   }
-    }
 }
-
-// Méthodes
-const handleFileUpload = (event) => {
-  photo.value = event.target.files[0];
-};
-
-
-
-const toggleWizard = (tab, value) => {
-  activeTab.value = tab;
-  progressBarValue.value = value;
-};
-
-const successmsg = (message, type = 'success') => {
-  Swal.fire('Succès!', `${message}!`, `${type}`);
-};
-
-const toggleTabWizard = (tab) => {
-  activeTabArrow.value = tab;
-};
-
-
-async function toutesCategories(slug) {
-  try {
-    const response = await apiClient.get(`/categorie_by_slug/${slug}`, {
-      headers: { 
-        'Authorization': `Bearer ${authStore.token}`,  // Utilise `this.token` si `this` est disponible
-      }
-    });
-
-    if (!response.data.error) {
-      return response.data.data;
-    }
-  } catch (error) {
-    console.error('Error fetching Departement-----:', error);
-  }
-}
-
-// Recuperer la liste des roles
-async function roles() {
-
-  try {
-    const response = await apiClient.get(`/role`, {
-      headers: { 
-        'Authorization': `Bearer ${authStore.token}`, 
-      }
-    });
-
-    if (!response.data.error) {
-      return response.data.data;
-    }
-  } catch (error) {
-    console.error('Erreur durant la recuperation des role-----:', error);
-  }
-}
-
 
 onMounted(async () => {
-
   try {
-    // Récupérer tous les départements
     const departements = await toutesCategories("DPT");
-    selectDepartements.value = departements;  // Assignation à la référence
+    selectDepartements.value = departements;
 
-    // Récupérer tous les services
     const services = await toutesCategories("SRV");
-    selectServices.value = services;  // Assignation à la référence
+    selectServices.value = services;
 
-    // Récupérer tous les rôles
     selectRoles.value = await roles();
-  
-
   } catch (error) {
     console.error('Erreur lors de la récupération des données:', error);
   }
 });
 
+async function toutesCategories(slug) {
+  try {
+    const response = await apiClient.get(`/categorie_by_slug/${slug}`, {
+      headers: { 'Authorization': `Bearer ${authStore.token}` },
+    });
+    if (!response.data.error) {
+      return response.data.data;
+    }
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+  }
+}
 
+async function roles() {
+  try {
+    const response = await apiClient.get(`/role`, {
+      headers: { 'Authorization': `Bearer ${authStore.token}` },
+    });
+    if (!response.data.error) {
+      return response.data.data;
+    }
+  } catch (error) {
+    console.error('Erreur durant la récupération des roles:', error);
+  }
+}
+
+// Gestion des étapes du formulaire
 const onNext = () => {
-  next.value = true
+  next.value = true;
   v$.value.$touch();
-  
-  if (
-    v$.value.e_mail.$error ||
-    v$.value.nom.$error ||
-    v$.value.prenom.$error ||
-    v$.value.telephone1.$error ) {
 
+  if (v$.value.e_mail.$error || v$.value.nom.$error || v$.value.prenom.$error || v$.value.telephone1.$error) {
     activeTabprofessionnelle.value = false;
-
   } else {
     activeTabprofessionnelle.value = true;
-    next.value = false
+    next.value = false;
     toggleWizard(2, 100);
-
   }
 };
 
 const onSave = async () => {
   submitted.value = true;
   v$.value.$touch();
-  if (
-    v$.value.codeVisite.$error ||
-    v$.value.departement.$error ||
-    v$.value.service.$error ||
-    v$.value.role.$error ||
-    v$.value.matricule.$error
-  ) {
+
+  if (v$.value.codeVisite.$error || v$.value.departement.$error || v$.value.service.$error || v$.value.role.$error || v$.value.matricule.$error) {
     return;
   } else {
-
-    this.loadingCreer = true;
-        try{
-
-          const formData = new FormData();
-          
-          // Ajout des champs à envoyer
-          formData.append('nom', this.nom);
-          formData.append('prenom', this.prenom);
-          formData.append('email', this.email);
-          formData.append('telephone1', this.mobile1);
-          formData.append('telephone2', this.mobile2);
-          formData.append('civilite', this.civilite);
-          formData.append('matricule', this.matricule);
-          formData.append('departement_id', this.userDepartement);
-          formData.append('service_id', this.userService);
-
-          // Vérification de l'image et ajout si elle est présente
-          if (this.photo) {
-            formData.append('image', this.photo);  // Ici, `this.photo` doit être un fichier valide (par exemple, un objet `File`)
-          }
-
-          await apiClient.post(
-            `/user/${this.user.uuid}`,formData,
-            {
-
-              headers: { 
-                'Authorization': `Bearer ${this.token}`, 
-              }
-
-            }).then(reponse =>{
-              if(!reponse.data.error){ 
-              
-              apiClient.post('/auth/me', {}, {
-                headers: { Authorization: `Bearer ${this.token}` },
-              }).then(response=>{
-
-                console.log("Utilisateur récupéré:", response.data);
-
-                this.authStore.setUser(response.data);
-                this.updateUserInfo(response.data)
-              }
-
-              )
-              
-
-              this.alertMessage(reponse.data.message, 'success')
-
-            }
-                
-
-
-        })
-          }catch (error) {
-            console.error("Erreur lors de la creation de l'utilisateur :", error);
-        }finally{
-          this.loadingCreer = false
-        }
-
-
-
-
-
-    successmsg();
-    resetForm();
-  }
-};
-
-// Modifier les données du user
-const onUpdateUser = async () => {
-  submitted.value = true;
-
-  // Toucher tous les champs pour les valider
-  v$.value.$touch();
-
-  // Vérification des erreurs de validation
-  if (
-    v$.value.codeVisite.$error ||
-    v$.value.departement.$error ||
-    v$.value.service.$error ||
-    v$.value.role.$error ||
-    v$.value.matricule.$error
-  ) {
-    // Si des erreurs existent, on arrête la soumission
-    return;
-  } else {
-    loadingEdit.value = true;
-    
+    loadingCreer.value = true;
     try {
-      // Effectuer l'appel API pour récupérer les données de l'utilisateur
       const formData = new FormData();
-          
-      // Ajout des champs à envoyer
       formData.append('nom', nom.value);
       formData.append('prenom', prenom.value);
-      formData.append('email', email.value);
+      formData.append('email', e_mail.value);
       formData.append('telephone1', telephone1.value);
       formData.append('telephone2', telephone2.value);
       formData.append('civilite', civilite.value);
       formData.append('matricule', matricule.value);
-      formData.append('role_id', role.value);
       formData.append('departement_id', departement.value);
       formData.append('service_id', service.value);
 
-      // Vérification de l'image et ajout si elle est présente
       if (photo.value) {
-        formData.append('image', photo.value);  
+        formData.append('image', photo.value);
       }
 
-      const response = await apiClient.post(`/user/${uuid.value}`, formData, {
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,  // Utilisation du token d'authentification
-        }
+      await apiClient.post(`/user/${uuid.value}`, formData, {
+        headers: { 'Authorization': `Bearer ${authStore.token}` },
       });
 
-      // Vérification de la réponse
-      if (!response.data.error) {
-        successmsg(response.data.message);  
-        resetForm(); 
-      } else {
-        // Gérer un cas d'erreur côté API (si `response.data.error` est vrai)
-        console.error("Erreur lors de la mise à jour de l'utilisateur:", response.data.error);
-
-      }
+      successmsg("Utilisateur créé avec succès!");
+      resetForm();
     } catch (error) {
-      // En cas d'erreur réseau ou autre, on l'affiche dans la console
-      console.error("Erreur lors de la mise à jour de l'utilisateur1 :", error);
-
+      console.error("Erreur lors de la création de l'utilisateur :", error);
     } finally {
-      // Fin du processus de chargement
-      loadingEdit.value = false;
+      loadingCreer.value = false;
     }
   }
 };
 
-
-const emit = defineEmits();
-// reinitialiser le modal durant la fermeture
-
+// Réinitialiser le formulaire
 const resetForm = () => {
   submitted.value = false;
   emit('update:isOpen', false);
@@ -447,13 +200,9 @@ const resetForm = () => {
   toggleWizard(1, 26);
   activeTabprofessionnelle.value = false;
   if (v$.value) {
-    v$.value.$reset();  // Réinitialise les validations
-  } else {
-    console.error("v$ n'est pas défini");
+    v$.value.$reset();  
   }
 
-
-  // Réinitialisation des champs
   nom.value = '';
   prenom.value = '';
   civilite.value = '';
@@ -467,7 +216,17 @@ const resetForm = () => {
   departement.value = '';
   service.value = '';
 };
+
+const toggleWizard = (tab, value) => {
+  activeTab.value = tab;
+  progressBarValue.value = value;
+};
+
+const successmsg = (message, type = 'success') => {
+  Swal.fire('Succès!', `${message}!`, `${type}`);
+};
 </script>
+
 
 
 <template>

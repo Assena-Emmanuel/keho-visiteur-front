@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { capitalize } from "vue";
 import apiClient from "~/components/api/intercepteur";
 import { useAuthStore } from "~/stores/auth.js";
+import { allUserStore} from "~/stores/allUserStore.js"
 import Swal from 'sweetalert2';
 
 // Props
@@ -11,7 +12,7 @@ const props = defineProps({
   title: String,
   showAddbtn: Boolean,
   typeForme: String,
-  data: Array,
+  // data: Array,
   modal: Boolean,
   isLoading: Boolean,
 });
@@ -21,6 +22,7 @@ const emit = defineEmits(['data-selected']);
 
 // Stores
 const authStore = useAuthStore();
+const userStore = allUserStore()
 
 // Refs
 const submitted = ref(false);
@@ -39,6 +41,7 @@ const detailUser = ref(null)
 const uuid = ref(null)
 const idDepartement = ref(null)
 const typeForme = ref(null)
+const data = ref(null)
 
 // Computed properties
 const filterOn = computed(() => props.fields.map(field => field.key));
@@ -47,13 +50,13 @@ const rows = computed(() => filteredData.value.length);
 
 const filteredData = computed(() => {
   if (filter.value) {
-    return props.data.filter(item =>
+    return data.value.filter(item =>
       filterOn.value.some(key =>
         String(item[key]).toLowerCase().includes(filter.value.toLowerCase())
       )
     );
   }
-  return props.data;
+  return data.value;
 });
 
 // Watchers
@@ -63,14 +66,14 @@ watch(() => props.modal, (newVal) => {
 
 // Lifecycle hooks
 onMounted(() => {
-  totalRows.value = props.data.length;
+  data.value = userStore.users
   typeForme.value = props.typeForme
   
 });
 
 // Methods
 const changerStatut = async (index) => {
-  const user = props.data[index];
+  const user = data.value[index];
 
   try {
     const userResponse = await apiClient.get(`/user/${user.uuid}`, {
