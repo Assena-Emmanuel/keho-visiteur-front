@@ -87,8 +87,8 @@ export default {
   
   mounted() {
     this.addEventListener();
-    // let dataUser = localStorage.getItem('user')
-    // this.user = JSON.parse(dataUser)
+    let dataUser = localStorage.getItem('user')
+    this.user = JSON.parse(dataUser)
   },
 
 
@@ -103,6 +103,8 @@ export default {
             }).then(response => {
               this.authStore.logout()
               
+              const userStore = useUserStore()
+              userStore.clearUser()
               
               // Rediriger vers la page enregistrée ou vers /dashboard par défaut
               this.$router.push('/login');

@@ -6,11 +6,8 @@ export default defineNuxtRouteMiddleware((to, from) => {
   const authPage = !publicPages.includes(to.fullPath);
 
   if (typeof window !== "undefined") {
-    const authStore = useAuthStore()
-
-    const token = authStore.token;
-
-    if (authPage && !token) {
+    const token = useCookie('token');
+    if (authPage && !token.value) {
       return navigateTo({ path: "/login" });
     }
 

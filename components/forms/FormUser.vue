@@ -89,8 +89,86 @@ watch(
       }
     }
   },
-  { immediate: true }  // Lance le watch dès que possible, même si la prop est déjà présente
-);
+  validations: {
+      email: {
+        required,
+        email
+      },
+      nom: {
+        required,
+      },
+      prenom: {
+        required,
+      },
+      civilite: {
+        required,
+      },
+      mobile1: {
+        required,
+      },
+      matricule:{
+        required
+      },
+      codeVisite: {
+        required
+      },
+      departement:{
+        required
+      },
+      service: {
+        required
+      },
+      photo:{required},
+      role:{required},
+   
+    },
+
+    watch: {
+    // Met à jour les données locales lorsque "data" change (utile pour le mode édition)
+    data: {
+      immediate: true,
+      handler(newData) {
+        if (Array.isArray(newData) && this.selectedIndex != null) {
+          const selectedData = newData[this.selectedIndex] || {};
+          this.nom = selectedData.nom || "";
+          this.prenom = selectedData.prenom || "";
+          this.civilite = selectedData.civilite || "";
+          this.email = selectedData.email || "";
+          this.mobile1 = selectedData.mobile1 || "";
+          this.mobile2 = selectedData.mobile2 || "";
+          this.photo = selectedData.photo || "";
+          this.matricule = selectedData.matricule || "";
+          this.codeVisite = selectedData.codeVisite || "";
+          this.departement = selectedData.departement || "";
+          this.service = selectedData.service || "";
+        }
+      },
+    },
+
+  props: {
+    modelValue: Boolean,
+    isEditMode: Boolean,
+    selectedIndex: Number,  // L'index de l'élément à éditer
+    data: Array,
+  
+  },
+  mounted(){
+  },
+  methods:{
+    handleFileUpload(event) {
+      // Récupérer le fichier sélectionné
+      this.photo = event.target.files[0];
+    },
+
+    toggleWizard(tab, value) {
+      this.activeTab = tab;
+      this.progressBarValue = value;
+    },
+
+    // SweetAlert
+    successmsg() {
+      this.$swal.fire("Succes!", "Modification reussie!", "success");
+    },
 
 
 // Fonction asynchrone pour récupérer l'utilisateur par uuid
@@ -111,6 +189,7 @@ async function getUser(uuid) {
   }finally{
     loading.value = false; 
   }
+    }
 }
 
 // Méthodes
@@ -395,8 +474,9 @@ const resetForm = () => {
   <BModal 
       @hide="resetForm" 
       size="lg"
-      :modelValue="isOpen" 
-      :title="isEditMode ? `Modification` : `Création d\'Utilisateur`" 
+      :modelValue="modelValue" 
+      @update:modelValue="$emit('update:modelValue', $event)"
+      :title="isEditMode ? `Modifier les informations ${(data.nom).toUpperCase()}` : 'Création d\'Utilisateur'" 
       title-class="font-18" 
       hide-footer
       no-close-on-backdrop
@@ -411,7 +491,7 @@ const resetForm = () => {
               <div class="progress">
                 <div class="progress-bar" role="progressbar" :style="`width: ${progressBarValue}%;`" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
               </div>
-
+              
               <ul class="nav nav-pills d-flex justify-content-evenly wizard-steps" role="tablist">
                 <li class="nav-item" role="presentation">
                   <button class="nav-link wizard-step" id="pills-gen-info-tab" type="button" role="tab" :class="{ 
@@ -442,7 +522,6 @@ const resetForm = () => {
                       <select v-model="civilite" id="civilite" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': next && v$.civilite.$error
                       }">
-                        <option value="" selected>civilité...</option>
                         <option value="M." :selected="civilite === 'M.'">M.</option>
                         <option value="Mme" :selected="civilite === 'Mme'">Mme</option>
                         <option value="Mlle" :selected="civilite === 'Mlle'">Mlle</option>

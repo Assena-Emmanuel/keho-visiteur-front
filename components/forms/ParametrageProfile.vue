@@ -2,7 +2,7 @@
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import apiClient from "~/components/api/intercepteur";
-import { useAuthStore } from "~/stores/auth.js";
+import { useUserStore } from '@/stores/user';
 
 export default {
   setup() {
@@ -19,8 +19,8 @@ export default {
       activeTabprofessionnelle: false,
       selectDepartements:"",
       selectServices:"",
-      token : this.authStore.token,
-      user: this.authStore.user,
+      token : "",
+      user: "",
       show: false,
       // infos personnelles
         test : "",
@@ -79,33 +79,30 @@ export default {
       },
       photo:{required},
       statut: {required},
-   
+
     },
 
-    computed: {
-      user() {
-        return this.authStore.user;
-      }
-    },
-    
     mounted() {
     this.show = true
-    this.updateUserInfo(this.user)
-    // this.test = this.user.visite.matricule
-    // this.civilite = this.user.civilite
-    // this.nom = this.user.nom
-    // this.prenom = this.user.prenom
-    // this.email = this.user.email
-    // this.mobile1 = this.user.telephone1
-    // this.mobile2 = this.user.telephone2
-    // this.statut = this.user.statut
+    this.token = useCookie('token')
+    const userStore = useUserStore()
+    this.user = userStore.user
 
-    // // Info professionnelles
-    // this.matricule = this.user.visite ? this.user.visite.matricule : ""
-    // this.codeVisite = this.user.visite ? this.user.visite.code_visite :  ""
-    // this.userService = this.user.visite ? this.user.visite.service_id :  ""
-    // this.userDepartement = this.user.visite? this.user.visite.departement_id :  ""
+    this.test = this.user.visite.matricule
+    this.civilite = this.user.civilite
+    this.nom = this.user.nom
+    this.prenom = this.user.prenom
+    this.email = this.user.email
+    this.mobile1 = this.user.telephone1
+    this.mobile2 = this.user.telephone2
+    this.statut = this.user.statut
+    this.photo = this.user.image
 
+    // Info professionnelles
+    this.matricule = this.user.visite.matricule || ""
+    this.codeVisite = this.user.visite.code_visite || ""
+    this.userService = this.user.visite.service_id
+    this.userDepartement = this.user.visite.departement_id
 
     // recuperer tous les departement
     this.toutesCategories("DPT")
@@ -116,7 +113,7 @@ export default {
       console.error('Erreur lors de la récupération du departement:', error);
     });
 
-    // recuperer tous les services
+    // recuperer tous les departement
     this.toutesCategories("SRV")
     .then(services => {
       this.selectServices = services;
@@ -125,11 +122,15 @@ export default {
       console.error('Erreur lors de la récupération du service:', error);
     });
 
-    
+
 
     this.show = false
   },
-  
+  computed(){
+    const userStore = useUserStore()
+    this.user = userStore.user
+  },
+
   methods: {
     updateUserInfo(user) {
       this.civilite = user.civilite || "";  // Mise à jour de la civilité
@@ -156,14 +157,14 @@ export default {
     async toutesCategories(slug) {
       try {
         const response = await apiClient.get(`/categorie_by_slug/${slug}`, {},{
-          headers: { 
-            'Authorization': `Bearer ${this.token}`, 
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
           }
         });
          if(!response.data.error){
           return response.data.data
          }
-        
+
       } catch (error) {
         console.error('Error fetching Departement-----:', error);
       }
@@ -174,10 +175,70 @@ export default {
       try {
         console.log(`Requête API pour la catégorie avec l'ID : ${id}`);
         console.log(`Token utilisé : ${this.token}`);
-        
+
         const response = await apiClient.get(`/categorie/${id}`, {
-          headers: { 
-            'Authorization': `Bearer ${this.token}`, 
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
+          }
+        });
+
+        if (!response.data.error) {
+          return response.data.data.libelle;
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération du service :', error);
+      }
+    }
+,
+
+    // SweetAlert
+    // successmsg() {
+    //   this.$swal.fire("Succes!", "Modification reussie!", "success");
+    // },
+
+    successmsg() {
+      this.$swal.fire("Succes!", "Modification réussie!", "success")
+        .then(() => {
+          this.activeTabprofessionnelle = false
+          this.next = false
+          this.toggleWizard(1, 100)
+
+          // const userStore = useUserStore()
+          // this.user = userStore.user
+
+          // this.civilite = this.user.civilite
+          // this.nom = this.user.nom
+          // this.prenom = this.user.prenom
+          // this.email = this.user.email
+          // this.mobile1 = this.user.telephone1
+          // this.mobile2 = this.user.telephone2
+          // this.statut = this.user.statut
+          // this.photo = this.user.photo
+
+          // // Info professionnelles
+          // this.matricule = this.user.visite.matricule || ""
+          // this.codeVisite = this.user.code_visite || ""
+          // this.userDepartement = this.user.departement_id || ""
+          // this.userService = this.user.service_id || ""
+        });
+         if(!response.data.error){
+          return response.data.data
+         }
+
+      } catch (error) {
+        console.error('Error fetching Departement-----:', error);
+      }
+    },
+
+
+    async categorie(id) {
+      try {
+        console.log(`Requête API pour la catégorie avec l'ID : ${id}`);
+        console.log(`Token utilisé : ${this.token}`);
+
+        const response = await apiClient.get(`/categorie/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
           }
         });
 
@@ -218,11 +279,11 @@ export default {
     onNext() {
       this.next = true
       this.v$.$touch();
-      if( 
-        this.v$.email.$error || 
-        this.v$.nom.$error || 
-        this.v$.prenom.$error || 
-        this.v$.civilite.$error || 
+      if(
+        this.v$.email.$error ||
+        this.v$.nom.$error ||
+        this.v$.prenom.$error ||
+        this.v$.civilite.$error ||
         this.v$.mobile1.$error){
 
           this.activeTabprofessionnelle = false
@@ -237,10 +298,10 @@ export default {
     async onSave(){
       this.submitted = true;
       this.v$.$touch();
-      if( 
-        this.v$.codeVisite.$error || 
-        this.v$.userDepartement.$error || 
-        this.v$.userService.$error || 
+      if(
+        this.v$.codeVisite.$error ||
+        this.v$.userDepartement.$error ||
+        this.v$.userService.$error ||
         this.v$.matricule.$error
         ){
           return
@@ -248,60 +309,46 @@ export default {
         this.show = true;
         try{
 
-          const formData = new FormData();
-          
-          // Ajout des champs à envoyer
-          formData.append('nom', this.nom);
-          formData.append('prenom', this.prenom);
-          formData.append('email', this.email);
-          formData.append('telephone1', this.mobile1);
-          formData.append('telephone2', this.mobile2);
-          formData.append('civilite', this.civilite);
-          formData.append('matricule', this.matricule);
-          formData.append('departement_id', this.userDepartement);
-          formData.append('service_id', this.userService);
-
-          // Vérification de l'image et ajout si elle est présente
-          if (this.photo) {
-            formData.append('image', this.photo);  // Ici, `this.photo` doit être un fichier valide (par exemple, un objet `File`)
-          }
-
           await apiClient.post(
-            `/user/${this.user.uuid}`,formData,
+            `/user/${this.user.uuid}`,
+            {
+              nom: this.nom,
+              prenom: this.prenom,
+              email: this.email ,
+              image: this.photo,
+              telephone1: this.mobile1,
+              telephone2: this.mobile2,
+              civilite: this.civilite,
+              matricule: this.matricule,
+              departement_id: this.userDepartement,
+              service_id: this.userService,
+            },
             {
 
-              headers: { 
-                'Authorization': `Bearer ${this.token}`, 
+              headers: {
+                'Authorization': `Bearer ${this.token}`,
               }
 
             }).then(reponse =>{
-              if(!reponse.data.error){ 
-              
+              if(!reponse.data.error){
+
               apiClient.post('/auth/me', {}, {
                 headers: { Authorization: `Bearer ${this.token}` },
               }).then(response=>{
 
-                console.log("Utilisateur récupéré:", response.data);
 
-                this.authStore.setUser(response.data);
-                this.updateUserInfo(response.data)
-              }
+            })
 
-              )
-              
-
-              this.alertMessage(reponse.data.message, 'success')
-
-            }
-                
-
-
-        })
-          }catch (error) {
-            console.error("--------------Une erreur est survenue :", error);
+        }catch{
+          alert("error")
         }finally{
           this.show = false
         }
+
+
+
+
+        this.successmsg()
 
 
         this.civilite = ""
@@ -322,18 +369,32 @@ export default {
         this.submitted = false;
       }
     },
-    
+    async handleStatut(){
+      try {
+        const response = await apiClient.get(`/categorie_by_slug/${this.user.id}`, {
+          active : this.user.statut === 0 ? 1 : 0
+        },{
+          headers: {
+            'Authorization': `Bearer ${this.token}`,
+          }
+        });
+        if(!response.data.error){
+          console.log("-------------------------!"+response.data.data)
+        }
+      } catch (error) {
+        console.error('Error fetching Service:', error);
+      }
+    }
 
   }
 };
 </script>
 
 <template>
-  
   <div v-if="show" class="loading-overlay">
     <div class="spinner"></div>
   </div>
-  <BRow class="wizard" >
+  <BRow class="wizard">
     <BCol>
       <BCard no-body>
         <BCardBody>
@@ -341,131 +402,238 @@ export default {
           <BForm action="#">
             <div id="custom-progress-bar" class="progress-nav mb-4">
               <div class="progress">
-                <div class="progress-bar" role="progressbar" :style="`width: ${progressBarValue}%;`" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                <div
+                  class="progress-bar"
+                  role="progressbar"
+                  :style="`width: ${progressBarValue}%;`"
+                  aria-valuenow="0"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
               </div>
 
-              <ul class="nav nav-pills d-flex justify-content-evenly wizard-steps" role="tablist">
+              <ul
+                class="nav nav-pills d-flex justify-content-evenly wizard-steps"
+                role="tablist"
+              >
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link wizard-step" id="pills-gen-info-tab" type="button" role="tab" :class="{ 
-                    active: activeTab == 1, done: activeTab > 1 }" @click="toggleWizard(1, 26)">
-                    <i class="wizard-icon mdi mdi-account-circle font-size-24"></i>
+                  <button
+                    class="nav-link wizard-step"
+                    id="pills-gen-info-tab"
+                    type="button"
+                    role="tab"
+                    :class="{
+                      active: activeTab == 1,
+                      done: activeTab > 1,
+                    }"
+                    @click="toggleWizard(1, 26)"
+                  >
+                    <i
+                      class="wizard-icon mdi mdi-account-circle font-size-24"
+                    ></i>
                   </button>
                 </li>
 
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link wizard-step" :disabled="!activeTabprofessionnelle" id="pills-success-tab" type="button" role="tab" :class="{ 
-                    active: activeTab == 2, done: activeTab > 2 }" @click="onNext">
+                  <button
+                    class="nav-link wizard-step"
+                    :disabled="!activeTabprofessionnelle"
+                    id="pills-success-tab"
+                    type="button"
+                    role="tab"
+                    :class="{
+                      active: activeTab == 2,
+                      done: activeTab > 2,
+                    }"
+                    @click="onNext"
+                  >
                     <i class="wizard-icon mdi mdi-briefcase font-size-24"></i>
-
                   </button>
                 </li>
               </ul>
             </div>
 
             <div class="tab-content">
-
               <!-- Informations personnelles -->
-              <div class="tab-pane fade" :class="activeTab == 1 && 'show active'" id="pills-gen-info" role="tabpanel" aria-labelledby="pills-gen-info-tab">
+              <div
+                class="tab-pane fade"
+                :class="activeTab == 1 && 'show active'"
+                id="pills-gen-info"
+                role="tabpanel"
+                aria-labelledby="pills-gen-info-tab"
+              >
                 <BRow class="mt-3 mb-4">
-                  <h4 class="text-center font-size-20 mb-5">Informations Personnelles </h4>
+                  <h4 class="text-center font-size-20 mb-5">
+                    Informations Personnelles
+                  </h4>
                   <BCol sm="3" class="mb-3">
-                    <label for="civilite" style="font-size: 12px; font-weight: bolder">Civilité</label>
+                    <label
+                      for="civilite"
+                      style="font-size: 12px; font-weight: bolder"
+                      >Civilité</label
+                    >
                     <div class="input-group">
-                      <select v-model="civilite" id="civilite" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': next && v$.civilite.$error
-                      }">
-                        <option value="M." :selected="civilite === 'M.'">M.</option>
-                        <option value="Mme" :selected="civilite === 'Mme'">Mme</option>
-                        <option value="Mlle" :selected="civilite === 'Mlle'">Mlle</option>
+                      <select
+                        v-model="civilite"
+                        id="civilite"
+                        class="form-select border border-black rounded-2"
+                        aria-label="Default select example"
+                        :class="{
+                          'is-invalid': next && v$.civilite.$error,
+                        }"
+                      >
+                        <option value="M." :selected="civilite === 'M.'">
+                          M.
+                        </option>
+                        <option value="Mme" :selected="civilite === 'Mme'">
+                          Mme
+                        </option>
+                        <option value="Mlle" :selected="civilite === 'Mlle'">
+                          Mlle
+                        </option>
                       </select>
-                      <div v-if="next && v$.civilite.$error" class="invalid-feedback">
-                        <span v-if="v$.civilite.required.$invalid">Civilité obligatoire
+                      <div
+                        v-if="next && v$.civilite.$error"
+                        class="invalid-feedback"
+                      >
+                        <span v-if="v$.civilite.required.$invalid"
+                          >Civilité obligatoire
                         </span>
                       </div>
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="nom" style="font-size: 12px; font-weight: bolder">Nom</label>
+                    <label
+                      for="nom"
+                      style="font-size: 12px; font-weight: bolder"
+                      >Nom</label
+                    >
                     <div class="input-group">
-                      <input 
-                        v-model="nom" 
-                        id="nom" 
-                        class="form-control border border-black rounded-2" 
+                      <input
+                        v-model="nom"
+                        id="nom"
+                        class="form-control border border-black rounded-2"
                         type="text"
                         :class="{
-                        'is-invalid': next && v$.nom.$error
-                      }">
-                      <div v-if="next && v$.nom.$error" class="invalid-feedback">
-                        <span v-if="v$.nom.required.$invalid">Nom obligatoire
+                          'is-invalid': next && v$.nom.$error,
+                        }"
+                      />
+                      <div
+                        v-if="next && v$.nom.$error"
+                        class="invalid-feedback"
+                      >
+                        <span v-if="v$.nom.required.$invalid"
+                          >Nom obligatoire
                         </span>
                       </div>
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="prenom" style="font-size: 12px; font-weight: bolder">Prénom</label>
+                    <label
+                      for="prenom"
+                      style="font-size: 12px; font-weight: bolder"
+                      >Prénom</label
+                    >
                     <div class="input-group">
-                      <input 
-                        v-model="prenom" 
-                        id="prenom" 
-                        class="form-control border border-black rounded-2" 
+                      <input
+                        v-model="prenom"
+                        id="prenom"
+                        class="form-control border border-black rounded-2"
                         type="text"
                         :class="{
-                        'is-invalid': next && v$.prenom.$error
-                      }">
-                      <div v-if="next && v$.prenom.$error" class="invalid-feedback">
-                      <span v-if="v$.prenom.required.$invalid">Prénom obligatoire
-                      </span>
-                    </div>
+                          'is-invalid': next && v$.prenom.$error,
+                        }"
+                      />
+                      <div
+                        v-if="next && v$.prenom.$error"
+                        class="invalid-feedback"
+                      >
+                        <span v-if="v$.prenom.required.$invalid"
+                          >Prénom obligatoire
+                        </span>
+                      </div>
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="email" style="font-size: 12px; font-weight: bolder">E-mail</label>
-                    <input v-model="email" type="email" class="form-control border border-black rounded-2" id="email" :class="{
-                      'is-invalid': next && v$.email.$error
-                    }" />
-                    <div v-if="next && v$.email.$error" class="invalid-feedback">
-                      <span v-if="v$.email.email.$invalid">Email invalide
-                      </span>
-                      <span v-if="v$.email.required.$invalid">Email obligatoire
-                      </span>
-                    </div>
-                  
-                  </BCol>
-                  <BCol sm="3" class="mb-3">
-                    <label for="mobile1" style="font-size: 12px; font-weight: bolder">Tel. Mobile</label>
-                    <input v-model="mobile1" 
-                      type="tel" 
-                      class="form-control border border-black rounded-2" 
-                      id="mobile1" 
-                      :class="{'is-invalid': next && v$.mobile1.$error}"
-                      @input="mobile1 = $event.target.value.replace(/\D/g, '')" 
-                      maxlength="10" 
+                    <label
+                      for="email"
+                      style="font-size: 12px; font-weight: bolder"
+                      >E-mail</label
+                    >
+                    <input
+                      v-model="email"
+                      type="email"
+                      class="form-control border border-black rounded-2"
+                      id="email"
+                      :class="{
+                        'is-invalid': next && v$.email.$error,
+                      }"
                     />
-                    <div v-if="next && v$.mobile1.$error" class="invalid-feedback">
-                      <span v-if="v$.mobile1.required.$invalid">Numéro obligatoire</span>
+                    <div
+                      v-if="next && v$.email.$error"
+                      class="invalid-feedback"
+                    >
+                      <span v-if="v$.email.email.$invalid"
+                        >Email invalide
+                      </span>
+                      <span v-if="v$.email.required.$invalid"
+                        >Email obligatoire
+                      </span>
+                    </div>
+                  </BCol>
+                  <BCol sm="3" class="mb-3">
+                    <label
+                      for="mobile1"
+                      style="font-size: 12px; font-weight: bolder"
+                      >Tel. Mobile</label
+                    >
+                    <input
+                      v-model="mobile1"
+                      type="tel"
+                      class="form-control border border-black rounded-2"
+                      id="mobile1"
+                      :class="{ 'is-invalid': next && v$.mobile1.$error }"
+                      @input="mobile1 = $event.target.value.replace(/\D/g, '')"
+                      maxlength="10"
+                    />
+                    <div
+                      v-if="next && v$.mobile1.$error"
+                      class="invalid-feedback"
+                    >
+                      <span v-if="v$.mobile1.required.$invalid"
+                        >Numéro obligatoire</span
+                      >
                     </div>
                   </BCol>
 
                   <BCol sm="3" class="mb-3">
-                    <label for="mobile2" style="font-size: 12px; font-weight: bolder">Autre Tel. Mobile</label>
-                    <input v-model="mobile2" 
-                      type="tel" 
-                      class="form-control border border-black rounded-2" 
-                      id="mobile2" 
-                      @input="mobile2 = $event.target.value.replace(/\D/g, '')" 
-                      maxlength="10" 
+                    <label
+                      for="mobile2"
+                      style="font-size: 12px; font-weight: bolder"
+                      >Autre Tel. Mobile</label
+                    >
+                    <input
+                      v-model="mobile2"
+                      type="tel"
+                      class="form-control border border-black rounded-2"
+                      id="mobile2"
+                      @input="mobile2 = $event.target.value.replace(/\D/g, '')"
+                      maxlength="10"
                     />
                   </BCol>
-                  
+
                   <BCol sm="3" class="mb-3">
-                    <label for="photo" style="font-size: 12px; font-weight: bolder">Photo</label>
-                    <input 
-                      @change="handleFileUpload" 
-                      type="file" 
-                      class="form-control border border-black rounded-2" 
-                      id="photo" 
+                    <label
+                      for="photo"
+                      style="font-size: 12px; font-weight: bolder"
+                      >Photo</label
+                    >
+                    <input
+                      @change="handleFileUpload"
+                      type="file"
+                      class="form-control border border-black rounded-2"
+                      id="photo"
                     />
-                    
                   </BCol>
                   <div class="d-flex justify-content-end mt-5">
                     <BButton variant="primary" class="px-5" @click="onNext">
@@ -476,91 +644,139 @@ export default {
               </div>
 
               <!-- Information professionnelles -->
-                <!-- <Step2  @onBack="toggleWizard(1, 18)" /> -->
+              <!-- <Step2  @onBack="toggleWizard(1, 18)" /> -->
               <!-- </div> -->
-              <div class="tab-pane fade" :class="activeTab == 2 && 'show active'" id="steparrow-description-info" role="tabpanel" aria-labelledby="steparrow-description-info-tab">
+              <div
+                class="tab-pane fade"
+                :class="activeTab == 2 && 'show active'"
+                id="steparrow-description-info"
+                role="tabpanel"
+                aria-labelledby="steparrow-description-info-tab"
+              >
                 <BRow>
-                  <h4 class="text-center font-size-20 mb-5">Informations Professionnelles</h4>
+                  <h4 class="text-center font-size-20 mb-5">
+                    Informations Professionnelles
+                  </h4>
                   <BCol sm="3" class="mb-3">
-                    <label for="nom" style="font-size: 12px; font-weight: bolder">Matricule</label>
+                    <label
+                      for="nom"
+                      style="font-size: 12px; font-weight: bolder"
+                      >Matricule</label
+                    >
                     <div class="input-group">
-                      <input 
-                        v-model="matricule" 
-                        id="nom" 
-                        class="form-control border border-black rounded-2" 
+                      <input
+                        v-model="matricule"
+                        id="nom"
+                        class="form-control border border-black rounded-2"
                         type="text"
                         :class="{
-                        'is-invalid': submitted && v$.matricule.$error
-                      }">
-                      <div v-if="submitted && v$.matricule.$error" class="invalid-feedback">
-                        <span v-if="v$.matricule.required.$invalid">Matricule obligatoire
-                        </span>
-                      </div>
-                    </div>
-                  </BCol>
-                  <BCol sm="3" class="mb-3">
-                    <label for="nom" style="font-size: 12px; font-weight: bolder">Code Visite</label>
-                    <div class="input-group">
-                      <input 
-                        v-model="codeVisite" 
-                        id="nom" 
-                        class="form-control border border-black rounded-2" 
-                        type="text"
-                        :class="{
-                        'is-invalid': submitted && v$.codeVisite.$error
-                      }">
-                      <div v-if="submitted && v$.codeVisite.$error" class="invalid-feedback">
-                        <span v-if="v$.codeVisite.required.$invalid">Code visite obligatoire
-                        </span>
-                      </div>
-                    </div>
-                  </BCol>
-                  <BCol sm="3" class="mb-3">
-                    <label for="departement" style="font-size: 12px; font-weight: bolder">Département</label>
-                    <div class="input-group">
-                      <select v-model="userDepartement" id="departement" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.userDepartement.$error}"
+                          'is-invalid': submitted && v$.matricule.$error,
+                        }"
+                      />
+                      <div
+                        v-if="submitted && v$.matricule.$error"
+                        class="invalid-feedback"
                       >
-
+                        <span v-if="v$.matricule.required.$invalid"
+                          >Matricule obligatoire
+                        </span>
+                      </div>
+                    </div>
+                  </BCol>
+                  <BCol sm="3" class="mb-3">
+                    <label
+                      for="nom"
+                      style="font-size: 12px; font-weight: bolder"
+                      >Code Visite</label
+                    >
+                    <div class="input-group">
+                      <input
+                        v-model="codeVisite"
+                        id="nom"
+                        class="form-control border border-black rounded-2"
+                        type="text"
+                        :class="{
+                          'is-invalid': submitted && v$.codeVisite.$error,
+                        }"
+                      />
+                      <div
+                        v-if="submitted && v$.codeVisite.$error"
+                        class="invalid-feedback"
+                      >
+                        <span v-if="v$.codeVisite.required.$invalid"
+                          >Code visite obligatoire
+                        </span>
+                      </div>
+                    </div>
+                  </BCol>
+                  <BCol sm="3" class="mb-3">
+                    <label
+                      for="departement"
+                      style="font-size: 12px; font-weight: bolder"
+                      >Département</label
+                    >
+                    <div class="input-group">
+                      <select
+                        v-model="userDepartement"
+                        id="departement"
+                        class="form-select border border-black rounded-2"
+                        aria-label="Default select example"
+                        :class="{
+                          'is-invalid': submitted && v$.userDepartement.$error,
+                        }"
+                      >
                         <option value="" selected>Selectionnez...</option>
-                        <option 
-                          v-for="departement in selectDepartements" 
-                          :key="departement.code" 
+                        <option
+                          v-for="departement in selectDepartements"
+                          :key="departement.code"
                           :value="departement.id"
                           :selected="departement.id === userDepartement"
                         >
-                        
                           {{ departement.libelle }}
-                        
                         </option>
-
                       </select>
-                      <div v-if="submitted && v$.userDepartement.$error" class="invalid-feedback">
-                        <span v-if="v$.userDepartement.required.$invalid">Département obligatoire
+                      <div
+                        v-if="submitted && v$.userDepartement.$error"
+                        class="invalid-feedback"
+                      >
+                        <span v-if="v$.userDepartement.required.$invalid"
+                          >Département obligatoire
                         </span>
                       </div>
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="service" style="font-size: 12px; font-weight: bolder">Service</label>
+                    <label
+                      for="service"
+                      style="font-size: 12px; font-weight: bolder"
+                      >Service</label
+                    >
                     <div class="input-group">
-                      <select v-model="userService" id="service" class="form-select border border-black rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': submitted && v$.userService.$error}"
+                      <select
+                        v-model="userService"
+                        id="service"
+                        class="form-select border border-black rounded-2"
+                        aria-label="Default select example"
+                        :class="{
+                          'is-invalid': submitted && v$.userService.$error,
+                        }"
                       >
                         <option value="" selected>Selectionnez...</option>
-                        <option 
-                          v-for="service in selectServices" 
-                          :key="service.id" 
+                        <option
+                          v-for="service in selectServices"
+                          :key="service.id"
                           :value="service.id"
                           :selected="service.id === userService"
                         >
-
-                        {{ service.libelle }}
-
+                          {{ service.libelle }}
                         </option>
                       </select>
-                      <div v-if="submitted && v$.userService.$error" class="invalid-feedback">
-                        <span v-if="v$.userService.required.$invalid">Service obligatoire
+                      <div
+                        v-if="submitted && v$.userService.$error"
+                        class="invalid-feedback"
+                      >
+                        <span v-if="v$.userService.required.$invalid"
+                          >Service obligatoire
                         </span>
                       </div>
                     </div>
@@ -571,7 +787,6 @@ export default {
                       <span class="px-md-5">Enregistrer</span>
                     </BButton>
                   </div>
-                  
                 </BRow>
               </div>
             </div>
@@ -581,7 +796,6 @@ export default {
     </BCol>
   </BRow>
 </template>
-
 
 <style lang="scss">
 /* Classe pour le popup */

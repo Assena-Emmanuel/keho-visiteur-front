@@ -31,6 +31,7 @@ export { useAuthStore } from '../stores/auth';
 export { useEditStore } from '../stores/editStore';
 export { useLayoutStore } from '../stores/layout';
 export { useNotifiedStore } from '../stores/notified';
+export { useUserStore } from '../stores/user';
 export { queryContent } from '../node_modules/@nuxt/content/dist/runtime/legacy/composables/query';
 export { useContentHelpers } from '../node_modules/@nuxt/content/dist/runtime/composables/helpers';
 export { useContentHead } from '../node_modules/@nuxt/content/dist/runtime/composables/head';

@@ -2,7 +2,6 @@
 import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
-import { useAuthStore } from "~/stores/auth.js";
 
 export default {
   setup() {
@@ -75,12 +74,10 @@ export default {
               },
             }).then(response => {
               const user = response.data
-              this.authStore.setUser(user)
+              console.log("-----------------------------user log:"+JSON.stringify(user))
 
-              console.log("------------------------------ok")
-
-              // const auth = useUserStore()
-              // auth.setUser(user)
+              const auth = useUserStore()
+              auth.setUser(user)
               // Rediriger vers la page enregistrée ou vers /dashboard par défaut
               
               this.$router.push('/dashboard');
@@ -94,7 +91,7 @@ export default {
 
           } 
         } catch (error) {
-          
+          console.log("------------------------------token:"+token)
           this.errorMsg = "Erreur de connexion";
           console.error("failed at onLogin", { error });
 

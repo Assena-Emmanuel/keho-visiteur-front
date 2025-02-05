@@ -68,7 +68,7 @@ const userId = id;
 
 const pusher = useNuxtApp().$pusher;
 let channel;
-
+   
 onMounted(() => {
   // Uncomment to subscribe to the channel
   notifiedStore.getNotification();

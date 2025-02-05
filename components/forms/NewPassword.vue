@@ -2,7 +2,6 @@
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import apiClient from "~/components/api/intercepteur";
-import { useAuthStore } from '~/stores/auth';
 
 export default {
   setup() {
@@ -39,22 +38,6 @@ export default {
     togglePasswordVisibility() {
       this.passwordVisible = !this.passwordVisible;
     },
-
-    alertMessage(message, icon="error") {
-      this.$swal.fire({
-        position: "top",
-        icon: icon,
-        text: message,
-        showConfirmButton: false,
-        timer: 2000,
-        customClass: {
-      popup: 'custom-popup', // Classe personnalisée pour le popup
-      icon: 'custom-icon', // Classe personnalisée pour l'icône
-      title: 'custom-title', // Classe personnalisée pour le titre (si nécessaire)
-    }
-      });
-    },
-
     async onReset() {
       this.submitted = true;
       this.isSuccess = false;
@@ -64,13 +47,12 @@ export default {
       } else {
           
           try {
-            this.loading = true
             if(this.newpassword !== this.confirmPassword){
-              // this.$swal.fire("Erreur!", `Mot de passe de confirmation different!`, "error");
-              this.alertMessage(`Mot de passe de confirmation different!`)
+              this.$swal.fire("Erreur!", `Mot de passe de confirmation different!`, "error");
               this.submitted = false;
               return
             }
+            const token = useCookie('token')
 
             
             const response = await apiClient.post('/user/me_pwd', {
@@ -80,18 +62,16 @@ export default {
 
               }, {
                 headers: { 
-                  'Authorization': `Bearer ${this.authStore.token}`, 
+                  'Authorization': `Bearer ${token.value}`, 
                 }
               });
 
             if(response.data.error){
                 const message =  response.data.message
-                this.alertMessage(`${message}`)
-                // this.$swal.fire("Erreur!", `${message}`, "error");
+                this.$swal.fire("Erreur!", `${message}`, "error");
                 return
             }else{
-              // this.$swal.fire("Succes!", `${response.data.message}`, "success");
-              this.alertMessage(`${response.data.message}`, "success")
+              this.$swal.fire("Succes!", `${response.data.message}`, "success");
               this.isSuccess = true;
               this.lastPassword = ""
               this.newpassword = "",
@@ -102,9 +82,7 @@ export default {
             
           } catch (error) {
             console.error('Error fetching user info:', error);
-          } finally{
-            this.loading = false
-          }
+          }  
         }
     }
   }
