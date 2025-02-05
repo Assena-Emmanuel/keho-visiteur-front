@@ -183,7 +183,7 @@ export default {
           // Si la réponse est réussie
           if (!response.data.error) {
             this.alertMessage(`ok`);
-            this.alertMessage(`${response.data.message}`);
+            this.alertMessage(`${response.data.message}`, "success");
             this.authStore.setUser(response.data.data)
 
          

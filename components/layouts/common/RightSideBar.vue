@@ -10,7 +10,6 @@ import {
   topBarOptions,
   layoutModeOptions
 } from "~/components/layouts/utils/rightSideBar.js";
-// import { NuxtLink } from "#build/components";
 
 export default {
   setup(){
@@ -23,8 +22,8 @@ export default {
       sideBarTypeOptions,
       topBarOptions,
       layoutModeOptions,
-      user: this.authStore.user,
-      token: this.authStore.token,
+      user: "",
+      token: "",
     };
   },
   components: {
@@ -85,6 +84,8 @@ export default {
 
   
   mounted() {
+    this.user = this.authStore.user,
+    this.token = this.authStore.token,
     this.addEventListener();
   },
 

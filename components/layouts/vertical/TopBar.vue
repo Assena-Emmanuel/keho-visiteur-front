@@ -77,15 +77,7 @@ export default {
         }
       }
     },
-    logoutUser() {
-      const auth = this.config.public.auth;
-      if (auth === "firebase") {
-        // this.$store.dispatch("auth/logOut");
-      } else if (auth === "fakebackend") {
-        // this.$store.dispatch("authfack/logout");
-      }
-      navigateTo({ path: "/login" });
-    },
+    
     toggleRightSidebar() {
       this.$parent.toggleRightSidebar();
     }

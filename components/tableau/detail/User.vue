@@ -21,7 +21,6 @@ onMounted(async () => {
 
 loadingDetail.value = true
 try {
-    console.log('---------------------user: '+props.uuid)
     const response = await apiClient.get(`/user/${props.uuid}`, {
       headers: { 
         'Authorization': `Bearer ${authStore.token}`, 
@@ -29,7 +28,6 @@ try {
     });
 
     if (!response.data.error) {
-        console.log('---------------------: '+response.data.data)
         detailUser.value = response.data.data; 
     }
 
