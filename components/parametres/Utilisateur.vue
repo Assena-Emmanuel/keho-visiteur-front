@@ -1,27 +1,30 @@
 <script>
 import apiClient from "~/components/api/intercepteur";
 import { useAuthStore } from "~/stores/auth.js";
-import { allUserStore} from "~/stores/allUserStore.js"
+// import { allUserStore} from "~/stores/allUserStore.js"
 
 
 export default{
     setup(){
         const authStore = useAuthStore();
-        const usersStore = allUserStore()
+        // const usersStore = allUserStore()
 
-        return { authStore, usersStore };
+        return { authStore };
     },
     data(){
         return{
-        all_users: {},
         token: this.authStore.token,
         title: 'Liste des Utilisateurs',
         isEdit: false,
         isLoading: true,
         modal: false,
-        isEditMode: false,  // Mode de modification ou ajout
-        selectedIndex: null,  // Index de l'élément sélectionné pour la modification
+        isEditMode: false,  
+        selectedIndex: null,  
         selectedRow: null,
+        data: [
+            
+        ],
+
         fields: []
     }
     },
@@ -64,9 +67,9 @@ export default{
             });
 
             if (!response.data.error) {
-                // this.data = response.data.data
-                this.usersStore.setUsers(response.data.data)
-                console.log('----------------------All user: '+this.usersStore.users)
+                this.data = response.data.data
+                // this.usersStore.setUsers(response.data.data)
+ 
             }
 
         } catch (error) {
@@ -81,10 +84,7 @@ export default{
         }
 
         }
-    
-}
-
-
+    }
 }
 </script>
 <template>
@@ -105,6 +105,7 @@ export default{
 
     <Tableau 
         :fields="fields" 
+        :data="data" 
         :title="title" 
         :show-addbtn="true" 
         :typeForme="'user'" 

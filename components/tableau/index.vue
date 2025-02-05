@@ -12,7 +12,7 @@ const props = defineProps({
   title: String,
   showAddbtn: Boolean,
   typeForme: String,
-  // data: Array,
+  data: Array,
   modal: Boolean,
   isLoading: Boolean,
 });

@@ -184,7 +184,12 @@ export default {
           if (!response.data.error) {
             this.alertMessage(`ok`);
             this.alertMessage(`${response.data.message}`, "success");
-            this.authStore.setUser(response.data.data)
+
+            apiClient.post('/auth/me', {}, {
+                headers: { Authorization: `Bearer ${this.token}` },
+              }).then(response=>{
+                this.authStore.setUser(response.data);
+              })
 
          
           } else {
