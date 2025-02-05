@@ -266,7 +266,7 @@ const resetForm = () => {
     </div>
 
 
-    <div class="mb-3">
+    <!-- <div class="mb-3">
       <label for="departement" style="font-size: 12px">Département Principal</label>
       <div class="input-group">
         <select v-model="departementPrincipale" id="departement" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example"
@@ -284,7 +284,7 @@ const resetForm = () => {
 
         </select>
       </div>
-    </div>
+    </div> -->
 
     <div class="mt-4 d-flex justify-content-center">
       <BButton v-if="!isEditMode" @click="onSaveDepartement" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
