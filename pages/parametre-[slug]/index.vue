@@ -12,6 +12,7 @@ const route = useRoute();
 const title = route.params.slug;
 const typeForm = route.params.slug;
 
+
 </script>
 
 <template>

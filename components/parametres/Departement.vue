@@ -3,9 +3,12 @@ import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import apiClient from "~/components/api/intercepteur";
 import { useAuthStore } from "~/stores/auth.js";
+import {useGestionStore} from "~/stores/gestion.js"
+
 export default{
     setup() {
-        return { v$: useVuelidate(), authStore: useAuthStore() };
+        const gestionStore = useGestionStore()
+        return { v$: useVuelidate(), authStore: useAuthStore(), gestionStore };
     },
     data(){
         return{
@@ -59,33 +62,39 @@ export default{
         },
 
         async departements() {
-        try {
-            this.isLoading = true
+        
             this.fields = [
-                {key: "slug"},
-                {key: "code"},
-                {key: "libelle"},
-                {key:"Actions"},
-            ]
-            const response = await apiClient.get(`/categorie`, {
-            headers: {
-                'Authorization': `Bearer ${this.authStore.token}`,
-            },
-            });
+                    {key: "slug"},
+                    {key: "code"},
+                    {key: "libelle"},
+                    {key:"Actions"},
+                ]
 
-            if (!response.data.error) {
-                this.data = response.data.data
+        if(this.gestionStore.departements.length === 0){
+
+            try {
+                this.isLoading = true
+                const slug = "DPT"
+                const response = await apiClient.get(`/categorie_by_slug/${slug}`, {
+                    headers: {
+                        'Authorization': `Bearer ${this.gestionStore.token}`
+                    }
+                });
+
+                if (!response.data.error) {
+                    this.gestionStore.setDepartements(response.data.data)
+                }
+
+            } catch (error) {
+                if (error.response && error.response.status === 401) {
+                console.error("Erreur 401 : Jeton invalide ou utilisateur non authentifié.");
+                } else {
+                console.error("Erreur lors de la récupération des departement :", error);
+                }
+                this.isLoading = false;
+            }finally {
+                this.isLoading = false; // Fin du chargement
             }
-
-        } catch (error) {
-            if (error.response && error.response.status === 401) {
-            console.error("Erreur 401 : Jeton invalide ou utilisateur non authentifié.");
-            } else {
-            console.error("Erreur lors de la récupération des departement :", error);
-            }
-
-        }finally {
-            this.isLoading = false; // Fin du chargement
         }
 
         }
@@ -112,7 +121,6 @@ export default{
 
     <Tableau 
         :fields="fields" 
-        :data="data" 
         :title="title" 
         :show-addbtn="true" 
         :typeForme="'departement'" 

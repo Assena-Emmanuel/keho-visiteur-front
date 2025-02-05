@@ -2,9 +2,9 @@
 
 import { defineStore } from 'pinia';
 
-export const allUserStore = defineStore('allUserStore', {
+export const useallUserStore = defineStore('allUserStore', {
   state: () => ({
-    users: null,
+    users: [],
   }),
   actions: {
     // Méthode pour mettre à jour les données
@@ -14,7 +14,7 @@ export const allUserStore = defineStore('allUserStore', {
 
     // Méthode pour supprimer les données
     deleteData() {
-      this.users = null;
+      this.users = [];
     },
   },
 });

@@ -1,18 +1,16 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { capitalize } from "vue";
 import apiClient from "~/components/api/intercepteur";
 import { useAuthStore } from "~/stores/auth.js";
-import { allUserStore} from "~/stores/allUserStore.js"
 import Swal from 'sweetalert2';
+import {useGestionStore} from "~/stores/gestion.js"
 
 // Props
 const props = defineProps({
   fields: Array,
   title: String,
-  showAddbtn: Boolean,
   typeForme: String,
-  data: Array,
+  // data: Array,
   modal: Boolean,
   isLoading: Boolean,
 });
@@ -22,11 +20,10 @@ const emit = defineEmits(['data-selected']);
 
 // Stores
 const authStore = useAuthStore();
-const userStore = allUserStore()
+const gestionStore = useGestionStore()
 
 // Refs
 const submitted = ref(false);
-
 const detailModal = ref(false);
 const localModal = ref(props.modal);
 const isStatutActive = ref(false);
@@ -37,11 +34,9 @@ const pageOptions = ref([5, 10, 15, 20]);
 const filter = ref('');
 const sortBy = ref('age');
 const sortDesc = ref(false);
-const detailUser = ref(null)
 const uuid = ref(null)
 const idDepartement = ref(null)
-const typeForme = ref(null)
-const data = ref(null)
+// const data = ref([]);  // Initialiser avec un tableau vide
 
 // Computed properties
 const filterOn = computed(() => props.fields.map(field => field.key));
@@ -65,10 +60,16 @@ watch(() => props.modal, (newVal) => {
 });
 
 // Lifecycle hooks
-onMounted(() => {
-  data.value = userStore.users
-  typeForme.value = props.typeForme
-  
+const data = computed(() => {
+  if(props.typeForme === "user"){
+    return gestionStore.users
+  }else if(props.typeForme === "departement"){
+    return gestionStore.departements
+  }else if (props.typeForme === "servie"){
+    return gestionStore.services
+  }
+    
+  return []
 });
 
 // Methods
@@ -104,43 +105,32 @@ const onFiltered = (filteredItems) => {
 };
 
 const showDetailsModal = (row) => {
-  
-  detailModal.value = true
+  detailModal.value = true;
 
   // Afficher le modal en fonction du type de gestion
-  if(typeForme.value == "departement"){
-    idDepartement.value = row.id
-
-  }else if(typeForme.value == "user"){
-    uuid.value = row.uuid
-
-  }else if(typeForme.value == "servie"){
-    uuid.value = row.id
-
+  if (props.typeForme === "departement") {
+    idDepartement.value = row.id;
+  } else if (props.typeForme === "user") {
+    uuid.value = row.uuid;
+  } else if (props.typeForme === "servie") {
+    uuid.value = row.id;
   }
-
 };
 
 // Méthode pour émettre l'événement
 const handleEdit = (row) => {
-
-  if(typeForme.value == "departement"){
-    emit('data-selected', { id: row.id});
-
-  }else if(typeForme.value == "user"){
-    emit('data-selected', { uuid: row.uuid});
-
-  }else if(typeForme.value == "servie"){
-    uuid.value = row.id
-
+  if (props.typeForme === "departement") {
+    emit('data-selected', { id: row.id });
+  } else if (props.typeForme === "user") {
+    emit('data-selected', { uuid: row.uuid });
+  } else if (props.typeForme === "servie") {
+    uuid.value = row.id;
   }
-  
 };
 
-const hideModal = () =>{
-  detailModal.value = false
-  detailUser.value = null
-}
+const hideModal = () => {
+  detailModal.value = false;
+};
 
 const confirmDelete = (code) => {
   Swal.fire({
@@ -156,7 +146,7 @@ const confirmDelete = (code) => {
   }).then((result) => {
     if (result.isConfirmed) {
       deleteItem(code);
-      useSwal().fire(
+      Swal.fire(
         'Supprimé!',
         'Votre élément a été supprimé.',
         'success'
@@ -171,10 +161,11 @@ const capitalizeText = (text) => {
 </script>
 
 
+
 <template>
-  <div v-if="isLoading" class="loading-overlay">
+  <!-- <div v-if="isLoading" class="loading-overlay">
     <div class="spinner"></div>
-  </div>
+  </div> -->
 
   <div>
     <BRow>
@@ -184,15 +175,19 @@ const capitalizeText = (text) => {
             <BCardTitle>{{ title }}</BCardTitle>
 
             <!-- Modal Détail -->
-            <BModal @hide="hideModal" v-if="detailModal" v-model="detailModal" :title="`Détail ${capitalize(typeForme)}`" hide-footer>
+            <BModal @hide="hideModal" v-if="detailModal" v-model="detailModal" :title="`Détail ${capitalizeText(typeForme)}`" hide-footer>
               <TableauDetailUser :uuid="uuid" v-if="typeForme == 'user'" />
               <TableauDetailDepartement :id="idDepartement" v-if="typeForme == 'departement'"/>
             </BModal>
 
+            <div v-if="isLoading" class="loading-ellipses">
+                <span class="dot text-primary">.</span>
+                <span class="dot text-danger">.</span>
+                <span class="dot text-success">.</span>
+            </div>
 
 
-
-            <BRow class="mt-4">
+            <BRow v-if="filteredData && !isLoading"  class="mt-4">
               <BCol sm="12" md="6" class="">
                 <div id="tickets-table_length" class="dataTables_length">
                     <label class="d-inline-flex align-items-center">
@@ -211,7 +206,9 @@ const capitalizeText = (text) => {
                 </div>
               </BCol>
             </BRow>
-            <div class="table-responsive mb-0">
+
+
+            <div class="table-responsive mb-0" v-if="filteredData && !isLoading">
             
               <BTable 
                 :items="filteredData" 
@@ -252,7 +249,7 @@ const capitalizeText = (text) => {
               </BTable>
             </div>
             <hr class="border-1 border-secondary">
-            <BRow>
+            <BRow v-if="filteredData && !isLoading">
               <BCol>
                 <div class="dataTables_paginate paging_simple_numbers d-flex justify-content-between">
                   <div id="tickets-table_length" class="dataTables_length">
@@ -274,34 +271,36 @@ const capitalizeText = (text) => {
   </div>
 </template>
 <style scoped>
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+.loading-ellipses {
+  font-size: 40px; /* Taille augmentée */
+  color: #3498db;
+  text-align: center;
+  font-weight: bold;
 }
 
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(255, 255, 255, 0.3);
-  border-top: 5px solid #fff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.dot {
+  animation: blink 1s infinite;
+  margin: 0 5px; /* Espacement entre les points */
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes blink {
+  0%, 20% {
+    opacity: 0;
   }
-  to {
-    transform: rotate(360deg);
+  50%, 100% {
+    opacity: 1;
   }
 }
 </style>

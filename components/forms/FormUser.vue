@@ -11,6 +11,7 @@ const authStore = useAuthStore();
 
 // Réactifs
 const loading = ref(false); 
+const loadingDetail = ref(false); 
 const loadingEdit = ref(false); 
 const loadingCreer = ref(false); 
 
@@ -233,19 +234,19 @@ const successmsg = (message, type = 'success') => {
   <BModal 
       @hide="resetForm" 
       size="lg"
-      :modelValue="modelValue" 
+      :modelValue="isOpen" 
       @update:modelValue="$emit('update:modelValue', $event)"
       :title="isEditMode ? `Modifier les informations ${(data.nom).toUpperCase()}` : 'Création d\'Utilisateur'" 
       title-class="font-18" 
       hide-footer
       no-close-on-backdrop
   >
-  <div v-if="loadingDetail" class="loading-ellipses">
+  <!-- <div v-if="loadingDetail" class="loading-ellipses">
         <span class="dot">.</span>
         <span class="dot">.</span>
         <span class="dot">.</span>
-    </div>
-  <BForm action="#" v-else>
+    </div> -->
+  <BForm action="#">
             <div id="custom-progress-bar" class="progress-nav mb-4">
               <div class="progress">
                 <div class="progress-bar" role="progressbar" :style="`width: ${progressBarValue}%;`" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>

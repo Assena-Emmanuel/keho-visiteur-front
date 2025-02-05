@@ -12,6 +12,7 @@ const props = defineProps({
 // Reactive
 const detailDept = ref({})
 const loading = ref(false);
+const serviceDepartement = ref([])
 
 const authStore = useAuthStore()
 
@@ -28,6 +29,23 @@ try {
 
     if (!response.data.error) {
         detailDept.value = response.data.data; 
+
+        // Recuperer les services du departement
+        const slug = "SRV" // slug des service
+        const responseService = await apiClient.get(`/categorie_by_slug/${slug}`, {
+          headers: {
+            'Authorization': `Bearer ${authStore.token}`
+          }
+        });
+        if (!responseService.data.error) {
+          responseService.data.data.forEach((service, index) => {
+              if(service.categorie_id == props.id){
+                serviceDepartement.push(service)
+              }
+            });
+
+        }
+
     }
 
 } catch (error) {
@@ -55,8 +73,13 @@ try {
         <div class="text-primary h5">
             <i class="fas fa-building me-2"></i> Département: <span class="fw-bold">{{ detailDept.libelle }}</span>
         </div>
-        <div class="text-primary h5">
+        <div class="d-flex justify-content-between">
+          <div class="h5">
             <i class="fas fa-hashtag me-2"></i> Code: <span class="fw-bold badge text-bg-info">{{ detailDept.code }}</span>
+          </div>
+          <div class="h5">
+            <i class="fas fa-hashtag me-2"></i> Slug: <span class="fw-bold badge text-bg-info">{{ detailDept.code }}</span>
+          </div>
         </div>
         </div>
 
@@ -68,20 +91,14 @@ try {
 
         <!-- Liste des services -->
         <ul class="list-group">
-        <li class="list-group-item d-flex justify-content-between align-items-center">
+        <li v-for="service in serviceDepartement" class="list-group-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-            <i class="fas fa-laptop-code me-3 text-muted"></i>
-            <strong>Informatique</strong>
+            <span>*</span>
+            <strong>{{ service.libelle }}</strong>
             </div>
-            <span class="badge bg-secondary rounded-pill">SEV003</span>
+            <span class="badge bg-secondary rounded-pill">{{ service.slug }}</span>
         </li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-            <i class="fas fa-code me-3 text-muted"></i>
-            <strong>Développement</strong>
-            </div>
-            <span class="badge bg-secondary rounded-pill">SEV005</span>
-        </li>
+
         <!-- Ajoutez d'autres services ici si nécessaire -->
         </ul>
     </div>
