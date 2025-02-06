@@ -3,32 +3,94 @@ import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import apiClient from "~/components/api/intercepteur";
 import { useAuthStore } from "~/stores/auth.js";
-import {useGestionStore} from "~/stores/gestion.js"
+import { useGestionStore } from "~/stores/gestion.js";
 
-export default{
+export default {
     setup() {
-        const gestionStore = useGestionStore()
-        return { v$: useVuelidate(), authStore: useAuthStore(), gestionStore };
-    },
-    data(){
-        return{
-        title: 'Liste des Départements',
-        modal: false,
-        formData: {},
-        rowSelect: null,
-        isEditMode: false,  // Mode de modification ou ajout
-        selectedIndex: null,  // Index de l'élément sélectionné pour la modification
-        data: [
-        ],
+        const gestionStore = useGestionStore();
+        const authStore = useAuthStore();
+        const v$ = useVuelidate();
 
-        fields: [
+        // Variables réactives
+        const title = 'Liste des Départements';
+        const modal = ref(false);
+        const formData = ref({});
+        const rowSelect = ref(null);
+        const isEditMode = ref(false);
+        const selectedIndex = ref(null);
+        const data = ref(gestionStore.departements);
+        const fields = ref([]);
+        const isLoading = ref(false);
 
-        ]
-    }
+        const openModal = (isEditMode, data) => {
+            isEditMode.value = isEditMode;
+            modal.value = true;
+            formData.value = data;
+        };
+
+        const openAddModal = () => {
+            modal.value = !modal.value;
+            isEditMode.value = false;
+        };
+
+        const departements = async () => {
+            fields.value = [
+                { key: "slug" },
+                { key: "code" },
+                { key: "libelle" },
+                { key: "Actions" },
+            ];
+
+            if (data.value.length === 0) {
+                try {
+                    isLoading.value = true;
+                    const slug = "DPT";
+                    const response = await apiClient.get(`/categorie_by_slug/${slug}`, {
+                        headers: {
+                            'Authorization': `Bearer ${authStore.token}`,
+                        },
+                    });
+
+                    if (!response.data.error) {
+                        gestionStore.setDepartements(response.data.data);
+                    }
+                } catch (error) {
+                    if (error.response && error.response.status === 401) {
+                        console.error("Erreur 401 : Jeton invalide ou utilisateur non authentifié.");
+                    } else {
+                        console.error("Erreur lors de la récupération des départements :", error);
+                    }
+                } finally {
+                    isLoading.value = false;
+                }
+            }
+        };
+
+        // Appeler departements au montage du composant
+        onMounted(departements);
+
+        return {
+            v$,
+            authStore,
+            gestionStore,
+            title,
+            modal,
+            formData,
+            rowSelect,
+            isEditMode,
+            selectedIndex,
+            data,
+            fields,
+            isLoading,
+            openModal,
+            openAddModal,
+            departements,
+        };
     },
-    props:{
-            typeForme: String,
-        },
+
+    props: {
+        typeForme: String,
+    },
 
     validations: {
         libelleDepartement: {
@@ -39,70 +101,16 @@ export default{
         },
     },
 
-    async mounted() {
-        await this.departements()
-    },
-
     methods: {
-        handleDataSelected(payload){
-            this.selectedRow = payload.id
-            this.modal = true
+        handleDataSelected(payload) {
+            this.selectedRow = payload.id;
+            this.modal = true;
             this.isEditMode = !!payload.id;
         },
-
-        openModal(isEditMode, data) {
-            this.isEditMode = isEditMode;
-            this.modal = true; 
-            this.formData = data
-        },
-
-        openAddModal(){
-            this.modal = !this.modal
-            this.isEditMode = false
-        },
-
-        async departements() {
-        
-            this.fields = [
-                    {key: "slug"},
-                    {key: "code"},
-                    {key: "libelle"},
-                    {key:"Actions"},
-                ]
-
-        if(this.gestionStore.departements.length === 0){
-
-            try {
-                this.isLoading = true
-                const slug = "DPT"
-                const response = await apiClient.get(`/categorie_by_slug/${slug}`, {
-                    headers: {
-                        'Authorization': `Bearer ${this.gestionStore.token}`
-                    }
-                });
-
-                if (!response.data.error) {
-                    this.gestionStore.setDepartements(response.data.data)
-                }
-
-            } catch (error) {
-                if (error.response && error.response.status === 401) {
-                console.error("Erreur 401 : Jeton invalide ou utilisateur non authentifié.");
-                } else {
-                console.error("Erreur lors de la récupération des departement :", error);
-                }
-                this.isLoading = false;
-            }finally {
-                this.isLoading = false; // Fin du chargement
-            }
-        }
-
-        }
-
-    }
-    
-}
+    },
+};
 </script>
+
 <template>
     <div>
     <div class="d-flex justify-content-between">

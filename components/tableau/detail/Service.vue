@@ -94,7 +94,7 @@ onMounted(async () => {
             </div>
             <span class="badge bg-secondary rounded-pill">{{ service.slug }}</span>
         </li>
-        <li v-if="!serviceDepartement" class="text-danger"><small>aucun service disponible</small></li>
+        <li v-else class="text-danger"><small>aucun service disponible</small></li>
         <!-- Ajoutez d'autres services ici si nécessaire -->
         </ul>
     </div>
