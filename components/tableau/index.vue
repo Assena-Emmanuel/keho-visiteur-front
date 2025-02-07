@@ -4,6 +4,7 @@ import apiClient from "~/components/api/intercepteur";
 import { useAuthStore } from "~/stores/auth.js";
 import Swal from 'sweetalert2';
 import {useGestionStore} from "~/stores/gestion.js"
+import { useApi } from '~/components/api/useApi';
 
 // Props
 const props = defineProps({
@@ -21,6 +22,7 @@ const emit = defineEmits(['data-selected']);
 // Stores
 const authStore = useAuthStore();
 const gestionStore = useGestionStore()
+const { deleteItem, getAll, getCategorieBySlug } = useApi(authStore.token);
 
 // Refs
 const submitted = ref(false);
@@ -35,7 +37,7 @@ const filter = ref('');
 const sortBy = ref('age');
 const sortDesc = ref(false);
 const uuid = ref(null)
-const idDepartement = ref(null)
+const id = ref(null)
 // const data = ref([]);  // Initialiser avec un tableau vide
 
 // Computed properties
@@ -63,9 +65,11 @@ watch(() => props.modal, (newVal) => {
 const data = computed(() => {
   if(props.typeForme === "user"){
     return gestionStore.users
+
   }else if(props.typeForme === "departement"){
     return gestionStore.departements
-  }else if (props.typeForme === "servie"){
+
+  }else if (props.typeForme === "service"){
     return gestionStore.services
   }
     
@@ -109,11 +113,11 @@ const showDetailsModal = (row) => {
 
   // Afficher le modal en fonction du type de gestion
   if (props.typeForme === "departement") {
-    idDepartement.value = row.id;
+    id.value = row.id;
   } else if (props.typeForme === "user") {
     uuid.value = row.uuid;
-  } else if (props.typeForme === "servie") {
-    uuid.value = row.id;
+  } else if (props.typeForme === "service") {
+    id.value = row.id;
   }
 };
 
@@ -123,8 +127,8 @@ const handleEdit = (row) => {
     emit('data-selected', { id: row.id });
   } else if (props.typeForme === "user") {
     emit('data-selected', { uuid: row.uuid });
-  } else if (props.typeForme === "servie") {
-    uuid.value = row.id;
+  } else if (props.typeForme === "service") {
+    emit('data-selected', { id: row.id });
   }
 };
 
@@ -132,7 +136,8 @@ const hideModal = () => {
   detailModal.value = false;
 };
 
-const confirmDelete = (code) => {
+// Fonction de confirmation avant suppression
+const confirmDelete = async (row) => {
   Swal.fire({
     title: 'Êtes-vous sûr?',
     text: 'Cette action est irréversible!',
@@ -143,17 +148,50 @@ const confirmDelete = (code) => {
     confirmButtonText: 'Oui',
     cancelButtonText: 'Non',
     reverseButtons: true,
-  }).then((result) => {
+  }).then(async (result) => {
     if (result.isConfirmed) {
-      deleteItem(code);
-      Swal.fire(
-        'Supprimé!',
-        'Votre élément a été supprimé.',
-        'success'
-      );
+      const id = row.id;
+      let endpoint = 'categorie';
+
+      if (props.typeForme === 'user') {
+        endpoint = 'user'; // Remplacer l'endpoint si nécessaire
+      }
+
+      try {
+        const response = await deleteItem(endpoint, id);
+
+        // Afficher un message de succès après suppression
+        Swal.fire(
+          'Supprimé!',
+          `${response.message}`,
+          'success'
+        );
+
+        // Recharger la liste des départements après la suppression
+        let data = null
+        
+        if (props.typeForme === "departement") {
+          data = await getCategorieBySlug(`DPT`);
+          gestionStore.setDepartements(data.data)
+
+        } else if (props.typeForme === "user") {
+          data = await getAll(`${endpoint}`);
+          gestionStore.setUsers(data.data)
+
+        } else if (props.typeForme === "service") {
+          data = await getCategorieBySlug(`SRV`);
+          console.log("------------------- suppression: "+data)
+          gestionStore.setServices(data.data)
+        }
+
+      } catch (error) {
+        // Gérer les erreurs de suppression
+        errorMessage.value = 'Erreur lors de la suppression!';
+        console.error(errorMessage.value);
+      } 
     }
-  });
-};
+  })
+}
 
 const capitalizeText = (text) => {
   return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
@@ -177,7 +215,8 @@ const capitalizeText = (text) => {
             <!-- Modal Détail -->
             <BModal @hide="hideModal" v-if="detailModal" v-model="detailModal" :title="`Détail ${capitalizeText(typeForme)}`" hide-footer>
               <TableauDetailUser :uuid="uuid" v-if="typeForme == 'user'" />
-              <TableauDetailDepartement :id="idDepartement" v-if="typeForme == 'departement'"/>
+              <TableauDetailDepartement :id="id" v-if="typeForme == 'departement'"/>
+              <TableauDetailService :id="id" v-if="typeForme == 'service'"/>
             </BModal>
 
             <div v-if="isLoading" class="loading-ellipses">
@@ -220,7 +259,7 @@ const capitalizeText = (text) => {
                 v-model:sort-desc.sync="sortDesc" 
                 @filtered="onFiltered" 
               >
-                <template #cell(statut)="row">
+                <template #cell(statut)="row" v-if="props.typeForme === 'user'" >
                   <BFormCheckbox 
                     v-model="row.item.statut" 
                     class="custom-switch" 
@@ -231,13 +270,17 @@ const capitalizeText = (text) => {
                   >
                   </BFormCheckbox>
                 </template>
+                <template #cell(statut)="row" v-if="props.typeForme !== 'user'" >
+                  <span class="badge text-bg-success" v-if="row.item.statut">activé</span>
+                  <span class="badge text-bg-danger" v-else>désactivé</span>
+                </template>
 
                 <template #cell(Actions)="row">
                     <div class="d-flex gap-1">
                         <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 text-primary d-flex justify-content-center align-items-center" @click="handleEdit(row.item)">
                             <i class="fas fa-edit" ></i>
                         </BButton>
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
+                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item)">
                           <i class="uil uil-trash-alt font-size-15"></i>
                         </BButton>
                         <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex justify-content-center align-items-center" @click="showDetailsModal(row.item)">

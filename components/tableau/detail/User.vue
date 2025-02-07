@@ -21,6 +21,7 @@ onMounted(async () => {
 
 loadingDetail.value = true
 try {
+  console.log("propos------------------"+ props.uuid)
     const response = await apiClient.get(`/user/${props.uuid}`, {
       headers: { 
         'Authorization': `Bearer ${authStore.token}`, 

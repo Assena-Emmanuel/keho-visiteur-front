@@ -9,9 +9,8 @@ const props = defineProps({
 });
 
 // Reactive variables
-const detailDept = ref({});
+const detailServ = ref({});
 const loading = ref(false);
-const serviceDepartement = ref([]);
 const errorMessage = ref(""); // Nouvelle variable pour gérer les erreurs
 
 const authStore = useAuthStore();
@@ -28,19 +27,8 @@ onMounted(async () => {
     });
 
     if (!response.data.error) {
-      detailDept.value = { ...response.data.data }; // Copier les données de manière sécurisée
-
-      // Récupérer les services du département
-      const slug = "SRV"; // Slug des services
-      const responseService = await apiClient.get(`/categorie_by_slug/${slug}`, {
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,
-        },
-      });
-
-      if (!responseService.data.error) {
-        serviceDepartement.value = responseService.data.data.filter((service) => service.categorie_id == props.id);
-      }
+      detailServ.value = { ...response.data.data }; // Copier les données de manière sécurisée
+    console.log("--------------------! ",detailServ.value)
     }
 
   } catch (error) {
@@ -61,38 +49,38 @@ onMounted(async () => {
         <span class="dot">.</span>
     </div>
 
-    <div v-if="detailDept && !loading" class="card shadow-sm border-0">
+    <div v-if="detailServ && !loading" class="card shadow-sm border-0">
     
     <div class="card-body p-4">
         <!-- En-tête du département -->
         <div class="mb-4">
-        <div class="text-primary h5">
-            <i class="fas fa-building me-2"></i> Département: <span class="fw-bold">{{ detailDept.libelle }}</span>
+        <div class="h5 mb-5">
+            <i class="fas fa-list-alt me-2"></i> Service: <span class="fw-bold text-primary ">{{ detailServ.libelle }}</span>
         </div>
         <div class="d-flex justify-content-between">
           <div class="h5">
-            <i class="fas fa-hashtag me-2"></i> Code: <span class="fw-bold badge text-bg-info">{{ detailDept.code }}</span>
+            <i class="fas fa-hashtag me-2"></i> Code: <span class="fw-bold badge text-bg-info">{{ detailServ.code }}</span>
           </div>
           <div class="h5">
-            <i class="fas fa-hashtag me-2"></i> Slug: <span class="fw-bold badge text-bg-info">{{ detailDept.slug }}</span>
+            <i class="fas fa-hashtag me-2"></i> Slug: <span class="fw-bold badge text-bg-info">{{ detailServ.slug }}</span>
           </div>
         </div>
         </div>
 
         <!-- Titre des services -->
         <h5 class="border-bottom pb-3 mb-3">
-        <i class="fas fa-list-alt me-2"></i> Services du département 
+        <i class="fas fa-building me-2"></i> Département 
         <!-- <strong>{{ data.libelle }}</strong> -->
         </h5>
 
         <!-- Liste des services -->
         <ul class="list-group">
-        <li v-if="serviceDepartement" v-for="service in serviceDepartement" class="list-group-item d-flex justify-content-between align-items-center">
+        <li v-if="detailServ.parent" class="list-group-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
             <span>*</span>
-            <strong>{{ service.libelle }}</strong>
+            <strong>{{ detailServ.parent.libelle }}</strong>
             </div>
-            <span class="badge bg-secondary rounded-pill">{{ service.slug }}</span>
+            <span class="badge bg-success rounded-pill">{{ detailServ.parent.slug }}</span>
         </li>
         <li v-else class="text-danger"><small>aucun service disponible</small></li>
         <!-- Ajoutez d'autres services ici si nécessaire -->

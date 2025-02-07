@@ -11,7 +11,6 @@ const props = defineProps({
 // Reactive variables
 const detailDept = ref({});
 const loading = ref(false);
-const serviceDepartement = ref([]);
 const errorMessage = ref(""); // Nouvelle variable pour gérer les erreurs
 
 const authStore = useAuthStore();
@@ -30,17 +29,6 @@ onMounted(async () => {
     if (!response.data.error) {
       detailDept.value = { ...response.data.data }; // Copier les données de manière sécurisée
 
-      // Récupérer les services du département
-      const slug = "SRV"; // Slug des services
-      const responseService = await apiClient.get(`/categorie_by_slug/${slug}`, {
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,
-        },
-      });
-
-      if (!responseService.data.error) {
-        serviceDepartement.value = responseService.data.data.filter((service) => service.categorie_id == props.id);
-      }
     }
 
   } catch (error) {
@@ -87,15 +75,14 @@ onMounted(async () => {
 
         <!-- Liste des services -->
         <ul class="list-group">
-        <li v-if="serviceDepartement" v-for="service in serviceDepartement" class="list-group-item d-flex justify-content-between align-items-center">
+        <li v-if="detailDept.children" v-for="service in detailDept.children" class="list-group-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
             <span>*</span>
             <strong>{{ service.libelle }}</strong>
             </div>
             <span class="badge bg-secondary rounded-pill">{{ service.slug }}</span>
         </li>
-        <li v-if="!serviceDepartement" class="text-danger"><small>aucun service disponible</small></li>
-        <!-- Ajoutez d'autres services ici si nécessaire -->
+
         </ul>
     </div>
     </div>

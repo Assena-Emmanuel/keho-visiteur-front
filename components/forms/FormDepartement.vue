@@ -5,10 +5,15 @@ import { required } from "@vuelidate/validators";
 import { useAuthStore } from "~/stores/auth.js";
 import apiClient from '~/components/api/intercepteur';
 import { useGestionStore } from "~/stores/gestion.js";
+import { useApi } from '~/components/api/useApi';
+
+
 
 const authStore = useAuthStore()
 const gestionStore = useGestionStore()
+const SLUG = "DPT"
 
+const { getCategorieBySlug, createResource } = useApi(authStore.token);
 
 // Déclaration des props
 const props = defineProps({
@@ -58,40 +63,44 @@ const onSaveDepartement = async () => {
   v$.value.$touch();
 
   if (v$.value.libelleDepartement.$error || v$.value.codeDepartement.$error) {
+    alert()
     return;
+
   }else{
     loadingAdd.value = true
-    try{
 
-      const formData = new FormData();
-      formData.append('libelle', libelleDepartement.value);
-      formData.append('slug', slug.value);
-      formData.append('code', codeDepartement.value);
-      formData.append('position', 1);  
-      formData.append('statut', statut.value || 1);
-      formData.append('categorie_id',  null); 
+    try{
+      const formData = {
+      libelle: libelleDepartement.value,
+      slug: slug.value,
+      code: codeDepartement.value,
+      position: 1,
+      statut: statut.value || 1,
+      categorie_id: null, 
+
+    };
       
-      const response = await apiClient.post(`/categorie`, formData, {
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,  
-        },
-      });
+      const response = await createResource("categorie", formData);
 
       if (!response.data.error) {
-        errorMessage.value = response.data.message;  
+        const data = await getCategorieBySlug(SLUG);
+        gestionStore.setDepartements(data.data)
         departements() // reuperer tous les departemeents
         resetForm();  // Réinitialisation du formulaire après une mise à jour réussie
-        console.error('----------------------------SaveA');
         erreur.value = false
+
       } else {
         erreur.value = true
         errorMessage.value = "Creation echouée !";
         console.error(response.data.message);
+
       }
     }catch(error){
       console.error("error creer : "+error.message);
+
     }finally{
       loadingAdd.value = false
+      
     }
     
   }
@@ -266,6 +275,7 @@ const resetForm = () => {
       :title="isEditMode ? `Modifier le département ` : 'Création du département'" 
       title-class="font-18" 
       hide-footer
+      no-close-on-backdrop
   >
 
   <div v-if="loading" class="loading-ellipses">

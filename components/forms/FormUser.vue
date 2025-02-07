@@ -5,9 +5,15 @@ import { required, email } from "@vuelidate/validators";
 import apiClient from '~/components/api/intercepteur';
 import { useAuthStore } from '~/stores/auth.js';
 import Swal from 'sweetalert2';
+import { useApi } from '~/components/api/useApi';
+import { useGestionStore } from "~/stores/gestion.js";
+
 
 // Stores
 const authStore = useAuthStore();
+const {getAll} = useApi(authStore.token)
+const gestionStore = useGestionStore()
+
 
 // Réactifs
 const loading = ref(false); 
@@ -39,6 +45,8 @@ const selectRoles = ref(null);
 const next = ref(false);
 const uuid = ref(null)
 let data = ref({})
+const password = ref(null)
+const confirmPassword = ref(null)
 
 // Vuelidate - Validation rules
 const rules = {
@@ -64,7 +72,9 @@ const props = defineProps({
 });
 
 // Watchers
-watch(() => props.uuid, async (newUuid) => {
+watch(
+  () => props.uuid, 
+  async (newUuid) => {
   if (newUuid) {
     data.value = await getUser(newUuid); 
     if(data.value) {
@@ -82,11 +92,13 @@ watch(() => props.uuid, async (newUuid) => {
       service.value = data.value.visite ? data.value.visite.service.libelle : "";
     }
   }
-});
+},
+{ immediate: true }
+);
 
 // Méthodes asynchrones
 async function getUser(uuid) {
-  loading.value = true;
+  loadingDetail.value = true;
   try {
     const response = await apiClient.get(`/user/${uuid}`, {
       headers: { 'Authorization': `Bearer ${authStore.token}` },
@@ -97,7 +109,7 @@ async function getUser(uuid) {
   } catch (error) {
     console.error('Error fetching user:', error);
   } finally {
-    loading.value = false; 
+    loadingDetail.value = false; 
   }
 }
 
@@ -155,6 +167,69 @@ const onNext = () => {
   }
 };
 
+const onUpdateUser = async () => {
+  submitted.value = true;
+  v$.value.$touch();
+
+  if (v$.value.codeVisite.$error || v$.value.departement.$error || v$.value.service.$error || v$.value.role.$error || v$.value.matricule.$error) {
+    return;
+  } else {
+    loadingEdit.value = true;
+    try {
+      const formData = new FormData();
+      formData.append('nom', nom.value);
+      formData.append('prenom', prenom.value);
+      formData.append('email', e_mail.value);
+      formData.append('telephone1', telephone1.value);
+      formData.append('telephone2', telephone2.value);
+      formData.append('civilite', civilite.value);
+      formData.append('matricule', matricule.value);
+      formData.append('departement_id', departement.value);
+      formData.append('service_id', service.value);
+
+      if (photo.value) {
+        formData.append('image', photo.value);
+      }
+
+      const response = await apiClient.post(`/user/${uuid.value}`, formData, {
+        headers: { 'Authorization': `Bearer ${authStore.token}` },
+      });
+
+      if(!response.data.error){
+        const users = await getAll("user")
+        gestionStore.setUsers(users.data)
+        successmsg("Utilisateur créé avec succès!");
+        resetForm();
+      }else{
+        console.error("----- Erreur lors de la création de l'utilisateur :", response.data.message);
+      }
+      
+    } catch (error) {
+      console.error("Erreur lors de la création de l'utilisateur :", error);
+    } finally {
+      loadingEdit.value = false;
+    }
+  }
+};
+
+const onPasswordNext = () => {
+  // Vous pouvez valider ici les champs de mot de passe
+  if (!v$.value.password || !v$.value.confirmPassword) {
+    return; // Ne permet pas de continuer si les champs de mot de passe sont vides
+  }
+
+  // Vérifiez si les mots de passe correspondent
+  if (v$.value.password.$model !== v$.value.confirmPassword.$model) {
+    // Gérer l'erreur ici
+    return; // Ne permet pas de continuer si les mots de passe ne correspondent pas
+  }
+
+  // Si tout est correct, permettre la navigation à l'étape suivante
+  activeTabMotDePasse.value = true;
+  toggleWizard(3, 100); // Passe à l'étape du mot de passe
+};
+
+
 const onSave = async () => {
   submitted.value = true;
   v$.value.$touch();
@@ -179,9 +254,18 @@ const onSave = async () => {
         formData.append('image', photo.value);
       }
 
-      await apiClient.post(`/user/${uuid.value}`, formData, {
+      const response = await apiClient.post(`/user`, formData, {
         headers: { 'Authorization': `Bearer ${authStore.token}` },
       });
+
+      if(!response.data.error){
+        const users = await getAll("user")
+        gestionStore.setUsers(users.data)
+        successmsg("Utilisateur créé avec succès!");
+        resetForm();
+      }else{
+        console.error("----- Erreur lors de la création de l'utilisateur :", response.data.message);
+      }
 
       successmsg("Utilisateur créé avec succès!");
       resetForm();
@@ -193,10 +277,14 @@ const onSave = async () => {
   }
 };
 
+const emit = defineEmits(["update:isOpen", "update:uuid"]);
+
 // Réinitialiser le formulaire
 const resetForm = () => {
   submitted.value = false;
-  emit('update:isOpen', false);
+  loadingDetail.value = false
+  loadingCreer.value = false
+  emit("update:isOpen", false);
   emit('update:uuid', null);
   toggleWizard(1, 26);
   activeTabprofessionnelle.value = false;
@@ -236,17 +324,17 @@ const successmsg = (message, type = 'success') => {
       size="lg"
       :modelValue="isOpen" 
       @update:modelValue="$emit('update:modelValue', $event)"
-      :title="isEditMode ? `Modifier les informations ${(data.nom).toUpperCase()}` : 'Création d\'Utilisateur'" 
+      :title="isEditMode ? `Modifier les informations` : 'Création d\'Utilisateur'" 
       title-class="font-18" 
       hide-footer
       no-close-on-backdrop
   >
-  <!-- <div v-if="loadingDetail" class="loading-ellipses">
+  <div v-if="loadingDetail" class="loading-ellipses">
         <span class="dot">.</span>
         <span class="dot">.</span>
         <span class="dot">.</span>
-    </div> -->
-  <BForm action="#">
+    </div>
+      <BForm v-else action="#">
             <div id="custom-progress-bar" class="progress-nav mb-4">
               <div class="progress">
                 <div class="progress-bar" role="progressbar" :style="`width: ${progressBarValue}%;`" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -494,7 +582,14 @@ const successmsg = (message, type = 'success') => {
                   </BCol>
 
                   <div class="mt-4 d-flex justify-content-center">
-                    <BButton v-if="!isEditMode" variant="primary" class="ms-2" @click="onSave">
+                    <BButton 
+                      v-if="!isEditMode" 
+                      variant="primary" 
+                      class="ms-2" 
+                      @click="onSave"
+                      :loading="loadingCreer" 
+                      loading-text="creation"
+                    >
                       <span class="px-md-5">Enregistrer</span>
                     </BButton>
                     <BButton
