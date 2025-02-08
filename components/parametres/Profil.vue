@@ -1,116 +1,126 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
+import { useAuthStore } from "~/stores/auth.js";
+import { useGestionStore } from "~/stores/gestion.js";
+import { useApi } from '~/components/api/useApi';
 
 export default {
-  setup() {
-    const formData = {
-      libelleDepartement: "",
-      codeDepartement: ""
-    };
+    setup() {
+        const gestionStore = useGestionStore();
+        const authStore = useAuthStore();
+        const v$ = useVuelidate();
+        const  { getAll } = useApi(authStore.token)
 
-    const v$ = useVuelidate();
+        // Variables réactives
+        const title = 'Liste des Profils';
+        const modal = ref(false);
+        const formData = ref({});
+        const rowSelect = ref(null);
+        const isEditMode = ref(false);
+        const selectedIndex = ref(null);
+        const data = ref([]);
+        const fields = ref([]);
+        const isLoading = ref(false);
 
-    return {
-      v$,
-      formData
-    };
-  },
-  data() {
-    return {
-      title: "Liste des Profils",
-      modal: false,
-      isDetailMode: false,
-      isEditMode: false, // Mode de modification ou ajout
-      selectedIndex: null, // Index de l'élément sélectionné pour la modification
-      data: [
-        {
-          "Code profil": "ADMIN",
-          Libelle: "ADMINISTRATEUR",
-          "Ajouté le": "2024-09-30",
-          Description: "Description 1"
-        },
-        {
-          "Code profil": "EMPLO",
-          Libelle: "EMPLOYE",
-          "Ajouté le": "2024-10-01",
-          Description: "Description 2"
-        },
-        {
-          "Code profil": "ASSIS",
-          Libelle: "ASSISTANTE",
-          "Ajouté le": "2024-10-05",
-          Description: "Description 3"
-        }
-      ],
-      fields: [
-        {
-          key: "Code profil"
-        },
-        {
-          key: "Libelle"
-        },
-        {
-          key: "Ajouté le"
-        },
-        {
-          key: "Actions"
-        }
-      ]
-    };
-  },
-  props: {
-    typeForme: {
-      type: String,
-      required: false
-    }
-  },
-  validations() {
-    return {
-      formData: {
-        libelleDepartement: { required },
-        codeDepartement: { required }
-      }
-    };
-  },
-  methods: {
-  openModal(isEditMode, data) {
-    this.isDetailMode = false;
-    this.isEditMode = isEditMode;
-    this.modal = true;
-    this.formData = { ...data };  // Cloner les données pour éviter les modifications directes
-  },
-  openModalDetail(isDetailMode, data) {
-    this.isEditMode = false;
-    this.isDetailMode = isDetailMode;
-    this.modal = true;
-    this.formData = { ...data };
-  },
-  openAddModal() {
-    this.modal = true;
-    this.isEditMode = false;
-    this.isDetailMode = false;
-    this.formData = {
-      libelleDepartement: "",
-      codeDepartement: ""
-    };  // Réinitialiser le formulaire
-  }
-}
+        const openModal = (isEditMode, data) => {
+            isEditMode.value = isEditMode;
+            modal.value = true;
+            formData.value = data;
+        };
 
+        const openAddModal = () => {
+            modal.value = !modal.value;
+            isEditMode.value = false;
+        };
+
+        const profils = async () => {
+            fields.value = [
+                { key: "libelle" },
+                { key: "description" },
+                { key: "Actions" },
+            ];
+
+            if (gestionStore.profils.length === 0) {
+              try {
+                  isLoading.value = true;
+                  const response = await getAll("role")
+
+                  if (!response.error) {
+                    gestionStore.setProfils(response.data);
+
+                  }
+              } catch (error) {
+                  if (error.response && error.response.status === 401) {
+                      console.error("Erreur 401 : Jeton invalide ou utilisateur non authentifié.");
+
+                  } else {
+                      console.error("Erreur lors de la récupération des profild :", error);
+
+                  }
+              } finally {
+                  isLoading.value = false;
+                  
+              }
+            }
+        };
+
+        // Appeler profils au montage du composant
+        onMounted(profils);
+
+        return {
+            v$,
+            authStore,
+            gestionStore,
+            title,
+            modal,
+            formData,
+            rowSelect,
+            isEditMode,
+            selectedIndex,
+            data,
+            fields,
+            isLoading,
+            openModal,
+            openAddModal,
+            profils,
+        };
+    },
+
+    props: {
+        typeForme: String,
+    },
+
+    validations: {
+        libelleDepartement: {
+            required,
+        },
+        codeDepartement: {
+            required,
+        },
+    },
+
+    methods: {
+        handleDataSelected(payload) {
+            this.selectedRow = payload.id;
+            this.modal = true;
+            this.isEditMode = !!payload.id;
+        },
+    },
 };
 </script>
 
 <template>
     <div>
     <div class="d-flex justify-content-between">
-        <div class="mb-0">Gestion des Profils</div>
+        <div class="mb-0">Gestion des profils</div>
         <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
-        <FormsFormProfil 
-            :modelValue="modal"
-            @update:modelValue="modal = $event"
+        <FormsFormProfil
+            :isOpen="modal"
+            :id="selectedRow"
+            @update:isOpen="modal = $event"
             :isEditMode="isEditMode"
-            :isDetailMode="isDetailMode"
-            :formData="formData"
+            @update:id="modal = $event"
         />
 
     </div>
@@ -118,12 +128,12 @@ export default {
 
     <Tableau 
         :fields="fields" 
-        :data="data" 
         :title="title" 
         :show-addbtn="true" 
         :typeForme="'profil'" 
+        :is-loading="isLoading"
         @edit="openModal(true, $event)"
-        @detail="openModalDetail(true, $event)"
+        @data-selected="handleDataSelected"
     />
 </div>
 </template>

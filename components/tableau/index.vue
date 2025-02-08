@@ -71,6 +71,12 @@ const data = computed(() => {
 
   }else if (props.typeForme === "service"){
     return gestionStore.services
+
+  }else if (props.typeForme === "profil"){
+    return gestionStore.profils
+
+  }else if (props.typeForme === "menu"){
+    return gestionStore.menus
   }
     
   return []
@@ -118,6 +124,8 @@ const showDetailsModal = (row) => {
     uuid.value = row.uuid;
   } else if (props.typeForme === "service") {
     id.value = row.id;
+  }else if (props.typeForme === "profil") {
+    id.value = row.id;
   }
 };
 
@@ -125,10 +133,19 @@ const showDetailsModal = (row) => {
 const handleEdit = (row) => {
   if (props.typeForme === "departement") {
     emit('data-selected', { id: row.id });
+
   } else if (props.typeForme === "user") {
     emit('data-selected', { uuid: row.uuid });
+
   } else if (props.typeForme === "service") {
     emit('data-selected', { id: row.id });
+
+  } else if (props.typeForme === "profil") {
+    emit('data-selected', { id: row.id });
+
+  }else if (props.typeForme === "menu") {
+    emit('data-selected', { id: row.id });
+    
   }
 };
 
@@ -156,10 +173,15 @@ const confirmDelete = async (row) => {
       if (props.typeForme === 'user') {
         endpoint = 'user'; // Remplacer l'endpoint si nécessaire
       }
+      if (props.typeForme === 'profil') {
+        endpoint = 'role'; // Remplacer l'endpoint si nécessaire
+      }
+      if (props.typeForme === 'menu') {
+        endpoint = 'menu'; // Remplacer l'endpoint si nécessaire
+      }
 
       try {
         const response = await deleteItem(endpoint, id);
-
         // Afficher un message de succès après suppression
         Swal.fire(
           'Supprimé!',
@@ -172,7 +194,7 @@ const confirmDelete = async (row) => {
         
         if (props.typeForme === "departement") {
           data = await getCategorieBySlug(`DPT`);
-          gestionStore.setDepartements(data.data)
+          gestionStore.setDepartements(data.data.data)
 
         } else if (props.typeForme === "user") {
           data = await getAll(`${endpoint}`);
@@ -180,14 +202,21 @@ const confirmDelete = async (row) => {
 
         } else if (props.typeForme === "service") {
           data = await getCategorieBySlug(`SRV`);
-          console.log("------------------- suppression: "+data)
-          gestionStore.setServices(data.data)
+          gestionStore.setServices(data.data.data)
+
+        } else if (props.typeForme === "profil") {
+          data = await getAll(`${endpoint}`);
+          gestionStore.setProfils(data.data)
+
+        }else if (props.typeForme === "menu") {
+          data = await getAll(`${endpoint}`);
+          gestionStore.setMenus(data.data)
         }
 
       } catch (error) {
         // Gérer les erreurs de suppression
         errorMessage.value = 'Erreur lors de la suppression!';
-        console.error(errorMessage.value);
+        console.error(errorMessage.value, error);
       } 
     }
   })
@@ -217,6 +246,7 @@ const capitalizeText = (text) => {
               <TableauDetailUser :uuid="uuid" v-if="typeForme == 'user'" />
               <TableauDetailDepartement :id="id" v-if="typeForme == 'departement'"/>
               <TableauDetailService :id="id" v-if="typeForme == 'service'"/>
+              <TableauDetailProfil :id="id" v-if="typeForme == 'profil'"/>
             </BModal>
 
             <div v-if="isLoading" class="loading-ellipses">
@@ -283,7 +313,7 @@ const capitalizeText = (text) => {
                         <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item)">
                           <i class="uil uil-trash-alt font-size-15"></i>
                         </BButton>
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex justify-content-center align-items-center" @click="showDetailsModal(row.item)">
+                        <BButton v-if="typeForme !== 'menu'" style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex justify-content-center align-items-center" @click="showDetailsModal(row.item)">
                           <i class="fas fa-eye"></i>
                         </BButton>
                     </div>

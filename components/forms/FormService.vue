@@ -6,6 +6,7 @@ import { useAuthStore } from "~/stores/auth.js";
 import apiClient from '~/components/api/intercepteur';
 import { useGestionStore } from "~/stores/gestion.js";
 import { useApi } from '~/components/api/useApi';
+import Swal from "sweetalert2";
 
 const authStore = useAuthStore()
 const gestionStore = useGestionStore()
@@ -67,16 +68,15 @@ const onSaveService = async () => {
     loadingAdd.value = true
     erreur.value = false
     try{
+      const formData = {
+      libelle: libelle.value,
+      slug: slug.value,
+      code: code.value,
+      position: 1,
+      statut: statut.value || 1,
+      categorie_id: departementPrincipale.value || null, 
 
-      const formData = new FormData();
-      formData.append('libelle', libelle.value);
-      formData.append('slug', slug.value);
-      formData.append('code', code.value);
-      formData.append('position', 1);  
-      formData.append('statut', statut.value || 1);
-      formData.append('categorie_id',  departementPrincipale.value || null); 
-
-      console.log(departementPrincipale.value+":------------"+departementPrincipale.value || null)
+    };
 
       const data = await createResource(`categorie`, formData);
       console.log("Error:------------"+JSON.stringify(data))
@@ -84,8 +84,8 @@ const onSaveService = async () => {
         
 
         const data = await getCategorieBySlug(SLUG);
-        console.log("data save:------------"+JSON.stringify(data))
-        gestionStore.setServices(data.data)
+        console.log("data save:------------"+JSON.stringify(data.data))
+        gestionStore.setServices(data.data.data)
         alertMessage(data.data.message, 'success')
         resetForm()
         
@@ -111,7 +111,7 @@ onMounted(async () => {
 try {
   // Récupérer tous les départements
   const departements = await getCategorieBySlug("DPT");
-  selectDepartements.value = departements.data; 
+  selectDepartements.value = departements.data.data; 
 } catch (error) {
   console.error('Erreur lors de la récupération des données:', error);
 }
@@ -208,7 +208,7 @@ const departements = async () => {
 
 // Alert
 function alertMessage(message, icon = "error") {
-    this.$swal.fire({
+    Swal.fire({
       position: "top",
       icon,
       text: message,
@@ -285,7 +285,7 @@ const resetForm = () => {
   <BModal 
       @hide="resetForm" 
       :modelValue="isOpen" 
-      size="md"
+      size="lg"
       :title="isEditMode ? `Modifier le service ` : 'Créer un Service'" 
       title-class="font-18" 
       hide-footer

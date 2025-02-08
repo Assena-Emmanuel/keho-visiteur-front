@@ -34,7 +34,7 @@ export const useApi = (token) => {
       if (response.data.error) {
         throw new Error(response.data.message); // Si l'API retourne une erreur
       }
-
+      
       return response.data; // Retourne le message de succès ou d'erreur
     } catch (error) {
       console.error('Erreur lors de la suppression de l\'élément:', error);
@@ -49,7 +49,6 @@ export const useApi = (token) => {
           'Authorization': `Bearer ${token}`,
         },
       });
-      console.log("------------------- suppression: "+JSON.stringify(response))
       return response
     } catch (error) {
       console.error("Erreur lors de la récupération de la catégorie :", error);
@@ -58,6 +57,22 @@ export const useApi = (token) => {
   };
 
 
+  const getById = async (endpoint, id) => {
+    try {
+      const response = await apiClient.get(`/${endpoint}/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      return response.data
+    } catch (error) {
+      console.error("Erreur lors de la récupération de la catégorie :", error);
+      throw error;  // Relance l'erreur pour que le composant appelant puisse la gérer
+    }
+  };
+
+
+  
   const createResource = async (endpoint, data) => {
     
     try {
@@ -66,7 +81,7 @@ export const useApi = (token) => {
           'Authorization': `Bearer ${token}`,
         },
       });
-      console.log('endpoint--------------------'+ JSON.stringify(response.data))
+      
       return response
     } catch (error) {
       console.error(`Erreur lors de la création de la ressource à ${endpoint}:`, error);
@@ -75,7 +90,27 @@ export const useApi = (token) => {
   };
 
 
+  const updateResource = async (endpoint, data) => {
+    
+    try {
+      const response = await apiClient.put(`/${endpoint}`, data, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.error) {
+        throw new Error(response.data.message); // Si l'API retourne une erreur
+      }
+
+      return response
+    } catch (error) {
+      console.error(`Erreur lors de la mise a jour de la ressource à ${endpoint}:`, error);
+      throw error;  
+    }
+  };
 
 
-  return { getAll, deleteItem, getCategorieBySlug, createResource }; // Retourner les deux fonctions
+
+  return { getById, getAll, updateResource, deleteItem, getCategorieBySlug, createResource }; // Retourner les deux fonctions
 };

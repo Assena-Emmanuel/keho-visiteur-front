@@ -6,6 +6,7 @@ import { useAuthStore } from "~/stores/auth.js";
 import apiClient from '~/components/api/intercepteur';
 import { useGestionStore } from "~/stores/gestion.js";
 import { useApi } from '~/components/api/useApi';
+import Swal from "sweetalert2";
 
 
 
@@ -57,6 +58,22 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, { libelleDepartement, codeDepartement, slug });
 
+
+function alertMessage(message, icon = "error") {
+    Swal.fire({
+      position: "top",
+      icon,
+      text: message,
+      showConfirmButton: false,
+      timer: 2000,
+      customClass: {
+        popup: 'custom-popup',
+        icon: 'custom-icon',
+        title: 'custom-title'
+      }
+    });
+  }
+
 // Méthodes
 const onSaveDepartement = async () => {
   submitted.value = true;
@@ -84,10 +101,10 @@ const onSaveDepartement = async () => {
 
       if (!response.data.error) {
         const data = await getCategorieBySlug(SLUG);
-        gestionStore.setDepartements(data.data)
-        departements() // reuperer tous les departemeents
-        resetForm();  // Réinitialisation du formulaire après une mise à jour réussie
-        erreur.value = false
+        gestionStore.setDepartements(data.data.data)
+        alertMessage(data.data.message, 'success')
+        resetForm();  
+
 
       } else {
         erreur.value = true
@@ -100,7 +117,7 @@ const onSaveDepartement = async () => {
 
     }finally{
       loadingAdd.value = false
-      
+      erreur.value = false
     }
     
   }
