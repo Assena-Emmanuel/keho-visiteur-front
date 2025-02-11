@@ -6,15 +6,14 @@
       <div v-if="afficheCamera==false" class="row">
         <div class="col-md-6">
           <label for="rectoFile" class="form-label">Recto</label>
-          <input class="form-control form-control-sm" @change="handleFileChange('rectoFile')" type="file" id="rectoFile">
-          <!-- <input class="form-control form-control-sm" v-model="rectoFile" type="file" id="rectoFile"> -->
+          <input class="form-control form-control-sm" @change="handleFileChange($event,'rectoFile')" type="file" id="rectoFile">
         </div>
         <div class="col-md-6">
           <label for="versoFile" class="form-label">Verso</label>
-          <input class="form-control form-control-sm" @change="handleFileChange('versoFile')" type="file" id="rectoFile">
-          <!-- <input class="form-control form-control-sm" v-model="versoFile" type="file" id="versoFile"> -->
+          <input class="form-control form-control-sm" @change="handleFileChange($event,'versoFile')" type="file" id="versoFile">
         </div>
       </div>
+
 
       <div v-if="afficheCamera" class="row text-center">
         <div class="col-6">
@@ -31,18 +30,18 @@
     </div>
     <div class="d-flex justify-content-center mt-4">
         <BFormCheckbox
-            v-model="afficheCamera"
-            name="camera"
-            @click="choisirAppareil"
-            class="border border-secondary"
+          v-model="afficheCamera"
+          name="camera"
+          @click="choisirAppareil"
+          class="border border-secondary"
         >
           Appareil photo 
         </BFormCheckbox>
       </div>
 
       <div class="row align-items-end">
-          <div  class="col-lg-5 position-relative"> <!-- Ajout de position-relative ici -->
-            <video class="border border-secondary" id="video" ref="video" autoplay style="display: none;"></video>
+          <div  class="col-lg-5 "> <!-- Ajout de position-relative ici -->
+            <video class="" id="video" ref="video" autoplay style="display: none;"></video>
             <div class="button-container d-flex gap-3 px-3"  style="position: absolute; bottom: 10px; left: 10px; right: 10px;"> <!-- Positionnement absolu -->
                 <button class="btn btn-primary" @click="takeSnapshot('canvas', 'rectoFichiercache')" id="click-photo" :style="{ display: !appareilRecto ? 'none' : 'block' }"> 
                     <i class="fas fa-camera-retro"></i> <span class="d-md-block d-none">Capturer Recto</span><span class="d-md-none d-block">Recto</span>
@@ -54,8 +53,12 @@
                 <button class="btn btn-secondary" @click="reset('canvas')" id="resetBtn" :style="{ display: !appareilRecto  ? 'none' : 'block' }">
                     <i class="fas fa-sync-alt"></i> <span class="d-md-block d-none">Réinitialisation</span>
                 </button>
-                <button class="btn btn-secondary" @click="reset('canvasVerso')" id="resetBtn" :style="{ display: !appareilVerso ? 'none' : 'block' }">
-                    <i class="fas fa-sync-alt"></i> <span class="d-md-block d-none">Réinitialisation</span>
+                <button 
+                  class="btn btn-danger" 
+                  @click="fermerCamera()" 
+                  v-show="appareilRecto || appareilVerso"
+                >
+                  <i class="fas fa-times"></i> Fermer Caméra
                 </button>
               
             </div>
@@ -86,6 +89,17 @@
 
 <script>
 export default {
+  props: {
+    rectoImage: {
+      type: [String, Object], // Utilisez Object pour gérer des types comme File
+      required: false
+    },
+    versoImage: {
+      type: [String, Object], // Utilisez Object pour gérer des types comme File
+      required: false
+    }
+  },
+
   data() {
     return {
       video: null,
@@ -107,8 +121,26 @@ export default {
 
   methods: {
     handleFileChange(event, typeFile) {
-      this[typeFile] = event.target.files[0];
-    },
+      
+      if (!event.target.files.length) return;
+
+      const fichier = event.target.files[0];
+      console.log("Fichier sélectionné---------------- :", fichier);
+      console.log("Propriétés du fichier:", fichier.name, fichier.size, fichier.type);
+
+      if (typeFile === 'rectoFile') {
+        this.rectoFichier = fichier;
+        // Émettre l'événement avec le fichier
+        this.$emit('update:rectoImage', fichier);
+      } else {
+        this.versoFichier = fichier;
+        // Émettre l'événement avec le fichier
+        this.$emit('update:versoImage', fichier);
+      }
+
+    }
+
+    ,
     choisirAppareil(){
       if(this.afficheCamera){
         this.video.style.display = 'none';
@@ -166,9 +198,11 @@ export default {
         console.error(error.message);
       }
     },
+    
 
     takeSnapshot(canvas, hiddenInput) {
         if (this[canvas] && this.video) {
+
             const ctx = this[canvas].getContext('2d');
             // Ajuster la taille du canvas à la vidéo
             this[canvas].width = this.video.videoWidth;
@@ -181,7 +215,31 @@ export default {
             this[hiddenInput] = imageDataUrl;
             // Afficher le canvas
             this[canvas].style.display = 'block';
-        }
+
+            // emission de l'image au parent
+            if (canvas === 'recto') {
+              this.rectoFichier = imageDataUrl;
+              this.$emit('update:rectoImage', imageDataUrl);
+            } else {
+              this.versoFichier = imageDataUrl;
+              this.$emit('update:versoImage', imageDataUrl);
+            }
+          }
+       
+    },
+
+    fermerCamera() {
+      this.appareilRecto = false;
+      this.appareilVerso = false;
+
+      // Arrêter la caméra
+      const video = this.$refs.video;
+      if (video && video.srcObject) {
+        const stream = video.srcObject;
+        stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        this.video.style.border = 'none'
+      }
     },
 
     reset(canvas) {
@@ -214,4 +272,5 @@ video, canvas {
   width: 100%; /* Ensure both video and canvas take full width */
   border-radius: 5px; /* Optional: add some rounded corners */
 }
+
 </style>

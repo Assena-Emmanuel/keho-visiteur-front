@@ -105,6 +105,7 @@ export default {
             this.selectedRow = payload.id;
             this.modal = true;
             this.isEditMode = !!payload.id;
+            console.log("edit-----------------------------: "+this.isEditMode)
         },
     },
 };

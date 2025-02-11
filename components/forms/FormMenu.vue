@@ -22,7 +22,7 @@ const props = defineProps({
 });
 
 // Déclaration des événements
-const emit = defineEmits(["update:isOpen", "update:id"]);
+const emit = defineEmits(["update:isOpen", "update:id", "update-edit-mode"]);
 
 
 // Variables réactives
@@ -40,7 +40,7 @@ const position = ref("");
 const name = ref("");
 const statut = ref("");
 const menu_id = ref(null);
-const isEditMode = ref("");
+// const isEditMode = ref("");
 const menus = ref([])
 
 
@@ -50,6 +50,9 @@ const rules = computed(() => ({
     required,
   },
   name: {
+    required,
+  },
+  target: {
     required,
   },
 
@@ -62,7 +65,7 @@ const onSaveMenu = async () => {
   submitted.value = true;
   v$.value.$touch();
 
-  if (v$.value.libelle.$error) {
+  if (v$.value.libelle.$error || v$.value.target.$error || v$.value.name.$error) {
     return;
 
   }else{
@@ -91,6 +94,7 @@ const onSaveMenu = async () => {
         resetForm()
         
       }else{
+        console.log("------------------------------error: "+JSON.stringify(data.data))
         alertMessage(data.data.message, 'error')
         erreur.value = true
         errorMessage = data.data.message
@@ -110,9 +114,6 @@ onMounted(async () => {
 
 try {
   // recuperation des menus
-  const menus = await getAll("menu")
-  menus.value = menus.data
-  console.log("--------------------------menu "+ JSON.stringify(menus.value))
   
 } catch (error) {
   console.error('Erreur lors de la récupération des données:', error);
@@ -134,6 +135,10 @@ watch(
       type.value = menu.data.type
       menu_id.value = menu.data.menu_id
 
+      // tous les menus
+      const menus = await getAll("menu")
+      menus.value = menus.data
+
       loading.value = false
     }
   },
@@ -147,6 +152,7 @@ const onUpdateMenu = async () => {
 
   // Vérification des erreurs de validation
   if (v$.value.$invalid) {
+    alert(target.value)
     return; // Si des erreurs existent, on arrête la fonction
   }
 
@@ -230,7 +236,7 @@ const resetForm = () => {
   
   emit("update:isOpen", false);
   emit("update:id", null);
-
+  emit('update-edit-mode', !props.isEditMode);
   v$.value.$reset();
 };
 </script>
@@ -240,7 +246,6 @@ const resetForm = () => {
   <BModal 
       @hide="resetForm" 
       :modelValue="isOpen" 
-      @update:modelValue="$emit('update:modelValue', $event)"
       size="lg"
       :title="isEditMode ? `Modification du Menu ` : 'Création du Menu'" 
       title-class="font-18" 
@@ -282,15 +287,16 @@ const resetForm = () => {
                 <label for="target" style="font-size: 12px;">Target </label>
                 <div>
                     <input 
-                    v-model="target" 
-                    id="target" 
-                    class="form-control form-control-sm"  
-                    type="text"
-                    :class="{
-                    'is-invalid': submitted && v$.target.$error,
-                    'border border-danger': submitted && v$.target.$error,
-                    'border border-secondary': !(submitted && v$.target.$error)
-                    }">
+                      v-model="target" 
+                      id="target" 
+                      class="form-control form-control-sm"  
+                      type="text"
+                      :class="{
+                      'is-invalid': submitted && v$.target.$error,
+                      'border border-danger': submitted && v$.target.$error,
+                      'border border-secondary': !(submitted && v$.target.$error)
+                      }"
+                    >
                     <div v-if="submitted && v$.target.$error" class="invalid-feedback">
                     <span v-if="v$.target.required.$invalid" class="font-size-12">champ obligatoire
                     </span>
@@ -299,7 +305,7 @@ const resetForm = () => {
             </div>
         </BCol>
 
-        <!-- <BCol md="6">
+        <BCol md="6">
             <div class="mb-3">
                 <label for="type" style="font-size: 12px;">Type </label>
                 <div class="input-group">
@@ -309,7 +315,7 @@ const resetForm = () => {
                     </select>
                 </div>
             </div>
-        </BCol> -->
+        </BCol>
         
         <BCol md="6">
             <div class="mb-3">
