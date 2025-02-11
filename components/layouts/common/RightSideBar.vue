@@ -10,22 +10,20 @@ import {
   topBarOptions,
   layoutModeOptions
 } from "~/components/layouts/utils/rightSideBar.js";
-// import { NuxtLink } from "#build/components";
 
 export default {
   setup(){
     return {authStore: useAuthStore()}
   },
   data() {
-    const authStore = useAuthStore()
     return {
       layoutOptions,
       widthOptions,
       sideBarTypeOptions,
       topBarOptions,
       layoutModeOptions,
-      user: authStore.user,
-      token: authStore.token,
+      user: "",
+      token: "",
     };
   },
   components: {
@@ -86,9 +84,9 @@ export default {
 
   
   mounted() {
+    this.user = this.authStore.user,
+    this.token = this.authStore.token,
     this.addEventListener();
-    let dataUser = localStorage.getItem('user')
-    this.user = JSON.parse(dataUser)
   },
 
 
@@ -103,9 +101,6 @@ export default {
             }).then(response => {
               this.authStore.logout()
               
-              const userStore = useUserStore()
-              userStore.clearUser()
-              
               // Rediriger vers la page enregistrée ou vers /dashboard par défaut
               this.$router.push('/login');
 
@@ -115,12 +110,9 @@ export default {
             });
 
         await apiClient.post('/auth/logout'); // Appel à l'API pour invalider le token
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        delete apiClient.defaults.headers.common['Authorization'];
         console.log('Déconnexion réussie');
-         // Redirection vers la page de connexion
-      this.$router.push('/login');
+        this.$router.push('/login');
+        
       } catch (error) {
         console.error('Erreur lors de la déconnexion:', error);
         throw error;

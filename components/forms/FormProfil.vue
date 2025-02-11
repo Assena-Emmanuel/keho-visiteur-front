@@ -1,221 +1,353 @@
-<script>
+<script setup>
+import { ref, computed } from "vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
+import { useAuthStore } from "~/stores/auth.js";
+import apiClient from '~/components/api/intercepteur';
+import { useGestionStore } from "~/stores/gestion.js";
+import { useApi } from '~/components/api/useApi';
+import Swal from "sweetalert2";
 
-export default {
-  setup() {
-    return { v$: useVuelidate() };
-  },
-  data() {
-    return {
-      libelleProfil: "",
-      codeProfil: "",
-      description: "",
-      submitted: false,
-      isEditMode: false,
-      titre: "",
-      pageOptions: [5, 10, 15, 20],
-      items: [
-        { menu: 'Dashboard', voir: true, modifier: true, supprimer: false, ajouter: false },
-        { menu: 'Utilisateurs', voir: true, modifier: false, supprimer: false, ajouter: true },
-        // Other items...
-      ],
-      fields: [
-        { key: 'menu', label: 'Menu', sortable: true },
-        { key: 'voir', label: 'Voir' },
-        { key: 'modifier', label: 'Modifier' },
-        { key: 'supprimer', label: 'Supprimer' },
-        { key: 'ajouter', label: 'Ajouter' },
-        { key: 'accepter', label: 'Accepter' },
-        { key: 'rejeter', label: 'Rejeter' },
-      ],
-      currentPage: 1,
-      perPage: 5,
-      totalRows: 0,
-      filter: null,
-      filterOn: ['menu']
+const authStore = useAuthStore()
+const gestionStore = useGestionStore()
+const { getAll, createResource, getById } = useApi(authStore.token);
+
+
+const SLUG = "SRV"
+
+// Déclaration des props
+const props = defineProps({
+  isOpen: Boolean,
+  id: Number,
+  isEditMode: Boolean,
+  selectedIndex: Number, // L'index de l'élément à éditer
+});
+
+// Déclaration des événements
+const emit = defineEmits(["update:isOpen", "update:id"]);
+
+// Variables réactives
+const libelle = ref("");
+const description = ref("");
+const submitted = ref(false);
+const loading = ref(false);
+const loadingEdit = ref(false);
+const loadingAdd = ref(false);
+const errorMessage = ref("")
+const erreur = ref(false)
+const actions = ref([])
+
+const totalRows = ref(1);
+const currentPage = ref(1);
+const perPage = ref(5);
+const pageOptions = ref([5, 10, 15, 20]);
+const filter = ref('');
+const sortBy = ref('age');
+const sortDesc = ref(false);
+const fields = ref(["Rôle"])
+
+// Validation avec Vuelidate
+const rules = computed(() => ({
+  libelle: { required },
+
+}));
+
+const v$ = useVuelidate(rules, { libelle});
+
+// Méthodes
+const onSaveprofil = async () => {
+  submitted.value = true;
+  v$.value.$touch();
+
+  if (v$.value.libelle.$error) {
+    return;
+
+  }else{
+    loadingAdd.value = true
+    erreur.value = false
+
+    try{
+      const formData = {
+      libelle: libelle.value,
+      description: description.value,
+
     };
-  },
-  validations: {
-    libelleProfil: {
-      required,
-    },
-    codeProfil: {
-      required,
-    },
-    description: {
-      required,
+
+      const data = await createResource(`role`, formData);
+      console.log("Error:------------"+JSON.stringify(data))
+      if(!data.data.error){
+
+        const data = await getAll("role");
+        console.log("data save:------------"+JSON.stringify(data.data))
+        gestionStore.setProfils(data.data)
+        alertMessage(data.data.message, 'success')
+        resetForm()
+        
+        
+      }else{
+        alertMessage(data.data.message, 'error')
+        erreur.value = true
+        errorMessage = data.data.message
+      }
+      
+      
+    }catch(error){
+      console.error("error creer : "+error.message);
+    }finally{
+      loadingAdd.value = false
     }
-  },
-  props: {
-    modelValue: Boolean,
-    isEditMode: Boolean,
-    isDetailMode: Boolean,
-    selectedIndex: Number,
-    formData: Object,
-  },
-
-  computed: {
-    /**
-     * Dynamically generate filterOn based on fields
-     */
-    filterOn() {
-      // Return an array of keys from fields
-      return this.fields.map(field => field.key);
-    },
-
-    /**
-     * Total no. of records
-     */
-    rows() {
-      return this.filteredData.length;
-    },
-
-    /**
-     * Filtered data based on search input
-     */
-    filteredData() {
-      if (this.filter) {
-        return this.items.filter(item =>
-          this.filterOn.some(key =>
-            String(item[key]).toLowerCase().includes(this.filter.toLowerCase())
-          )
-        );
-      }
-      return this.items;
-    }
-  },
-
-  mounted() {
-    this.totalRows = this.items.length;
-  },
-  methods: {
-    onFiltered(filteredItems) {
-      // Update totalRows and reset to first page after filtering
-      this.totalRows = filteredItems.length;
-      this.currentPage = 1;
-    },
-    onSaveprofil() {
-      this.submitted = true;
-      this.v$.$touch();
-      if (this.v$.libelleProfil.$error || this.v$.codeProfil.$error || this.v$.description.$error) {
-        return;
-      }
-      // Handle the profile save here
-    },
-    resetForm() {
-      this.libelleProfil = '';
-      this.codeProfil = '';
-      this.description = '';
-      this.submitted = false;
-      this.v$.$reset();
-    },
-    saveMenus() {
-      const menusWithPermissions = this.items.map(item => ({
-        menu: item.menu,
-        voir: item.voir,
-        modifier: item.modifier,
-        supprimer: item.supprimer,
-        ajouter: item.ajouter,
-      }));
-    },
-    onCheckboxChange(item) {
-      console.log('Permissions modifiées pour:', item);
-    },
-    getTitle() {
-      if (this.isDetailMode) {
-        this.titre = "Consultation du profil";
-      } else if (this.isEditMode) {
-        this.titre = "Modification du profil";
-      } else if(!this.isDetailMode && !this.isEditMode) {
-        this.titre = "Création du profil";
-      }
-      return this.titre
-    },
-    handleHide() {
-      // Émettre l'événement pour informer le parent de la fermeture
-      this.$emit('update:modelValue', false); // Réinitialiser la modal à fermée
-      this.resetForm(); // Réinitialiser les données du formulaire
-    },
-
+    
   }
+};
+
+
+onMounted(async () => {
+
+try {
+  // Récupérer tous les départements
+  
+} catch (error) {
+  console.error('Erreur lors de la récupération des données:', error);
+}
+});
+
+
+watch(
+  () => props.id,  
+  async (newid) => {  
+    if (newid) {
+      loading.value = true
+      // recuperation du profil
+      const profil = await getById("role", newid);
+      libelle.value = profil.data.libelle
+      description.value = profil.data.description
+
+      // recuperation des profils
+      const role = await getAll("role")
+      console.log("role-------------------------: "+JSON.stringify(role.data))
+
+      // recuperation des action
+      const actions = await getAll("action")
+      actions.value = actions.data
+
+      // extrait les libelles
+      if (actions.value && Array.isArray(actions.value)) {
+        actions.value.forEach(element => {
+          fields.value.push(element.libelle);
+        });
+      } else {
+        console.error('actions.value.array n\'est pas un tableau ou est undefined');
+      }
+      console.log("libelle---------------------"+JSON.stringify(fields.value))
+
+      loading.value = false
+    }
+  },
+  { immediate: true }  // Lance le watch dès que possible, même si la prop est déjà présente
+);
+
+// Fonction de mise à jour du département
+const onUpdateprofil = async () => {
+  submitted.value = true;
+  v$.value.$touch(); // Marquer tous les champs comme touchés pour activer la validation
+
+  // Vérification des erreurs de validation
+  if (v$.value.$invalid) {
+    return; // Si des erreurs existent, on arrête la fonction
+  }
+
+  loadingEdit.value = true;
+  try {
+    // Préparation des données à envoyer via FormData
+    const formData = new FormData();
+    formData.append('libelle', libelle.value);
+    formData.append('description', description.value);
+
+    // Appel API pour mettre à jour le profil
+    const response = await  apiClient.put(`/categorie/${props.id}`, formData, {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`,  // Utilisation du token d'authentification
+      },
+    });
+
+    // Vérification de la réponse
+    if (!response.data.error) {
+      console.log("Modification réussie : ", response.data.message);
+      erreur.value = false;  // Réinitialiser l'état d'erreur
+      resetForm();  // Réinitialiser le formulaire après une mise à jour réussie
+    } else {
+      // Si une erreur se produit dans la réponse de l'API
+      erreur.value = true;
+      errorMessage.value = "Mise à jour échouée !";
+      console.error(response.data.message);
+    }
+
+  } catch (error) {
+    // Gestion des erreurs si l'appel API échoue
+    errorMessage.value = "Échec de mise à jour !";
+    console.error(errorMessage.value, error);
+  } finally {
+    // Fin du processus de chargement, que l'appel réussisse ou échoue
+    loadingEdit.value = false;
+  }
+};
+
+const filterOn = computed(() => props.fields.map(field => field.key));
+
+const filteredData = computed(() => {
+  if (filter.value) {
+    return actions.value.filter(item =>
+      filterOn.value.some(key =>
+        String(item[key]).toLowerCase().includes(filter.value.toLowerCase())
+      )
+    );
+  }
+  return actions.value;
+});
+
+
+// Alert
+function alertMessage(message, icon = "error") {
+    Swal.fire({
+      position: "top",
+      icon,
+      text: message,
+      showConfirmButton: false,
+      timer: 2000,
+      customClass: {
+        popup: 'custom-popup',
+        icon: 'custom-icon',
+        title: 'custom-title'
+      }
+    });
+  }
+
+// Fonction asynchrone pour récupérer l'utilisateur par uuid
+async function getCategorie(id) {
+  loading.value = true;
+  try {
+    const response = await apiClient.get(`/categorie/${id}`, {
+      headers: { 
+        'Authorization': `Bearer ${authStore.token}`,  
+      }
+    });
+
+    if (!response.data.error) {
+      libelle.value = response.data.data.libelle
+      description.value = response.data.data.description
+
+    }
+  } catch (error) {
+    console.error('Erreur durant la recuperation de la categorie:', error);
+  }finally{
+    loading.value = false; 
+  }
+}
+
+
+const resetForm = () => {
+  libelle.value = "";
+  description.value = "";
+
+  submitted.value = false;
+  erreur.value = false
+  
+  emit("update:isOpen", false);
+  emit("update:id", null);
+
+  v$.value.$reset();
 };
 </script>
 
 <template>
   <BModal 
-      @hide="handleHide"
-      :modelValue="modelValue" 
-      @update:modelValue="$emit('update:modelValue', $event)"
+      @hide="resetForm" 
+      :modelValue="isOpen" 
       size="lg"
-      :title="getTitle()" 
       title-class="font-18" 
       hide-footer
+      no-close-on-backdrop
   >
+    <!-- :title="isEditMode ? `Modifier le service ` : 'Créer un Service'"  -->
+  <div v-if="loading" class="loading-ellipses">
+    <span class="dot">.</span>
+    <span class="dot">.</span>
+    <span class="dot">.</span>
+  </div>
   <template #modal-title>
       <!-- Gestion du titre selon les modes -->
       <div v-if="isEditMode">Modifier le profil</div>
       <div v-else-if="isDetailMode">Détails du profil</div>
       <div v-else>Créer un profil</div>
-    </template>
-  <BForm class="form-vertical px-3" role="form">
+  </template>
+  <BForm v-if="!loading" class="form-vertical px-3" role="form">
 
-    <BRow>
-        <BCol md="4" sm="4">
-        <div class="mb-3">
-            <label for="code" style="font-size: 12px;">Code Profil <span class="fw-bool text-danger">*</span></label>
+    <!-- Afficher en cas de creation -->
+    <div v-if="!props.id">
+      <div class="mb-3">
+            <label for="libelle" style="font-size: 12px;">Libellé <span class="fw-bool text-danger">*</span></label>
             <div class="input-group">
                 <input 
-                    v-model="codeProfil" 
-                    type="text" 
-                    class="form-control border border-secondary" 
-                    id="code" 
-                    placeholder="Code"
-                    :class="{ 'is-invalid': submitted && v$.code.$error }" 
-                />
-                <div v-if="submitted && v$.code.$error" class="invalid-feedback">
-                    <span v-if="v$.code.required.$invalid">Ce champ est obligatoire</span>
-                </div>
-            </div>
-            
-            </div>
-        </BCol>
-        <BCol md="4" sm="4">
-        <div class="mb-3">
-            <label for="libelle" style="font-size: 12px;">Libellé <span class="fw-bool">*</span></label>
-            <div class="input-group">
-                <input 
-                v-model="libelleProfil" 
+                v-model="libelle" 
                 type="text" 
                 class="form-control border border-secondary" 
                 id="libelle" 
                 placeholder="Libellé" 
-                :class="{'is-invalid': submitted && v$.libelleProfil.$error }" 
+                :class="{'is-invalid': submitted && v$.libelle.$error }" 
                 />
-                <div v-if="submitted && v$.libelleProfil.$error" class="invalid-feedback">
-                <span v-if="v$.libelleProfil.required.$invalid">Cet champ est obligatoire
+                <div v-if="submitted && v$.libelle.$error" class="invalid-feedback">
+                <span v-if="v$.libelle.required.$invalid">Cet champ est obligatoire
+                </span>
+                </div>
+            </div>
+            
+      </div>
+      <div class="mb-3">
+        <label for="description" style="font-size: 12px;">Description</label>
+        <div class="input-group">
+            <textarea 
+                v-model="description" 
+                type="text"
+                class="form-control border border-secondary" 
+                id="description" 
+                placeholder="Description" 
+            ></textarea>
+        </div>  
+      </div>
+    </div>
+
+    <BRow v-if="props.id">
+        <BCol md="4" sm="12" >
+        <div class="mb-3">
+            <label for="libelle" style="font-size: 12px;">Libellé <span class="fw-bool text-danger">*</span></label>
+            <div class="input-group">
+                <input 
+                v-model="libelle" 
+                type="text" 
+                class="form-control border border-secondary" 
+                id="libelle" 
+                placeholder="Libellé" 
+                :class="{'is-invalid': submitted && v$.libelle.$error }" 
+                />
+                <div v-if="submitted && v$.libelle.$error" class="invalid-feedback">
+                <span v-if="v$.libelle.required.$invalid">Cet champ est obligatoire
                 </span>
                 </div>
             </div>
             
         </div>
         </BCol>
-        <BCol md="4" sm="4">
+        <BCol md="8" sm="12">
         <div class="mb-3">
             <label for="description" style="font-size: 12px;">Description</label>
             <div class="input-group">
-                <input 
-                    v-model="description" 
-                    type="text"
-                    class="form-control border border-secondary" 
-                    id="description" 
-                    placeholder="Description"
-                    :class="{ 'is-invalid': submitted && v$.description.$error }" 
-                />
-                <div v-if="submitted && v$.description.$error" class="invalid-feedback">
-                <span v-if="v$.description.required.$invalid">Ce champ est obligatoire
-                </span>
-                </div>
+              <input 
+                v-model="description" 
+                type="text"
+                class="form-control border border-secondary" 
+                id="description" 
+                placeholder="Description" 
+            />
             </div>
             
         </div>
@@ -223,7 +355,7 @@ export default {
     </BRow>
 
     <!-- Tableau Habilitation -->
-    <div class="border border-secondary p-2 rounded-3">
+    <div class="border border-secondary p-2 rounded-3" v-if="props.id">
     <BRow class="">
         <BCol sm="12" md="6" class="">
             <div id="tickets-table_length" class="dataTables_length">
@@ -300,13 +432,74 @@ export default {
     </div>
 
     <div v-if="!isDetailMode" class="mt-4 d-flex justify-content-center">
-      <BButton v-if="!isEditMode" @click="onSaveprofil" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+      <BButton 
+        v-if="!isEditMode" 
+        @click="onSaveprofil" 
+        :loading="loadingAdd"
+        loading-text="enregistrement"
+        variant="primary" 
+        class="w-sm waves-effect waves-light btn btn-sm" 
+      >
         Enregistrer
       </BButton>
-      <BButton v-if="isEditMode" @click="onUpdateprofil" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+      <BButton 
+        v-if="isEditMode" 
+        @click="onUpdateprofil" 
+        :loading="loadingEdit"
+        loading-text="modification"
+        variant="primary" 
+        class="w-sm waves-effect waves-light btn btn-sm" 
+      >
         Modifier
       </BButton>
     </div>
   </BForm>
 </BModal>
 </template>
+<style scoped>
+.loading-ellipses {
+  font-size: 40px; /* Taille augmentée */
+  color: #3498db;
+  text-align: center;
+  font-weight: bold;
+}
+
+.dot {
+  animation: blink 1s infinite;
+  margin: 0 5px; /* Espacement entre les points */
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes blink {
+  0%, 20% {
+    opacity: 0;
+  }
+  50%, 100% {
+    opacity: 1;
+  }
+}
+
+/* Alert */
+.custom-popup {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Classe pour l'icône */
+.custom-icon {
+  font-size: 10px;
+  float: left;
+}
+</style>
