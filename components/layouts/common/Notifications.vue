@@ -56,15 +56,16 @@ import { useNotifiedStore } from "~/stores/notified";
 import { useAuthStore } from "~/stores/auth.js";
 
 const notifiedStore = useNotifiedStore();
+const authUser = useAuthStore()
 
 // Définir une propriété calculée pour obtenir les notifications
 const myNotifs = computed(() => notifiedStore.mynotifs);
    
 // Utilisateur connecté
-const user = useAuthStore();
-const id = parseInt(user.id, 10);
 
-const userId = id;
+
+
+const userId = parseInt(authUser.user.id, 10);
 
 const pusher = useNuxtApp().$pusher;
 let channel;
