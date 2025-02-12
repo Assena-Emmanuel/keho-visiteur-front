@@ -100,7 +100,7 @@ export default {
               },
             }).then(response => {
               this.authStore.logout()
-              
+              this.hide()
               // Rediriger vers la page enregistrée ou vers /dashboard par défaut
               this.$router.push('/login');
 
@@ -109,9 +109,10 @@ export default {
                 console.error('Error fetching user info:', error);
             });
 
-        await apiClient.post('/auth/logout'); // Appel à l'API pour invalider le token
-        console.log('Déconnexion réussie');
-        this.$router.push('/login');
+        // await apiClient.post('/auth/logout'); // Appel à l'API pour invalider le token
+        // console.log('Déconnexion réussie');
+        // this.hide()
+        // this.$router.push('/login');
         
       } catch (error) {
         console.error('Erreur lors de la déconnexion:', error);
