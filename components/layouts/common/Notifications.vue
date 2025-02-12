@@ -59,9 +59,9 @@ const notifiedStore = useNotifiedStore();
 
 // Définir une propriété calculée pour obtenir les notifications
 const myNotifs = computed(() => notifiedStore.mynotifs);
-
+   
 // Utilisateur connecté
-const user = useAuthStore()
+const user = useAuthStore();
 const id = parseInt(user.id, 10);
 
 const userId = id;
@@ -74,7 +74,7 @@ onMounted(() => {
   notifiedStore.getNotification();
 });
 
-channel = pusher.subscribe(`App.User.${userId}`);
+channel = pusher.subscribe(`App.Models.User.${userId}`);
 channel.bind("visitor.notified", (data) => {
   const newNotification = {
     id: data.id,
