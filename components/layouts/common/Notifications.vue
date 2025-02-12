@@ -62,9 +62,6 @@ const authUser = useAuthStore()
 const myNotifs = computed(() => notifiedStore.mynotifs);
    
 // Utilisateur connecté
-
-
-
 const userId = parseInt(authUser.user.id, 10);
 
 const pusher = useNuxtApp().$pusher;
