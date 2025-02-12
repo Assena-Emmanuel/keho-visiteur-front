@@ -390,11 +390,6 @@
                    <div class="alert alert-danger" v-if="submitted && (!rectoImage || !versoImage)"> Photo de la piece (recto et verso) obligatoire</div>
                 </BRow>
 
-
-                <!-- Debugging log -->
-                <p>Recto Image: {{ rectoImage ? rectoImage.name : 'Aucune image' }}</p>
-                <p>Verso Image: {{ versoImage ? versoImage.name : 'Aucune image' }}</p>
-
                 <div class="mt-4 d-flex justify-content-center">
 
                 <BButton :loading="loading" loading-text="Enregistrement ..." @click="onSaveVisiteur" variant="primary" class="w-sm waves-effect waves-light btn btn-lg" >
@@ -416,6 +411,11 @@
     import { useApi } from '~/components/api/useApi';
     import apiClient from '~/components/api/intercepteur';
     import Swal from "sweetalert2";
+    import { useAuthStore } from "~/stores/auth.js";
+
+
+
+
 
     definePageMeta({
         layout: "utility"
@@ -423,11 +423,13 @@
     
     export default {
         setup() {
-            return { v$: useVuelidate(),  };
+            
+            return { v$: useVuelidate() };
         },
 
         mounted() {
             
+            // const agences = get
 
         },
 
@@ -458,7 +460,8 @@
                 email: "",
                 isEntreprise: false,
                 rectoImage: null,
-                versoImage: null
+                versoImage: null,
+                listAgence : []
             }
         },
         
@@ -592,14 +595,13 @@
 
                         // Vérification de la réponse
                         if (!response.data.error) {
-                        console.log("visite--------------- : ",JSON.stringify( response.data)[0]);
-                        this.loading = false
-                        
-                        this.alertMessage(response.data.message, 'success')
+                            this.loading = false
+                            
+                            this.alertMessage(response.data.message, 'success')
 
-                        this.$router.push({
-                            path: "/visiteur-save"
-                        });
+                            this.$router.push({
+                                path: "/visiteur-save"
+                            });
 
                         } else {
                         console.error(response.data);
