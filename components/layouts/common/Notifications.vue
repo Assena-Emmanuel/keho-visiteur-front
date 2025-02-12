@@ -75,7 +75,7 @@ onMounted(() => {
   notifiedStore.getNotification();
 });
 
-channel = pusher.subscribe(`App.User.${userId}`);
+channel = pusher.subscribe(`App.Models.User.${userId}`);
 channel.bind("visitor.notified", (data) => {
   const newNotification = {
     id: data.id,

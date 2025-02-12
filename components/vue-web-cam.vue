@@ -125,8 +125,6 @@ export default {
       if (!event.target.files.length) return;
 
       const fichier = event.target.files[0];
-      console.log("Fichier sélectionné---------------- :", fichier);
-      console.log("Propriétés du fichier:", fichier.name, fichier.size, fichier.type);
 
       if (typeFile === 'rectoFile') {
         this.rectoFichier = fichier;
@@ -213,16 +211,20 @@ export default {
             const imageDataUrl = this[canvas].toDataURL('image/jpeg');
             // Affecter la valeur à l'input hidden correspondant
             this[hiddenInput] = imageDataUrl;
+
+            con
             // Afficher le canvas
             this[canvas].style.display = 'block';
 
             // emission de l'image au parent
             if (canvas === 'recto') {
-              this.rectoFichier = imageDataUrl;
+              alert(1)
               this.$emit('update:rectoImage', imageDataUrl);
+
             } else {
-              this.versoFichier = imageDataUrl;
+              alert(2)
               this.$emit('update:versoImage', imageDataUrl);
+
             }
           }
        
