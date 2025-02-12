@@ -128,6 +128,8 @@ const showModal = async (notif) =>{
 
   if(response.data.error){
     console.log("Erreur "+response.data.message)
+  }else{
+    notifiedStore.getNotification();
   }
 
 }
