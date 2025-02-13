@@ -167,6 +167,7 @@ export default {
           formData.append('telephone2', this.mobile2);
           formData.append('civilite', this.civilite);
           formData.append('matricule', this.matricule);
+          formData.append('matricule', this.matricule);
           formData.append('departement_id', this.userDepartement);
           formData.append('service_id', this.userService);
 

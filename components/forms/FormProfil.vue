@@ -13,8 +13,6 @@ const gestionStore = useGestionStore()
 const { getAll, createResource, getById } = useApi(authStore.token);
 
 
-const SLUG = "SRV"
-
 // Déclaration des props
 const props = defineProps({
   isOpen: Boolean,
@@ -28,6 +26,7 @@ const emit = defineEmits(["update:isOpen", "update:id"]);
 
 // Variables réactives
 const libelle = ref("");
+const ancienLibelle = ref("")
 const description = ref("");
 const submitted = ref(false);
 const loading = ref(false);
@@ -120,12 +119,14 @@ watch(
       // recuperation du profil
       const profil = await getById("role", newid);
       libelle.value = profil.data.libelle
+      ancienLibelle.value = profil.data.libelle
       description.value = profil.data.description
+
+      console.log("profil---------------------"+JSON.stringify(profil))
 
       // recuperation des profils
       const role = await getAll("role")
-      console.log("role-------------------------: "+JSON.stringify(role.data))
-
+  
       // recuperation des action
       const actions = await getAll("action")
       actions.value = actions.data
@@ -160,11 +161,16 @@ const onUpdateprofil = async () => {
   try {
     // Préparation des données à envoyer via FormData
     const formData = new FormData();
-    formData.append('libelle', libelle.value);
+    if(ancienLibelle.value !== libelle.value){
+      formData.append('libelle', libelle.value);
+    }
+    
     formData.append('description', description.value);
 
+    console.log("----------------------Mise  jour ------------------")
+
     // Appel API pour mettre à jour le profil
-    const response = await  apiClient.put(`/categorie/${props.id}`, formData, {
+    const response = await  apiClient.put(`/role/${props.id}`, formData, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`,  // Utilisation du token d'authentification
       },
@@ -174,12 +180,18 @@ const onUpdateprofil = async () => {
     if (!response.data.error) {
       console.log("Modification réussie : ", response.data.message);
       erreur.value = false;  // Réinitialiser l'état d'erreur
-      resetForm();  // Réinitialiser le formulaire après une mise à jour réussie
+      const data = await getAll("role");
+      console.log("data save:------------"+JSON.stringify(data.data))
+      gestionStore.setProfils(data.data)
+      alertMessage(data.data.message, 'success')
+      resetForm()
+
     } else {
       // Si une erreur se produit dans la réponse de l'API
       erreur.value = true;
       errorMessage.value = "Mise à jour échouée !";
       console.error(response.data.message);
+
     }
 
   } catch (error) {
@@ -266,6 +278,7 @@ const resetForm = () => {
       size="lg"
       title-class="font-18" 
       hide-footer
+      :title="isEditMode ? `Modifier le Profil ` : 'Créer un Profil'" 
       no-close-on-backdrop
   >
     <!-- :title="isEditMode ? `Modifier le service ` : 'Créer un Service'"  -->
@@ -274,32 +287,32 @@ const resetForm = () => {
     <span class="dot">.</span>
     <span class="dot">.</span>
   </div>
-  <template #modal-title>
-      <!-- Gestion du titre selon les modes -->
+  
+  <!-- <template #modal-title>
       <div v-if="isEditMode">Modifier le profil</div>
-      <div v-else-if="isDetailMode">Détails du profil</div>
       <div v-else>Créer un profil</div>
-  </template>
+  </template> -->
+
   <BForm v-if="!loading" class="form-vertical px-3" role="form">
 
     <!-- Afficher en cas de creation -->
-    <div v-if="!props.id">
+    <div v-if="!isEditMode">
       <div class="mb-3">
-            <label for="libelle" style="font-size: 12px;">Libellé <span class="fw-bool text-danger">*</span></label>
-            <div class="input-group">
-                <input 
-                v-model="libelle" 
-                type="text" 
-                class="form-control border border-secondary" 
-                id="libelle" 
-                placeholder="Libellé" 
-                :class="{'is-invalid': submitted && v$.libelle.$error }" 
-                />
-                <div v-if="submitted && v$.libelle.$error" class="invalid-feedback">
-                <span v-if="v$.libelle.required.$invalid">Cet champ est obligatoire
-                </span>
-                </div>
+        <label for="libelle" style="font-size: 12px;">Libellé <span class="fw-bool text-danger">*</span></label>
+        <div class="input-group">
+            <input 
+            v-model="libelle" 
+            type="text" 
+            class="form-control border border-secondary" 
+            id="libelle" 
+            placeholder="Libellé" 
+            :class="{'is-invalid': submitted && v$.libelle.$error }" 
+            />
+            <div v-if="submitted && v$.libelle.$error" class="invalid-feedback">
+            <span v-if="v$.libelle.required.$invalid">Cet champ est obligatoire
+            </span>
             </div>
+      </div>
             
       </div>
       <div class="mb-3">
@@ -316,46 +329,47 @@ const resetForm = () => {
       </div>
     </div>
 
-    <BRow v-if="props.id">
+    <BRow>
+
         <BCol md="4" sm="12" >
-        <div class="mb-3">
-            <label for="libelle" style="font-size: 12px;">Libellé <span class="fw-bool text-danger">*</span></label>
-            <div class="input-group">
+          <div class="mb-3">
+              <label for="libelle" style="font-size: 12px;">Libellé <span class="fw-bool text-danger">*</span></label>
+              <div class="input-group">
                 <input 
-                v-model="libelle" 
-                type="text" 
-                class="form-control border border-secondary" 
-                id="libelle" 
-                placeholder="Libellé" 
-                :class="{'is-invalid': submitted && v$.libelle.$error }" 
+                  v-model="libelle" 
+                  type="text" 
+                  class="form-control border border-secondary" 
+                  id="libelle" 
+                  placeholder="Libellé" 
+                  :class="{'is-invalid': submitted && v$.libelle.$error }" 
                 />
                 <div v-if="submitted && v$.libelle.$error" class="invalid-feedback">
                 <span v-if="v$.libelle.required.$invalid">Cet champ est obligatoire
                 </span>
                 </div>
-            </div>
-            
-        </div>
+              </div>
+              
+          </div>
         </BCol>
+
         <BCol md="8" sm="12">
-        <div class="mb-3">
-            <label for="description" style="font-size: 12px;">Description</label>
-            <div class="input-group">
-              <input 
-                v-model="description" 
-                type="text"
-                class="form-control border border-secondary" 
-                id="description" 
-                placeholder="Description" 
-            />
-            </div>
-            
-        </div>
+          <div class="mb-3">
+              <label for="description" style="font-size: 12px;">Description</label>
+              <div class="input-group">
+                <input 
+                  v-model="description" 
+                  type="text"
+                  class="form-control border border-secondary" 
+                  id="description" 
+                  placeholder="Description" 
+              />
+              </div>
+          </div>
         </BCol>
     </BRow>
 
     <!-- Tableau Habilitation -->
-    <div class="border border-secondary p-2 rounded-3" v-if="props.id">
+    <div class="border border-secondary p-2 rounded-3" v-if="props.id" ">
     <BRow class="">
         <BCol sm="12" md="6" class="">
             <div id="tickets-table_length" class="dataTables_length">
@@ -373,6 +387,7 @@ const resetForm = () => {
         </div>
         </BCol>
     </BRow>
+
     <div class="table-responsive mb-0 my-3">
     <BTable
       :items="filteredData" 
@@ -382,7 +397,7 @@ const resetForm = () => {
       :current-page="currentPage" 
       v-model:sort-by.sync="sortBy" 
       v-model:sort-desc.sync="sortDesc" 
-      @filtered="onFiltered" 
+      @filtered="onFiltered"
     >
 
         <template #cell(voir)="row">
@@ -431,7 +446,7 @@ const resetForm = () => {
     </div>
     </div>
 
-    <div v-if="!isDetailMode" class="mt-4 d-flex justify-content-center">
+    <div v-if="!isEditMode" class="mt-4 d-flex justify-content-center">
       <BButton 
         v-if="!isEditMode" 
         @click="onSaveprofil" 

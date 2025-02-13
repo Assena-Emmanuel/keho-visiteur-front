@@ -416,6 +416,11 @@
     import { useApi } from '~/components/api/useApi';
     import apiClient from '~/components/api/intercepteur';
     import Swal from "sweetalert2";
+    import { useAuthStore } from "~/stores/auth.js";
+
+
+
+
 
     definePageMeta({
         layout: "utility"
@@ -423,11 +428,13 @@
     
     export default {
         setup() {
-            return { v$: useVuelidate(),  };
+            
+            return { v$: useVuelidate() };
         },
 
         mounted() {
             
+            // const agences = get
 
         },
 
@@ -458,7 +465,8 @@
                 email: "",
                 isEntreprise: false,
                 rectoImage: null,
-                versoImage: null
+                versoImage: null,
+                listAgence : []
             }
         },
         
@@ -592,14 +600,13 @@
 
                         // Vérification de la réponse
                         if (!response.data.error) {
-                        console.log("visite--------------- : ",JSON.stringify( response.data)[0]);
-                        this.loading = false
-                        
-                        this.alertMessage(response.data.message, 'success')
+                            this.loading = false
+                            
+                            this.alertMessage(response.data.message, 'success')
 
-                        this.$router.push({
-                            path: "/visiteur-save"
-                        });
+                            this.$router.push({
+                                path: "/visiteur-save"
+                            });
 
                         } else {
                         console.error(response.data);
