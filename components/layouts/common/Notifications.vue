@@ -88,8 +88,6 @@ const authUser = useAuthStore()
 const myNotifs = computed(() => notifiedStore.mynotifs);
    
 // Utilisateur connecté
-const user = useAuthStore();
-const id = parseInt(user.id, 10);
 
 const userId = id;
 

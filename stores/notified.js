@@ -11,9 +11,7 @@ export const useNotifiedStore = defineStore("notified", {
   actions: {
     async getNotification() {
       const authToken = useAuthStore()
-    
-      const response = await axios.get(
-        `${useRuntimeConfig().public.API_URL}/user/notifs`,
+      const response = await apiClient.get(`user/notifs`,
         {
           headers: {
             Authorization: `Bearer ${authToken.token}`, // Ajoutez le token Bearer ici
@@ -38,7 +36,6 @@ export const useNotifiedStore = defineStore("notified", {
     
       } else {
         console.error("Error fetching notifications: " + response.status);
-        
       }
 
      
