@@ -10,7 +10,7 @@ export const useNotifiedStore = defineStore("notified", {
   actions: {
     async getNotification() {
       const authToken = useAuthStore()
-
+    
       const response = await axios.get(
         `${useRuntimeConfig().public.API_URL}/user/notifs`,
         {
@@ -26,19 +26,14 @@ export const useNotifiedStore = defineStore("notified", {
        let notifs = JSON.parse(JSON.stringify(response.data));
 
        if(parseInt(notifs.code)===1){
-        
         this.notifications.push(...notifs.data);
-
         this.mynotifs = this.notifications.map(notification => notification.data);
      
-
-
        }
     
-        
-       
       } else {
         console.error("Error fetching notifications: " + response.status);
+        
       }
 
      

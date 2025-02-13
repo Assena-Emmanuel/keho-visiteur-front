@@ -26,11 +26,11 @@
                             }"
                         >
                             <option value="" selected>civilité...</option>
-                            <option value="MONSIEUR">MONSIEUR</option>
-                            <option value="MADAME">MADAME</option>
-                            <option value="MADEMOISELLE">MADEMOISELLE</option>
+                            <option value="M.">M.</option>
+                            <option value="Mme">Mme</option>
+                            <option value="Mlle">Mlle</option>
                         </select>
-                        <div v-if="next && v$.civilite.$error" class="invalid-feedback">
+                        <div v-if="submitted && v$.civilite.$error" class="invalid-feedback">
                             <span v-if="v$.civilite.required.$invalid">champ obligatoire
                             </span>
                         </div>
@@ -80,24 +80,7 @@
                             </div>
                         </div>
                     </BCol>
-                    <BCol md="4">
-                        <div class="mb-3">
-                            <label for="entreprise" class="fw-bold text-black" style="font-size: 12px;">Entreprise </label>
-                            <div>
-                                <input 
-                                    v-model="entreprise" 
-                                    id="entreprise" 
-                                    placeholder="NOM DE L'ENTREPRISE"
-                                    class="form-control form-control-sm"  
-                                    type="text"
-                                >
-                                <!-- <div v-if="submitted && v$.entreprise.$error" class="invalid-feedback">
-                                <span v-if="v$.entreprise.required.$invalid" class="font-size-12">champ obligatoire
-                                </span>
-                                </div> -->
-                            </div>
-                        </div>
-                    </BCol>
+                    
 
                     <BCol md="4">
                         <div class="mb-3">
@@ -132,8 +115,7 @@
                                 id="email" 
                                 placeholder="exemple@gmail.com"
                                 class="form-control form-control-sm"  
-                                type="email"
-                                maxlength="10"  
+                                type="email" 
                                 :class="{
                                 'is-invalid': submitted && v$.email.$error,
                                 'border border-danger': submitted && v$.email.$error,
@@ -161,7 +143,7 @@
                                         'is-invalid': submitted && v$.typePiece.$error,
                                         'border border-danger': submitted && v$.typePiece.$error,
                                         'border border-secondary': !(submitted && v$.typePiece.$error)
-                                        }"
+                                    }"
                                 >
                                     <option value="">SÉLECTIONNER LE TYPE DE PIÈCE...</option>
                                     <option value="CNI">Carte Nationale d'Identité (CNI)</option>
@@ -198,7 +180,9 @@
                         </div>
                     </BCol>
 
-                    <!-- <BCol md="4">
+                    
+
+                    <BCol md="4">
                         <div class="mb-3">
                             <label for="visite" class="fw-bold text-black" style="font-size: 12px;">Type de Visite <strong class="text-danger">*</strong></label>
                             <div class="input-group">
@@ -214,8 +198,8 @@
                                 }"
                                 >
                                     <option value="">SÉLECTIONNER LE TYPE DE VISITE...</option>
-                                    <option value="RDV">SUR RENDEZ-VOUS</option>
-                                    <option value="INOPINEE">INOPINÉE</option>
+                                    <option value="1">SUR RENDEZ-VOUS</option>
+                                    <option value="2">INOPINÉE</option>
                                 </select>
                                 <div v-if="submitted && v$.visite.$error" class="invalid-feedback">
                                     <span v-if="v$.visite.required.$invalid" class="font-size-12">champ obligatoire
@@ -223,7 +207,8 @@
                                 </div>
                             </div>
                         </div>
-                    </BCol> -->
+                    </BCol>
+
 
                     <BCol md="4">
                         <div class="mb-3">
@@ -246,6 +231,31 @@
                             </div>
                         </div>
                     </BCol>
+
+
+                    <BCol md="4">
+                        <div class="mb-3">
+                            <label for="codeVisite" class="fw-bold text-black" style="font-size: 12px;">Agence <strong class="text-danger">*</strong></label>
+                            <div>
+                                <input 
+                                v-model="agence" 
+                                id="agence" 
+                                class="form-control form-control-sm"  
+                                type="text"
+                                :class="{
+                                'is-invalid': submitted && v$.agence.$error,
+                                'border border-danger': submitted && v$.agence.$error,
+                                'border border-secondary': !(submitted && v$.agence.$error)
+                                }">
+                                <div v-if="submitted && v$.agence.$error" class="invalid-feedback">
+                                <span v-if="v$.agence.required.$invalid" class="font-size-12">champ obligatoire
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </BCol>
+
+
                     <BCol v-if="vehicule" md="4">
                         <div  class="mb-3">
                             <label for="immatricule" class="fw-bold text-black" style="font-size: 12px;">Immatricule <strong class="text-danger">*</strong></label>
@@ -268,6 +278,7 @@
                             </div>
                         </div>
                     </BCol>
+                    
 
                     <BRow class="d-flex flex-wrap">
                     <BCol md="4">
@@ -300,7 +311,6 @@
                         </BRow>
                     </BCol>
                     </BRow>
-                    
                     <BRow>   
                         <BCol  v-if="delegation">
                             <BFormCheckbox
@@ -316,6 +326,54 @@
                             </BFormCheckbox>
                         </BCol>
                     </BRow>
+
+                    <hr>
+                    <BRow class="d-flex align-items-center">
+                        <BCol col="4">
+                            <BFormCheckbox
+                                id="entreprise"
+                                v-model="isEntreprise"
+                                @click="isEntreprise=!isEntreprise"
+                                class="border border-secondary"
+                                
+                                
+                            >
+                                <label for="vehicule" class="fw-bold text-black">Entreprise </label>
+                            </BFormCheckbox>
+                        </BCol>
+                        <BCol md="4" v-if="isEntreprise">
+                            <div class="mb-3">
+                                <label for="entreprise" class="fw-bold text-black" style="font-size: 12px;">Entreprise <strong class="text-danger">*</strong></label>
+                                <div>
+                                    <input 
+                                        v-model="entreprise" 
+                                        id="entreprise" 
+                                        placeholder="NOM DE L'ENTREPRISE"
+                                        class="form-control form-control-sm"  
+                                        type="text"
+                                    >
+
+                                </div>
+                            </div>
+                        </BCol>
+                        <BCol md="4" v-if="isEntreprise">
+                            <div class="mb-3">
+                                <label for="entreprise" class="fw-bold text-black" style="font-size: 12px;">Sigle de l'entreprise </label>
+                                <div>
+                                    <input 
+                                        v-model="sigle" 
+                                        id="sigle" 
+                                        placeholder="Sigle"
+                                        class="form-control form-control-sm"  
+                                        type="text"
+                                    >
+
+                                </div>
+                            </div>
+                        </BCol>
+                    </BRow>
+                    
+                    
                     <BRow>
                         
                     </BRow>
@@ -324,18 +382,26 @@
                 <hr>
                 <BRow>
                     
-                        <div class="mb-3">
-                            <ClientOnly>
-                                <vue-web-cam />
-                            </ClientOnly>
-                        </div>
-                   
+                    <div class="mb-3">
+                        <ClientOnly>
+                            <vue-web-cam v-model:rectoImage="rectoImage" v-model:versoImage="versoImage" />
+                        </ClientOnly>
+                    </div>
+                   <div class="alert alert-danger" v-if="submitted && (!rectoImage || !versoImage)"> Photo de la piece (recto et verso) obligatoire</div>
                 </BRow>
 
+
+                <!-- Debugging log -->
+                <p>Recto Image: {{ rectoImage ? rectoImage.name : 'Aucune image' }}</p>
+                <p>Verso Image: {{ versoImage ? versoImage.name : 'Aucune image' }}</p>
+
                 <div class="mt-4 d-flex justify-content-center">
-                <BButton @click="onSaveVisiteur" variant="primary" class="w-sm waves-effect waves-light btn btn-lg" >
+
+                <BButton :loading="loading" loading-text="Enregistrement ..." @click="onSaveVisiteur" variant="primary" class="w-sm waves-effect waves-light btn btn-lg" >
                     ENREGISTRER
                 </BButton>
+
+
                 </div>
                 </BForm>
 
@@ -344,26 +410,39 @@
 </template>
   
 <script>
+    import { useVuelidate} from "@vuelidate/core";
+    import Visiteur from "~/components/detail/Visiteur.vue";
+    import { email, required } from "@vuelidate/validators";
+    import { useApi } from '~/components/api/useApi';
+    import apiClient from '~/components/api/intercepteur';
+    import Swal from "sweetalert2";
+
     definePageMeta({
         layout: "utility"
     });
-    import { useVuelidate} from "@vuelidate/core";
-    import Visiteur from "~/components/detail/Visiteur.vue";
-  
-    import { email, required } from "@vuelidate/validators";
+    
     export default {
         setup() {
-            return { v$: useVuelidate() };
+            return { v$: useVuelidate(),  };
         },
+
+        mounted() {
+            
+
+        },
+
         components: {
             Visiteur,
         },
+
         data(){
             return{
                 detailModal:true,
-
+                loading: false,
                 submitted: false,
+                agence: "",
                 nom: "",
+                sigle: "",
                 prenom: "",
                 entreprise: "",
                 telephone: "",
@@ -376,14 +455,24 @@
                 chefEquipe: false,
                 immatricule: "",
                 codeVisite: "",
-                photoPiece: "",
-                email: ""
-
+                email: "",
+                isEntreprise: false,
+                rectoImage: null,
+                versoImage: null
             }
         },
         
         validations: {
             nom: {
+                required,
+            },
+            rectoImage: {
+                required,
+            },
+            versoImage: {
+                required,
+            },
+            agence: {
                 required,
             },
             civilite: {
@@ -416,13 +505,32 @@
             },
 
         },
+
         methods: {
             handlePhoto(photo) {
                 this.form.photo = photo;
             },
-            onSaveVisiteur(){
+
+            alertMessage(message, icon = "error") {
+                Swal.fire({
+                position: "top",
+                icon: icon, // Vous pouvez aussi écrire `icon` directement ici
+                text: message,
+                showConfirmButton: false,
+                timer: 2000,
+                customClass: {
+                    popup: 'custom-popup',
+                    icon: 'custom-icon',
+                    title: 'custom-title'
+                }
+                })
+            },
+
+            async onSaveVisiteur(){
                 this.submitted = true;
                 this.v$.$touch();
+                
+                console.log("verso --------- "+JSON.stringify(this.versoImage)+"(---------) recto--------"+this.rectoImage.name)
                 if (this.v$.nom.$error || 
                     this.v$.prenom.$error || 
                     this.v$.typePiece.$error ||
@@ -431,14 +539,83 @@
                     this.v$.codeVisite.$error ||
                     this.v$.email.$error ||
                     this.v$.civilite.$error ||
+                    this.v$.rectoImage.$error ||
+                    this.v$.versoImage.$error ||
                     (this.vehicule && this.v$.immatricule.$error)
                 ) {
                     return;
                 }else{
                     this.submitted = false
-                    this.$router.push({
-                        path: "/visiteur-save"
-                    });
+                    this.loading = true
+                    try{
+
+                        if (!this.rectoImage) {
+                            console.error("Le fichier recto est manquant.");
+                            return; // Empêche l'envoi si le fichier recto est manquant
+                        }
+
+                        if (!this.versoImage) {
+                            console.error("Le fichier verso est manquant.");
+                            return; // Empêche l'envoi si le fichier verso est manquant
+                        }
+
+                        console.log("type----------------------------: "+typeof this.rectoImage)
+
+                        const formData = {
+                            nom: this.nom,
+                            prenom: this.prenom,
+                            email: this.email,  // Exemple de valeur pour position
+                            telephone: this.telephone,
+                            entreprise: this.entreprise,
+                            entreprise_sigle: this.sigle,
+                            type_piece: this.typePiece,
+                            numero_piece: this.numPiece,
+                            type_fvisite: this.visite,
+                            delegation: this.delegation,
+                            vehicule: this.vehicule,
+                            immatriculation: this.immatricule,
+                            chef_equipe: this.chefEquipe,
+                            code_visite: this.codeVisite,
+                            agence: this.agence,
+                            image_p: this.rectoImage,
+                            image_v: this.versoImage,
+                        }
+
+                        
+                        console.log("Start--------------- : 1"+JSON.stringify(this.rectoImage)+" 2-- "+JSON.stringify(this.versoImage));
+                        const response = await apiClient.post('/fvisites', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            },
+
+                        });
+
+                        // Vérification de la réponse
+                        if (!response.data.error) {
+                        console.log("visite--------------- : ",JSON.stringify( response.data)[0]);
+                        this.loading = false
+                        
+                        this.alertMessage(response.data.message, 'success')
+
+                        this.$router.push({
+                            path: "/visiteur-save"
+                        });
+
+                        } else {
+                        console.error(response.data);
+                        this.alertMessage(response.data.message, 'error')
+                        }
+
+                        
+                    }catch(error){
+                        console.error("Error a l'enregistrement -------------------"+error);
+                    }finally{
+                        this.loading = false
+                        
+                        
+                    }
+
+                    
                 }
             },
         },
@@ -470,6 +647,20 @@
 @media (min-width: 992px) {
  
 }
+
+/* Alert */
+.custom-popup {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Classe pour l'icône */
+.custom-icon {
+  font-size: 10px;
+  float: left;
+}
+
 
 </style>
 
