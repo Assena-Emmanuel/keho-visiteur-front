@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { useAuthStore } from "~/stores/auth.js";
+import apiClient from "~/components/api/intercepteur";
 
 export const useNotifiedStore = defineStore("notified", {
   state: () => ({
@@ -21,8 +22,12 @@ export const useNotifiedStore = defineStore("notified", {
         }
       );
 
+      this.notifications = []
+      this.mynotifs = []
+
       if (response.status === 200) {
        // this.notifications = response.data;
+       
        let notifs = JSON.parse(JSON.stringify(response.data));
 
        if(parseInt(notifs.code)===1){
@@ -38,5 +43,7 @@ export const useNotifiedStore = defineStore("notified", {
 
      
     },
+
+
   },
 });

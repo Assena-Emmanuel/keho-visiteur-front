@@ -107,7 +107,12 @@ export default {
             this.selectedRow = payload.id;
             this.modal = true;
             this.isEditMode = !!payload.id;
+            console.log("--------------------- edit menu: "+this.isEditMode)
         },
+
+        updateEditMode(value) {
+            this.isEditMode = value;
+        }
     },
 };
 </script>
@@ -116,13 +121,14 @@ export default {
     <div>
     <div class="d-flex justify-content-between">
         <div class="mb-0">Gestion des Menus</div>
-        <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
+        <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong> </BButton>
         <FormsFormMenu
             :isOpen="modal"
             :id="selectedRow"
             @update:isOpen="modal = $event"
             :isEditMode="isEditMode"
             @update:id="modal = $event"
+            @update-edit-mode="updateEditMode"
         />
 
     </div>

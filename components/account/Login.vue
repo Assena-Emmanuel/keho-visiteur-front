@@ -2,16 +2,19 @@
 import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
+import { useNotifiedStore } from "~/stores/notified";
+
 
 export default {
   setup() {
-    return { v$: useVuelidate(), authStore: useAuthStore() };
+
+    return { v$: useVuelidate(), authStore: useAuthStore(), };
   },
   data() {
     return {
       dismissibleAlert: true,
-      email: "ibrahim1155@outlook.com",
-      password: "1P@ssword",
+      email: "assena@gmail.com",
+      password: "1111111111@",
       isRemember: true,
       processing: false,
       errorMsg: "",
