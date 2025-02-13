@@ -91,11 +91,11 @@
 export default {
   props: {
     rectoImage: {
-      type: [String, Object], // Utilisez Object pour gérer des types comme File
+      type: [Object], // Utilisez Object pour gérer des types comme File
       required: false
     },
     versoImage: {
-      type: [String, Object], // Utilisez Object pour gérer des types comme File
+      type: [Object], // Utilisez Object pour gérer des types comme File
       required: false
     }
   },
@@ -212,18 +212,37 @@ export default {
             // Affecter la valeur à l'input hidden correspondant
             this[hiddenInput] = imageDataUrl;
 
-            con
+            console.log("Image -------------------- : "+JSON.stringify(this[canvas]))
             // Afficher le canvas
             this[canvas].style.display = 'block';
 
+
+            // Convertir le data URL en Blob
+            const byteString = atob(imageDataUrl.split(',')[1]);
+            const mimeString = imageDataUrl.split(',')[0].split(':')[1].split(';')[0];
+            const arrayBuffer = new ArrayBuffer(byteString.length);
+            const uint8Array = new Uint8Array(arrayBuffer);
+
+            for (let i = 0; i < byteString.length; i++) {
+              uint8Array[i] = byteString.charCodeAt(i);
+            }
+
+            // Créer le Blob à partir de l'ArrayBuffer
+            const blob = new Blob([uint8Array], { type: mimeString });
+
+            // Créer un fichier à partir du Blob
+            const file = new File([blob], 'image.jpg', { type: mimeString });
+
+
+
             // emission de l'image au parent
-            if (canvas === 'recto') {
+            if (canvas === 'canvas') {
               alert(1)
-              this.$emit('update:rectoImage', imageDataUrl);
+              this.$emit('update:rectoImage', file);
 
             } else {
               alert(2)
-              this.$emit('update:versoImage', imageDataUrl);
+              this.$emit('update:versoImage', file);
 
             }
           }
