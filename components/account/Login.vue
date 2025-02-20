@@ -3,9 +3,15 @@ import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import { useNotifiedStore } from "~/stores/notified";
+import  PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+import axios from 'axios';
 
 
 export default {
+  components: {
+    PulseLoader,
+
+  },
   setup() {
 
     return { v$: useVuelidate(), authStore: useAuthStore(), };
@@ -23,6 +29,10 @@ export default {
       passwordVisible: false,
       dismissCountDown: 10000,
       countdown: 0,
+      height: 25,        
+      width: 25,         
+      size: "20",
+      color: "#FFFFFF"
     };
   },
   validations: {
@@ -55,47 +65,52 @@ export default {
         return;
       } else {
         this.errorMsg = "";
-        try {
+
           this.processing = true;
 
-          const { data } = await apiClient.post(
+          await apiClient.post(
             "/auth/login",
             {
               email: this.email,
               password: this.password
             }
-          );
-          const token = data.access_token;
- 
-          if (token) {
-            this.authStore.setToken(token)
-            // accessToken.value = token;
+          ).then(response => {
+            
+            if(response.data.access_token){
+              const token = response.data.access_token;
 
-            apiClient.post('/auth/me', {}, {
-              headers: {
-                Authorization: `Bearer ${token}`, // Utiliser le token dans l'en-tête Authorization
-              },
-            }).then(response => {
-              const user = response.data
+              apiClient.post('/auth/me', {}, {
+                headers: {
+                  Authorization: `Bearer ${token}`, // Utiliser le token dans l'en-tête Authorization
+                },
 
-              this.authStore.setUser(user)
-              this.$router.push('/dashboard');
+              }).then(response => {
 
-            })
-            .catch(error => {
-                this.errorMsg = "E-mail ou mot de passe incorrect";
-                console.error('Error fetching user info:', error);
+                this.authStore.setToken(token)
+                this.authStore.setUser(response.data)
+                
+                this.$router.push('/dashboard');
+
+              })
+              .catch(error => {
+                  console.error('Error fetching user info:', error);
+                  return
+              });
+            
+            }else{
+              this.errorMsg = "E-mail ou Mot de passe incorrect "
+            }
+            
+  
+
+          }).catch(error => {
+                console.error('Error fetching token:', error);
                 return
             });
+          
 
-          } 
-        } catch (error) {
-          this.errorMsg = "Erreur de connexion";
-          console.error("failed at onLogin", { error });
-
-        } finally {
           this.processing = false;
-        }
+        
       }
     }
   }
@@ -116,15 +131,6 @@ export default {
               <p class="">{{ errorMsg }}</p>
             </BAlert>
 
-            <!-- <BAlert
-              v-model="dismissCountDown"
-              dismissible
-              variant="danger"
-              @close-countdown="countdown = $event"
-            >
-              <p class="">{{ errorMsg }}</p>
-              <BProgress variant="warning" :max="dismissCountDown" :value="countdown" height="4px" />
-            </BAlert> -->
 
               <div class="mb-3">
                 <label for="email" class="font-size-12 text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
@@ -180,13 +186,16 @@ export default {
       <div class="mt-4 text-center">
         <BButton 
           variant="success"
-          :loading="processing" 
-          loading-text="connexion" 
           :class="['btn-bg', processing ? 'btn-loading' : '']"  
           :disabled="processing" 
-          @click="onLogin">
-          Se connecter
+          @click="onLogin"
+        >
+          <span v-if="!processing">Se connecter</span>
+          
+          <!-- Affiche PulseLoader à la place de ScaleLoader si nécessaire -->
+          <pulse-loader :loading="processing" :color="color" :size="size" />
         </BButton>
+        
       </div>
     </BForm>
 </template>

@@ -27,11 +27,13 @@ export default {
             isEditMode.value = isEditMode;
             modal.value = true;
             formData.value = data;
+
         };
 
         const openAddModal = () => {
             modal.value = !modal.value;
             isEditMode.value = false;
+
         };
 
         const profils = async () => {
@@ -39,29 +41,30 @@ export default {
                 { key: "libelle" },
                 { key: "description" },
                 { key: "Actions" },
+
             ];
 
             if (gestionStore.profils.length === 0) {
-              try {
-                  isLoading.value = true;
-                  const response = await getAll("role")
+                try {
+                    isLoading.value = true;
+                    const response = await getAll("role")
 
-                  if (!response.error) {
-                    gestionStore.setProfils(response.data);
+                    if (!response.error) {
+                        gestionStore.setProfils(response.data);
 
-                  }
-              } catch (error) {
-                  if (error.response && error.response.status === 401) {
+                    }
+                } catch (error) {
+                if (error.response && error.response.status === 401) {
                       console.error("Erreur 401 : Jeton invalide ou utilisateur non authentifié.");
 
-                  } else {
-                      console.error("Erreur lors de la récupération des profild :", error);
+                    } else {
+                        console.error("Erreur lors de la récupération des profild :", error);
 
-                  }
-              } finally {
-                  isLoading.value = false;
-                  
-              }
+                    }
+                } finally {
+                    isLoading.value = false;
+                    
+                }
             }
         };
 
@@ -105,7 +108,7 @@ export default {
             this.selectedRow = payload.id;
             this.modal = true;
             this.isEditMode = !!payload.id;
-            console.log("edit-----------------------------: "+this.isEditMode)
+
         },
     },
 };

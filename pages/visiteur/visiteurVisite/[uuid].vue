@@ -3,13 +3,15 @@ import "simplebar";
 
 
 export default {
+  setup() {
+    const route = useRoute();
+    const uuid = route.params.uuid; // Récupérer le paramètre uuid
+
+    return { uuid: uuid}
+  },
   data() {
     return {
-      title: "Visiteur",
       items: [
-        {
-          text: "Visiteur"
-        },
         {
           text: "Visiteur",
           active: true
@@ -17,15 +19,14 @@ export default {
       ]
     };
   },
-  // components:{
-  //   Visiteur,
-  // }
+//   components:{
+//     Visiteur,
+//   }
 };
 </script>
 
 <template>
   <SiteHeader :title="title" />
   <PageHeader :title="title" :items="items" />
-  
-  <DashboardMesVisiteurNew />
+  <DashboardVisiteurVisite :uuid="this.uuid" />
 </template>

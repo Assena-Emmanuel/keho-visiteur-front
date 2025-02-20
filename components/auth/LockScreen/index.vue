@@ -12,7 +12,7 @@
             </div>
             <div class="p-2 mt-4">
               <div class="user-thumb text-center mb-4">
-                <img src="/images/users/avatar-4.jpg" class="rounded-circle img-thumbnail avatar-lg" alt="thumbnail" />
+                <img src="" class="rounded-circle img-thumbnail avatar-lg" alt="thumbnail" />
                 <h5 class="font-size-15 mt-3">Marcus</h5>
               </div>
               <BForm>

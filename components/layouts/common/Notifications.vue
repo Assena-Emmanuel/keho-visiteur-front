@@ -23,7 +23,10 @@
     </div>
 
     <!-- Popup de la notification -->
-    <DashboardNotification :afficherModalNotification="false" />
+    <DashboardNotification
+      v-model:afficher-modal-notification="modal"
+      v-model:visiteur="visiteur"
+    />
 
     <div style="max-height: 230px" data-simplebar class="bg-danger">
       <template v-if="myNotifs.length > 0">
@@ -51,31 +54,12 @@
   </BDropdown>
 
   <!-- Modal détail visiteur -->
-  <BModal 
-    v-model="modal" 
-    hide-footer
-  > 
-
-    <div class="notification-container">
-
-      <div class="notification-message text-center">
-          Visite <strong>N° {{ notifDetail.visitor_code }}</strong> 
-          <p>de</p> 
-          <div><strong> {{ notifDetail.visitor_nom }} {{ notifDetail.visitor_prenom }} </strong></div> 
-      </div>
-
-      <div class="d-flex justify-content-between mt-5">
-        <div><button class="btn text-danger">Rejeter</button></div>
-        <div><button class="btn btn-primary">Accepter</button></div>
-      </div>
-
-    </div>
-
-    
-  </BModal>
+  
+  <!-- <DashboardNotification :afficher-modal-notification="modal" /> -->
 </template>
 
 <script setup>
+
 import { computed, onMounted } from "vue";
 import { useNotifiedStore } from "~/stores/notified";
 import { useAuthStore } from "~/stores/auth.js";
@@ -83,13 +67,14 @@ import apiClient from "~/components/api/intercepteur";
 
 const notifiedStore = useNotifiedStore();
 const authUser = useAuthStore()
+const visiteur = ref({})
+const modal = ref(false)
 
 // Définir une propriété calculée pour obtenir les notifications
 const myNotifs = computed(() => notifiedStore.mynotifs);
    
 // Utilisateur connecté
-
-const userId = id;
+const userId = parseInt(authUser.user.id, 10);
 
 const pusher = useNuxtApp().$pusher;
 let channel;
@@ -107,16 +92,41 @@ channel.bind("visitor.notified", (data) => {
     message: data.message,
   };
 
+  modal.value = true
+  visiteur.value = {
+    id: data.id,
+    nom: data.visitor_nom+" "+data.visitor_prenom ,
+    entreprise: 'KEHO GROUPE',
+    contact: '07 07 07 07 00',
+    nomEmploye: authUser.user.civilite+' '+authUser.user.nom
+  }
+
+  
   // Pousser la nouvelle notification dans mynotifs
   notifiedStore.mynotifs.push(newNotification);
 });
 
-const modal = ref(false)
-const notifDetail = ref({})
+
 
 const showModal = async (notif) =>{
   modal.value = !modal.value
-  notifDetail.value = notif
+  
+  visiteur.value = {
+    id: notif.id,
+    nom: notif.visitor_nom+" "+notif.visitor_prenom ,
+    entreprise: '',
+    contact: '',
+    nomEmploye: authUser.user.civilite+' '+authUser.user.nom
+  }
+  console.log("data-------------------"+notif.id)
+  // const response = await apiClient.get(`/fvisites/${notif.id}`, {
+  //     headers: {
+  //       'Authorization': `Bearer ${authUser.token}`,  
+  //     },
+  // });
+  // if(!response.data.error){
+  //   console.log("data-------------------"+JSON.stringify(response.data.data))
+  // }
 
   const response = await apiClient.get(`/user/notifs/${notif.id}/mark-as-read`, {
       headers: {
@@ -136,68 +146,3 @@ const showModal = async (notif) =>{
 
 </script>
 
-<style>
-
-.notification-container {
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      font-size: 16px;
-      line-height: 1.6;
-  }
-
-  .notification-header {
-      font-size: 20px;
-      font-weight: bold;
-      color: #2c3e50;
-      margin-bottom: 10px;
-  }
-
-  .notification-subheader {
-      font-size: 14px;
-      color: #7f8c8d;
-      margin-bottom: 15px;
-  }
-
-  .notification-details {
-      margin: 10px 0;
-  }
-
-  .notification-details span {
-      font-weight: bold;
-      color: #34495e;
-  }
-
-  .notification-message {
-      background-color: #ecf0f1;
-      padding: 10px;
-      border-radius: 5px;
-      color: #2c3e50;
-      font-style: italic;
-  }
-
-  .notification-footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 12px;
-      color: #bdc3c7;
-  }
-  
-  .notification-button {
-      display: inline-block;
-      padding: 10px 15px;
-      background-color: #2980b9;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      margin-top: 15px;
-      font-weight: bold;
-  }
-
-  .notification-button:hover {
-      background-color: #3498db;
-  }
-
-</style>
