@@ -122,24 +122,24 @@ watch(
       ancienLibelle.value = profil.data.libelle
       description.value = profil.data.description
 
-      console.log("profil---------------------"+JSON.stringify(profil))
+      console.log("profil---------------------"+isEditMode)
 
-      // recuperation des profils
-      const role = await getAll("role")
+      // // recuperation des profils
+      // const role = await getAll("role")
   
-      // recuperation des action
-      const actions = await getAll("action")
-      actions.value = actions.data
+      // // recuperation des action
+      // const actions = await getAll("action")
+      // actions.value = actions.data
 
-      // extrait les libelles
-      if (actions.value && Array.isArray(actions.value)) {
-        actions.value.forEach(element => {
-          fields.value.push(element.libelle);
-        });
-      } else {
-        console.error('actions.value.array n\'est pas un tableau ou est undefined');
-      }
-      console.log("libelle---------------------"+JSON.stringify(fields.value))
+      // // extrait les libelles
+      // if (actions.value && Array.isArray(actions.value)) {
+      //   actions.value.forEach(element => {
+      //     fields.value.push(element.libelle);
+      //   });
+      // } else {
+      //   console.error('actions.value.array n\'est pas un tableau ou est undefined');
+      // }
+      // console.log("libelle---------------------"+JSON.stringify(fields.value))
 
       loading.value = false
     }

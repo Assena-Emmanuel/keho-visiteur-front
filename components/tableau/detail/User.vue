@@ -21,21 +21,24 @@ onMounted(async () => {
 
 loadingDetail.value = true
 try {
-  console.log("propos------------------"+ props.uuid)
     const response = await apiClient.get(`/user/${props.uuid}`, {
       headers: { 
         'Authorization': `Bearer ${authStore.token}`, 
       }
+      
     });
 
     if (!response.data.error) {
         detailUser.value = response.data.data; 
+
     }
 
 } catch (error) {
     console.error('Erreur durant la recuperation du user:', error);
+
 }finally{
-    loadingDetail.value = false
+  loadingDetail.value = false
+
 }
 })
 
@@ -60,7 +63,7 @@ try {
             <h4 class="user-name">{{ detailUser.civilite }} {{ detailUser.nom }} {{ detailUser.prenom }}</h4>
             <div class="mb-2">
                 <span class="badge badge-role">
-                <i class="fas fa-user-tie"></i> EMPLOYÉ
+                <i class="fas fa-user-tie"></i> {{ detailUser.role ? detailUser.role.libelle : "" }}
                 </span>
             </div>
             <BBadge :variant="detailUser.statut ? 'success' : 'danger'" class="status-badge">

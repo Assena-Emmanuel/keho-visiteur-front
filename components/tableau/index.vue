@@ -138,6 +138,7 @@ const handleEdit = (row) => {
     emit('data-selected', { uuid: row.uuid });
 
   } else if (props.typeForme === "service") {
+    console.log("profil-------------------------id: "+row.id)
     emit('data-selected', { id: row.id });
 
   } else if (props.typeForme === "profil") {

@@ -3,9 +3,10 @@ export default defineNuxtConfig({
   plugins: [
     '~/plugins/sweetalert.ts',
     '~/plugins/qrcode-reader.js',
-   '~/plugins/vue-cal.js',
-   '~/plugins/vue-awesome-paginate.js',
-   '~/plugins/piniaPersistedState',
+    '~/plugins/vue-cal.js',
+    '~/plugins/vue-awesome-paginate.js',
+    '~/plugins/vue3-datatable.js',
+    '~/plugins/vue-spinners.js',
   ],
   app: {
     head: {
