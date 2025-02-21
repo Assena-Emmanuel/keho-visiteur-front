@@ -5,6 +5,7 @@ import { useAuthStore } from "~/stores/auth.js";
 import Swal from 'sweetalert2';
 import {useGestionStore} from "~/stores/gestion.js"
 import { useApi } from '~/components/api/useApi';
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 
 // Props
 const props = defineProps({
@@ -77,6 +78,9 @@ const data = computed(() => {
 
   }else if (props.typeForme === "menu"){
     return gestionStore.menus
+
+  }else if (props.typeForme === "action"){
+    return gestionStore.actions
   }
     
   return []
@@ -138,16 +142,20 @@ const handleEdit = (row) => {
     emit('data-selected', { uuid: row.uuid });
 
   } else if (props.typeForme === "service") {
-    console.log("profil-------------------------id: "+row.id)
     emit('data-selected', { id: row.id });
 
   } else if (props.typeForme === "profil") {
+    console.log("profil-------------------------id: "+row.id)
     emit('data-selected', { id: row.id });
 
   }else if (props.typeForme === "menu") {
     emit('data-selected', { id: row.id });
     
+  }else if (props.typeForme === "action") {
+    emit('data-selected', { id: row.id });
+    
   }
+
 };
 
 const hideModal = () => {
@@ -181,6 +189,10 @@ const confirmDelete = async (row) => {
         endpoint = 'menu'; // Remplacer l'endpoint si nécessaire
       }
 
+      if (props.typeForme === 'action') {
+        endpoint = 'action'; // Remplacer l'endpoint si nécessaire
+      }
+
       try {
         const response = await deleteItem(endpoint, id);
         // Afficher un message de succès après suppression
@@ -212,6 +224,10 @@ const confirmDelete = async (row) => {
         }else if (props.typeForme === "menu") {
           data = await getAll(`${endpoint}`);
           gestionStore.setMenus(data.data)
+
+        }else if (props.typeForme === "action") {
+          data = await getAll(`${endpoint}`);
+          gestionStore.setActions(data.data)
         }
 
       } catch (error) {
@@ -250,12 +266,7 @@ const capitalizeText = (text) => {
               <TableauDetailProfil :id="id" v-if="typeForme == 'profil'"/>
             </BModal>
 
-            <div v-if="isLoading" class="loading-ellipses">
-                <span class="dot text-primary">.</span>
-                <span class="dot text-danger">.</span>
-                <span class="dot text-success">.</span>
-            </div>
-
+            <ScaleLoader :loading="isLoading" style="margin: 10em 0;" :color="'#FE0201'" />
 
             <BRow v-if="filteredData && !isLoading"  class="mt-4">
               <BCol sm="12" md="6" class="">

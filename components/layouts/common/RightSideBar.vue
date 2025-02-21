@@ -3,6 +3,7 @@ import { useLayoutStore } from "~/stores/layout";
 import apiClient from "~/components/api/intercepteur";
 import RadioGroup from "~/components/common/RadioGroup.vue";
 import { useAuthStore } from '~/stores/auth';
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 
 
 
@@ -28,10 +29,14 @@ export default {
       layoutModeOptions,
       user: "",
       token: "",
+      isLoading: false,
+      color: "#FFFFFF",
+      height: "18px"
     };
   },
   components: {
-    RadioGroup
+    RadioGroup,
+    ScaleLoader
   },
   computed: {
     layoutData() {
@@ -97,6 +102,7 @@ export default {
   methods: {
     async deconnexion(){
       try {
+          this.isLoading = true
           // const token = useCookie("token")
           await  apiClient.post('/auth/logout', {}, {
               headers: {
@@ -118,6 +124,9 @@ export default {
       } catch (error) {
         console.error('Erreur lors de la déconnexion:', error);
         throw error;
+
+      }finally{
+        this.isLoading = true
       }
       
   },
@@ -190,9 +199,12 @@ export default {
             </button>
           </div>
           <div class="text-center mt-5">
-            <BButton variant="outline-danger" @click="deconnexion">
-              <i class="uil uil-sign-out-alt font-size-18 align-middle me-1"></i>
-              <span class="align-middle">Déconnexion</span>
+            <BButton variant="outline-danger" @click="deconnexion" style="min-width: 120px">
+              <span class="d-flex" v-if="!isLoading">
+                <i  class="uil uil-sign-out-alt font-size-18 align-middle me-1"></i>
+                <span class="align-middle">Déconnexion</span>
+              </span>
+              <ScaleLoader :loading="isLoading" :height="height" :color="color" />
             </BButton>
           </div>
         

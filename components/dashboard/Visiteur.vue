@@ -4,97 +4,109 @@
 
   <!-- Modal détail -->
   <BModal v-if="detailData.visiteurs" v-model="detailModal" hide-footer title="Détails des Visites" >
-    <div class="d-flex justify-content-end">
-        <BButton variant="primary" size="sm" style="padding: 2px;">
-            <i class="uil uil-print font-size-15 annuler"></i> Imprimer
+    <ScaleLoader :loading="loadingDetail" style="margin: 10em 0;" :color="color" />
+    <div v-if="!loadingDetail">
+      <div class="d-flex justify-content-end mb-4">
+        <BButton variant="primary" size="sm" style="padding: 6px 16px; font-weight: bold; background-color: #E30613; border-color: #E30613;">
+          <i class="uil uil-print font-size-18 me-2"></i> Ticket
         </BButton>
-    </div>
-    <div v-for="item in detailData.visiteurs" :key="item['Code visite']">
-      <div class="text-center"><span class="h4">M. {{  }}</span> <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">Délégué</span>
-        <div class="bg-secondary text-center text-light mt-1">En délégation</div>
       </div>
-      <hr class="text-secondary">
-      <div class="d-flex justify-content-between my-3">
-          <span class="border border-primary rounded px-2 ms-2 text-primary fw-bold"><span>{{ item.Date }}</span></span>
-          <span class="border border-success rounded px-2 ms-2 text-success">visite: <span class="fw-bold">Terminé</span></span>
 
-      </div>
-      <div class="row">
-          
-        <div class="col col-md-6">
-          <p><strong>Téléphone:</strong> {{ item.Telephone }}</p>
+      <div v-for="item in detailData.visiteurs" :key="item['Code visite']" class="visitor-card mb-4 p-4 border rounded shadow-sm bg-light">
+        <!-- Titre avec Délégué -->
+        <div class="text-center mb-3">
+          <span class="h4 text-primary" style="color: #005F87;">M. {{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</span>
+          <span v-if="item.Delegué" class="badge" style="background-color: #005F87; color: #fff; font-weight: bold; padding: 4px 12px;">Délégué</span>
+          <div v-if="item.Delegué" class="bg-warning text-center text-dark mt-2 p-1 rounded" style="background-color: #F7B800; color: #000;">En délégation</div>
         </div>
-        <div class="col col-md-6">
-          <p><strong>Société:</strong> {{ item.Société }}</p>
+        <hr class="text-secondary">
+        
+        <!-- Date et Statut -->
+        <div class="d-flex justify-content-between my-3">
+          <span class="badge bg-light text-primary border border-primary px-3 py-1" style="background-color: #005F87; color: #fff;">{{ item.code_fvisite }}</span>
+          <span class="badge bg-success text-light px-3 py-1" style="background-color: #28a745; color: #fff;">Visite: <strong>Terminé</strong></span>
         </div>
-      </div>
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>E-mail:</strong> {{ item.Email }}</p>
-        </div>
-        <div class="col col-md-6">
-          <p><strong>Code visiteur:</strong> {{ item['Code visiteur'] }}</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>Type pièce:</strong> {{ item.TypePiece }}</p>
-        </div>
-        <div class="col col-md-6">
-          <p><strong>Num pièce:</strong> {{ item.CNI }}</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>Employé:</strong> {{ item.Employé }}</p>
-        </div>
-        <div class="col col-md-6">
-          <p><strong>Code:</strong> {{ item["Code visite"] }}</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>Heure d'entrée:</strong> {{ item['H entrée'] }}</p>
-        </div>
-        <div class="col col-md-6">
-          <p><strong>Heure de Sortie:</strong> {{ item["H Sortie"] }}</p>
-        </div>
-      </div>
-    </div>
 
-    <div class="d-flex justify-content-evenly mb-3">
-      <div class="piece" align="center" @click="showImg('rectoVisible')">
-        <div>Recto</div>
-        <img :src="recto" alt="recto" width="200" height="90" />
+        <!-- Détails visiteur -->
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Téléphone:</strong> {{ item.visiteur.users.telephone2 }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Société:</strong> {{ item.visiteur.entreprise.libelle }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>E-mail:</strong> {{ item.visiteur.users.email }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Code visiteur:</strong> {{ item.visiteur.numero_piece }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Type pièce:</strong> {{ item.visiteur.type_piece.libelle }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Num pièce:</strong> {{ item.visiteur.numero_piece }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Employé:</strong> {{ item.visiteur.users.nom }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Code:</strong> {{ item.code_fvisite }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Heure d'entrée:</strong> {{ item.heure_entree }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Heure de Sortie:</strong> {{ item.heure_fin || 'En cours' }}</p>
+          </div>
+        </div>
       </div>
-      <VueEasyLightbox
-            :visible="rectoVisible"
-            :imgs="recto"
-            @hide="onHide('rectoVisible')"
-        />
-      
-      <div>
-        <div class="piece" align="center" @click="showImg('versoVisible')">
-          <div>Verso</div>
-          <img  :src="verso" width="200" height="90" alt="verso" />
+
+      <!-- Affichage des images -->
+      <div class="d-flex justify-content-evenly mb-4">
+        <div class="piece" align="center" @click="showImg('rectoVisible')" style="cursor: pointer;">
+          <div style="font-weight: bold; color: #005F87;">Recto</div>
+          <img :src="recto" alt="recto" width="220" height="70" class="border rounded" style="border-color: #005F87;" />
         </div>
         <VueEasyLightbox
-            :visible="versoVisible"
-            :imgs="verso"
-            @hide="onHide('versoVisible')"
-          />
-          <!-- :src="`data:${detailData.visiteurs[0].visiteur.mime_type_v};base64,${detailData.visiteurs[0].visiteur.image_p}`" -->
+          :visible="rectoVisible"
+          :imgs="recto"
+          @hide="onHide('rectoVisible')"
+        />
+        
+        <div class="piece" align="center" @click="showImg('versoVisible')" style="cursor: pointer;">
+          <div style="font-weight: bold; color: #005F87;">Verso</div>
+          <img :src="verso" width="220" height="70px" alt="verso" class="border rounded" style="border-color: #005F87;" />
+        </div>
+        <VueEasyLightbox
+          :visible="versoVisible"
+          :imgs="verso"
+          @hide="onHide('versoVisible')"
+        />
       </div>
+
+      <!-- Pagination -->
+      <div class="d-flex justify-content-end" v-if="detailData.enDelegation">
+        <BPagination
+          v-model="page"
+          :total-rows="detailData.visiteurs.length"
+          :per-page="itemsPerPage"
+          aria-controls="modal-pagination"
+          class="pagination-sm"
+          style="background-color: #005F87; color: #fff; border-radius: 20px;"
+        />
+      </div>
+
     </div>
 
-    <div class="d-flex justify-content-end" v-if="detailData.enDelegation">
-      <BPagination
-        v-model="page"
-        :total-rows="detailData.visiteurs.length"
-        :per-page="itemsPerPage"
-        aria-controls="modal-pagination"
-      ></BPagination>
-    </div>
     
   </BModal>
 
@@ -106,11 +118,7 @@
     <BRow>
       <BCol cols="12">
         <BCard no-body>
-          <div v-if="loading" class="loading-ellipses">
-            <span class="dot text-success">.</span>
-            <span class="dot text-primary">.</span>
-            <span class="dot text-danger">.</span>
-          </div>
+          <ScaleLoader :loading="loading" style="margin: 10em 0;" :color="color" />
           <BCardBody v-if="!loading && data">
             <BRow class="mb-3">
               <BCol sm="12" md="2">
@@ -207,12 +215,12 @@
 <script>
 import apiClient from '../api/intercepteur';
 import { useAuthStore } from "~/stores/auth.js";
-import { PulseLoader } from '@saeris/vue-spinners'
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 
 
 export default {
 components: {
-  PulseLoader
+  ScaleLoader
 },
 setup(){
   const authStore = useAuthStore()
@@ -238,6 +246,7 @@ setup(){
         page: 1,
         itemsPerPage: 1,
         loading: false,
+        loadingDetail: false,
         detailModal: false,
         isActive: 'Jour' ,
         verso:"",
@@ -275,7 +284,8 @@ setup(){
       ],
       title: null,
       data: [],
-
+      color: "#FE0201",
+      
   };
 },
 
@@ -334,20 +344,28 @@ setup(){
       async showDetailsModal(row){
         
         if(row.uuid){
-          const response = await apiClient.get(`/fvisites/${row.uuid}`, {
-            headers: {
-              'Authorization': `Bearer ${this.authStore.token}`,
-            },
-          })
-          if(!response.data.error){
-            this.detailData.visiteurs = response.data.data.visiteurs
-            console.log("Donnée----------------------------: "+JSON.stringify(this.detailData.visiteurs))
-            this.verso = `data:${this.detailData.visiteurs[0].visiteur.mime_type_v};base64,${this.detailData.visiteurs[0].visiteur.image_v}`
-            this.recto = `data:${this.detailData.visiteurs[0].visiteur.mime_type_p};base64,${this.detailData.visiteurs[0].visiteur.image_p}`
-            // detailData.visiteurs[0].visiteur.image_p
-            this.detailModal = !this.detailModal
-          }else{
-            console.error("Erreur fiche visite :",response.data.message)
+          try{
+              this.loadingDetail = true
+              this.detailModal = !this.detailModal
+              const response = await apiClient.get(`/fvisites/${row.uuid}`, {
+              headers: {
+                'Authorization': `Bearer ${this.authStore.token}`,
+              },
+            })
+            if(!response.data.error){
+              this.detailData.visiteurs = response.data.data.visiteurs
+              console.log("Donnée----------------------------: "+JSON.stringify(this.detailData.visiteurs))
+              this.verso = `data:${this.detailData.visiteurs[0].visiteur.mime_type_v};base64,${this.detailData.visiteurs[0].visiteur.image_v}`
+              this.recto = `data:${this.detailData.visiteurs[0].visiteur.mime_type_p};base64,${this.detailData.visiteurs[0].visiteur.image_p}`
+              // detailData.visiteurs[0].visiteur.image_p
+              
+            }else{
+              console.error("Erreur fiche visite :",response.data.message)
+            }
+          }catch(e){
+            console.error("Erreur :",e)
+          }finally{
+            this.loadingDetail = false
           }
 
         }else{

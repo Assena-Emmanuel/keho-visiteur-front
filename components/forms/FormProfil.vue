@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, defineModel } from "vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import { useAuthStore } from "~/stores/auth.js";
@@ -7,22 +7,17 @@ import apiClient from '~/components/api/intercepteur';
 import { useGestionStore } from "~/stores/gestion.js";
 import { useApi } from '~/components/api/useApi';
 import Swal from "sweetalert2";
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 
 const authStore = useAuthStore()
 const gestionStore = useGestionStore()
 const { getAll, createResource, getById } = useApi(authStore.token);
 
 
-// Déclaration des props
-const props = defineProps({
-  isOpen: Boolean,
-  id: Number,
-  isEditMode: Boolean,
-  selectedIndex: Number, // L'index de l'élément à éditer
-});
+const isOpen = defineModel('isOpen')
+const id = defineModel('id')
+const isEditMode = ref(false)
 
-// Déclaration des événements
-const emit = defineEmits(["update:isOpen", "update:id"]);
 
 // Variables réactives
 const libelle = ref("");
@@ -35,6 +30,8 @@ const loadingAdd = ref(false);
 const errorMessage = ref("")
 const erreur = ref(false)
 const actions = ref([])
+const menus = ref([])
+const permissions = ref({})
 
 const totalRows = ref(1);
 const currentPage = ref(1);
@@ -43,7 +40,11 @@ const pageOptions = ref([5, 10, 15, 20]);
 const filter = ref('');
 const sortBy = ref('age');
 const sortDesc = ref(false);
-const fields = ref(["Rôle"])
+const fields = ref([])
+const dataRole = ref({})
+const formData = ref({})
+
+const newPermission = ref({})
 
 // Validation avec Vuelidate
 const rules = computed(() => ({
@@ -101,47 +102,98 @@ const onSaveprofil = async () => {
 
 
 onMounted(async () => {
-
-try {
-  // Récupérer tous les départements
-  
-} catch (error) {
-  console.error('Erreur lors de la récupération des données:', error);
-}
 });
 
+// Extraire les actions pour créer les fields du tableau
+const extractActionFields = (menus) => {
+      let actions = new Set();
+      menus.forEach(menu => {
+        menu.permissions.forEach(permission => {
+          actions.add(permission.action_lib);
+        });
+      });
+      return Array.from(actions);
+};
 
 watch(
-  () => props.id,  
+  () => id.value,  
   async (newid) => {  
     if (newid) {
+      
       loading.value = true
+      isOpen.value = false
       // recuperation du profil
-      const profil = await getById("role", newid);
-      libelle.value = profil.data.libelle
-      ancienLibelle.value = profil.data.libelle
-      description.value = profil.data.description
+      try{
+          isOpen.value = true
+          isEditMode.value = true
+          
+          
+         
+          const profil = await getById("role", newid);
+          
+          
+          // const actions = await getAll("action")
+        
+        if(!profil.data.error){
 
-      console.log("profil---------------------"+isEditMode)
+          libelle.value = profil.data.libelle
+          ancienLibelle.value = profil.data.libelle
+          description.value = profil.data.description
 
-      // // recuperation des profils
-      // const role = await getAll("role")
-  
-      // // recuperation des action
-      // const actions = await getAll("action")
-      // actions.value = actions.data
+          
+          const response = await apiClient.get(`/permissions/${profil.data.id}`,{
+            headers: {
+              'Authorization': `Bearer ${authStore.token}`,
+            },
+          });
+          
+          if(!response.data.error){
 
-      // // extrait les libelles
-      // if (actions.value && Array.isArray(actions.value)) {
-      //   actions.value.forEach(element => {
-      //     fields.value.push(element.libelle);
-      //   });
-      // } else {
-      //   console.error('actions.value.array n\'est pas un tableau ou est undefined');
-      // }
-      // console.log("libelle---------------------"+JSON.stringify(fields.value))
+            dataRole.value = response.data
 
-      loading.value = false
+            // Mappage des menus et permissions
+            menus.value = dataRole.value.menus;
+
+            // Définir les actions comme les fields pour la table
+            fields.value = extractActionFields(menus.value);
+
+           
+              menus.value.map((menu) => {
+                menu.permissions.map((perm) => {
+                  formData.value[`${menu.resourceId}-${perm.action_id}`] =
+                    perm.habilitation;
+                });
+              });
+            console.log("fields-------------: "+JSON.stringify(fields.value))
+
+            
+          }else{
+            alert()
+          }
+          
+          
+
+          // // Initialiser les permissions pour chaque ressource
+          // this.menus.forEach(menu => {
+          //   this.permissions[menu.resourceId] = {};
+          //   menu.permissions.forEach(permission => {
+          //     this.permissions[menu.resourceId][permission.action_lib] = permission.habilitation;
+          //   });
+          // });
+
+          
+
+        }else{
+          console.error("recuperation Profil error: "+profil.data.message)
+        }
+        
+        
+      }catch(e){
+        console.error("Erreur: "+e)
+      }finally{
+        loading.value = false
+      }
+      
     }
   },
   { immediate: true }  // Lance le watch dès que possible, même si la prop est déjà présente
@@ -149,50 +201,38 @@ watch(
 
 // Fonction de mise à jour du département
 const onUpdateprofil = async () => {
+  alert()
   submitted.value = true;
   v$.value.$touch(); // Marquer tous les champs comme touchés pour activer la validation
 
   // Vérification des erreurs de validation
-  if (v$.value.$invalid) {
+  if (!id.value || id.value  > 0) {
     return; // Si des erreurs existent, on arrête la fonction
   }
 
   loadingEdit.value = true;
   try {
-    // Préparation des données à envoyer via FormData
-    const formData = new FormData();
-    if(ancienLibelle.value !== libelle.value){
-      formData.append('libelle', libelle.value);
-    }
-    
-    formData.append('description', description.value);
 
-    console.log("----------------------Mise  jour ------------------")
-
-    // Appel API pour mettre à jour le profil
-    const response = await  apiClient.put(`/role/${props.id}`, formData, {
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`,  // Utilisation du token d'authentification
-      },
-    });
-
-    // Vérification de la réponse
-    if (!response.data.error) {
-      console.log("Modification réussie : ", response.data.message);
-      erreur.value = false;  // Réinitialiser l'état d'erreur
-      const data = await getAll("role");
-      console.log("data save:------------"+JSON.stringify(data.data))
-      gestionStore.setProfils(data.data)
-      alertMessage(data.data.message, 'success')
-      resetForm()
-
-    } else {
-      // Si une erreur se produit dans la réponse de l'API
-      erreur.value = true;
-      errorMessage.value = "Mise à jour échouée !";
-      console.error(response.data.message);
-
-    }
+        const response = await apiClient.post(`${this.url}/permissions`,
+          {
+            profil_id: id.value,
+            choices: formData.value,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `${authStore.token}`,
+            },
+          }
+        );
+        
+        console.log("Permission--------------------: "+JSON.stringify(response.data))
+        if (response.status == 201) {
+          resetForm()
+          
+        }else{
+          alert("Error")
+        }
 
   } catch (error) {
     // Gestion des erreurs si l'appel API échoue
@@ -214,7 +254,7 @@ const filteredData = computed(() => {
       )
     );
   }
-  return actions.value;
+  return menus.value;
 });
 
 
@@ -264,113 +304,67 @@ const resetForm = () => {
   submitted.value = false;
   erreur.value = false
   
-  emit("update:isOpen", false);
-  emit("update:id", null);
+  isOpen.value = false
+  // id.value = null
+  isEditMode.value = false
 
-  v$.value.$reset();
 };
 </script>
 
 <template>
   <BModal 
       @hide="resetForm" 
-      :modelValue="isOpen" 
+      v-model="isOpen" 
       size="lg"
       title-class="font-18" 
       hide-footer
       :title="isEditMode ? `Modifier le Profil ` : 'Créer un Profil'" 
       no-close-on-backdrop
+      ok-only no-stacking
   >
     <!-- :title="isEditMode ? `Modifier le service ` : 'Créer un Service'"  -->
-  <div v-if="loading" class="loading-ellipses">
-    <span class="dot">.</span>
-    <span class="dot">.</span>
-    <span class="dot">.</span>
-  </div>
+    <ScaleLoader :loading="loading" style="margin: 10em 0;" :color="'#FE0201'" />
   
-  <!-- <template #modal-title>
-      <div v-if="isEditMode">Modifier le profil</div>
-      <div v-else>Créer un profil</div>
-  </template> -->
-
   <BForm v-if="!loading" class="form-vertical px-3" role="form">
-
     <!-- Afficher en cas de creation -->
-    <div v-if="!isEditMode">
-      <div class="mb-3">
+    <div class="row">
+      <div class="col-md-6 mb-3">
         <label for="libelle" style="font-size: 12px;">Libellé <span class="fw-bool text-danger">*</span></label>
         <div class="input-group">
-            <input 
-            v-model="libelle" 
-            type="text" 
-            class="form-control border border-secondary" 
-            id="libelle" 
-            placeholder="Libellé" 
-            :class="{'is-invalid': submitted && v$.libelle.$error }" 
-            />
-            <div v-if="submitted && v$.libelle.$error" class="invalid-feedback">
+          <input 
+          v-model="libelle" 
+          type="text" 
+          class="form-control border border-secondary" 
+          id="libelle" 
+          placeholder="Libellé" 
+          :class="{'is-invalid': submitted && v$.libelle.$error }" 
+          />
+          <div v-if="submitted && v$.libelle.$error" class="invalid-feedback">
             <span v-if="v$.libelle.required.$invalid">Cet champ est obligatoire
             </span>
-            </div>
+          </div>
+        </div>
       </div>
-            
-      </div>
-      <div class="mb-3">
+
+      <div class="col-md-6 mb-3">
         <label for="description" style="font-size: 12px;">Description</label>
         <div class="input-group">
-            <textarea 
-                v-model="description" 
-                type="text"
-                class="form-control border border-secondary" 
-                id="description" 
-                placeholder="Description" 
-            ></textarea>
-        </div>  
+          <textarea 
+              v-model="description" 
+              rows="1"
+              type="text"
+              class="form-control border border-secondary" 
+              id="description" 
+              placeholder="Description" 
+          ></textarea>
+        </div>
       </div>
+
     </div>
 
-    <BRow>
-
-        <BCol md="4" sm="12" >
-          <div class="mb-3">
-              <label for="libelle" style="font-size: 12px;">Libellé <span class="fw-bool text-danger">*</span></label>
-              <div class="input-group">
-                <input 
-                  v-model="libelle" 
-                  type="text" 
-                  class="form-control border border-secondary" 
-                  id="libelle" 
-                  placeholder="Libellé" 
-                  :class="{'is-invalid': submitted && v$.libelle.$error }" 
-                />
-                <div v-if="submitted && v$.libelle.$error" class="invalid-feedback">
-                <span v-if="v$.libelle.required.$invalid">Cet champ est obligatoire
-                </span>
-                </div>
-              </div>
-              
-          </div>
-        </BCol>
-
-        <BCol md="8" sm="12">
-          <div class="mb-3">
-              <label for="description" style="font-size: 12px;">Description</label>
-              <div class="input-group">
-                <input 
-                  v-model="description" 
-                  type="text"
-                  class="form-control border border-secondary" 
-                  id="description" 
-                  placeholder="Description" 
-              />
-              </div>
-          </div>
-        </BCol>
-    </BRow>
-
-    <!-- Tableau Habilitation -->
-    <div class="border border-secondary p-2 rounded-3" v-if="props.id" ">
-    <BRow class="">
+    <!-- Habilitation -->
+    <div v-if="!loading && isEditMode">
+      <BRow class="mt-4">
         <BCol sm="12" md="6" class="">
             <div id="tickets-table_length" class="dataTables_length">
             <label class="d-inline-flex align-items-center" style="font-size: 12px;">
@@ -382,95 +376,95 @@ const resetForm = () => {
         <BCol sm="12" md="6">
         <div id="tickets-table_filter" class="dataTables_filter text-md-end">
             <label class="d-inline-flex align-items-center">
-            <BFormInput placeholder="Rechercher" v-model="filter" type="search" class="form-control border border-black form-control-sm"></BFormInput>
+            <BFormInput placeholder="Rechercher" v-model="filter" type="search" class="form-control border border-black form-control-sm w-100"></BFormInput>
             </label>
         </div>
         </BCol>
-    </BRow>
+      </BRow>
 
-    <div class="table-responsive mb-0 my-3">
-    <BTable
-      :items="filteredData" 
-      :fields="fields" 
-      responsive="sm" 
-      :per-page="perPage" 
-      :current-page="currentPage" 
-      v-model:sort-by.sync="sortBy" 
-      v-model:sort-desc.sync="sortDesc" 
-      @filtered="onFiltered"
-    >
+      <table class="table" v-if="id">
+        <thead class="table-dark">
+          <tr>
+            <th>Menu</th>
+            <th v-for="action in fields" :key="action.id">
+              <th>{{ action }}</th>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="menu in menus" :key="menu.resourceId">
+            <td>{{ menu.resourceName }}</td>
+            <td
+              class="text-center"
+              v-for="action in menu.permissions"
+              :key="action.action_id"
+            >
+              <input
+                type="checkbox"
+                :name="`${menu.resourceId}-${action.action_id}`"
+                :checked="action.habilitation ? true : false"
+                v-model="
+                  formData[`${menu.resourceId}-${action.action_id}`]
+                "
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-        <template #cell(voir)="row">
-            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.modifier" @change="onCheckboxChange(row.item)">
-            </BFormCheckbox>
-        </template>
-
-        <template #cell(supprimer)="row">
-            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.supprimer" @change="onCheckboxChange(row.item)">
-            </BFormCheckbox>
-        </template>
-        <template #cell(modifier)="row">
-            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.modifier" @change="onCheckboxChange(row.item)">
-            </BFormCheckbox>
-        </template>
-
-        <template #cell(ajouter)="row">
-            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.ajouter" @change="onCheckboxChange(row.item)">
-            </BFormCheckbox>
-        </template>
-        <template #cell(accepter)="row">
-            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.accepter" @change="onCheckboxChange(row.item)">
-            </BFormCheckbox>
-        </template>
-        <template #cell(rejeter)="row">
-            <BFormCheckbox :disabled="isDetailMode" class="border border-secondary" v-model="row.item.rejeter" @change="onCheckboxChange(row.item)">
-            </BFormCheckbox>
-        </template>
-
-    </BTable>
-    <!-- Pagination placée après le tableau -->
-    <BRow>
+      <!-- Pagination -->
+      <BRow>
         <BCol>
-        <div class="dataTables_paginate paging_simple_numbers d-flex justify-content-between pb-2" style="font-size: 12px;">
-            <div id="tickets-table_length" class="dataTables_length">
-            <label class="d-inline-flex align-items-center">
-                Afficher de 1 à {{ perPage }} sur {{ totalRows }} éléments
-            </label>
-            </div>
-            <ul class="pagination pagination-rounded mb-0">
-            <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" />
-            </ul>
-        </div>
+          <div class="dataTables_paginate paging_simple_numbers d-flex justify-content-between pb-2" style="font-size: 12px;">
+              <div id="tickets-table_length" class="dataTables_length">
+              <label class="d-inline-flex align-items-center">
+                  Afficher de 1 à {{ perPage }} sur {{ totalRows }} éléments
+              </label>
+              </div>
+              <ul class="pagination pagination-rounded mb-0">
+              <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" />
+              </ul>
+          </div>
         </BCol>
-    </BRow>
-    </div>
+      </BRow>
+
     </div>
 
-    <div v-if="!isEditMode" class="mt-4 d-flex justify-content-center">
+    <div class="d-flex justify-content-center">
       <BButton 
-        v-if="!isEditMode" 
-        @click="onSaveprofil" 
-        :loading="loadingAdd"
-        loading-text="enregistrement"
-        variant="primary" 
-        class="w-sm waves-effect waves-light btn btn-sm" 
-      >
-        Enregistrer
-      </BButton>
-      <BButton 
-        v-if="isEditMode" 
-        @click="onUpdateprofil" 
-        :loading="loadingEdit"
-        loading-text="modification"
-        variant="primary" 
-        class="w-sm waves-effect waves-light btn btn-sm" 
-      >
-        Modifier
-      </BButton>
+      v-if="!isEditMode" 
+      @click="onSaveprofil" 
+      :loading="loadingAdd"
+      loading-text="enregistrement"
+      variant="primary" 
+      class="w-sm waves-effect waves-light btn btn-sm" 
+    >
+      
+      <span v-if="!loadingAdd">Enregistrer</span>
+      <ScaleLoader :loading="loadingAdd" :height="'20px'" :color="'#FFFFFF'" />
+    </BButton>
+    
+    <BButton 
+      v-if="isEditMode" 
+      @click="onUpdateprofil" 
+      :loading="loadingEdit"
+      loading-text="modification"
+      variant="primary" 
+      class="w-sm waves-effect waves-light btn btn-sm" 
+    >
+      <span v-if="!loadingEdit">Modifier</span>
+      <ScaleLoader :loading="loadingEdit" :height="'20px'" :color="'#FFFFFF'" />
+    </BButton>
     </div>
+
+
+
   </BForm>
 </BModal>
+
 </template>
+
+
 <style scoped>
 .loading-ellipses {
   font-size: 40px; /* Taille augmentée */

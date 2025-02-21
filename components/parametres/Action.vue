@@ -13,7 +13,7 @@ export default {
         const  { getAll,  } = useApi(authStore.token)
 
         // Variables réactives
-        const title = 'Liste des Menus';
+        const title = 'Liste des actions';
         const modal = ref(false);
         const formData = ref({});
         const rowSelect = ref(null);
@@ -34,24 +34,22 @@ export default {
             isEditMode.value = false;
         };
 
-        const menus = async () => {
+        const actions = async () => {
         fields.value = [
-            {key: "target"},
             {key: "libelle" },
-            {key: "type"},
-            {key: "name"},
+            {key: "code"},
             {key: "icon"},
             {key: "statut"},
             {key: "Actions"},
         ]
 
-            if (gestionStore.menus.length === 0) {
+            if (gestionStore.actions.length === 0) {
               try {
                   isLoading.value = true;
-                  const response = await getAll("menu")
+                  const response = await getAll("action")
 
                   if (!response.error) {
-                    gestionStore.setMenus(response.data);
+                    gestionStore.setActions(response.data);
 
                   }
               } catch (error) {
@@ -69,8 +67,8 @@ export default {
             }
         };
 
-        // Appeler menus au montage du composant
-        onMounted(menus);
+        // Appeler actions au montage du composant
+        onMounted(actions);
 
         return {
             v$,
@@ -87,7 +85,7 @@ export default {
             isLoading,
             openModal,
             openAddModal,
-            menus,
+            actions,
         };
     },
 
@@ -124,22 +122,20 @@ export default {
 <template>
     <div>
     <div class="d-flex justify-content-between">
-        <div class="mb-0">Gestion des Menus</div>
+        <div class="mb-0">Gestion des Actions</div>
         <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong> </BButton>
-
-        <FormsFormMenu
-            v-model:isOpen="modal"
-            v-model:id="selectedIndex"
-        />
-
     </div>
+    <FormsFormAction
+        v-model:isOpen="modal"
+        v-model:id="selectedIndex"
+    />
     
 
     <Tableau 
         :fields="fields" 
         :title="title" 
         :show-addbtn="true" 
-        :typeForme="'menu'" 
+        :typeForme="'action'" 
         :is-loading="isLoading"
         @edit="openModal(true, $event)"
         @data-selected="handleDataSelected"

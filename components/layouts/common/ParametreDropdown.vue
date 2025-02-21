@@ -78,6 +78,15 @@
             </div>
           </div>
         </nuxt-link>
+        <nuxt-link to="/parametre-action" class="text-reset notification-item">
+            <div class="media d-flex">
+            <div class="media-body">
+              <h6 class="mt-0 mb-1">
+                Gestion des actions
+              </h6>
+            </div>
+          </div>
+        </nuxt-link>
         
         
       </div>

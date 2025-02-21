@@ -29,7 +29,7 @@ const emit = defineEmits(["update:isOpen", "update:id"]);
 // Variables réactives
 const libelle = ref("");
 const code = ref("");
-const slug = ref("");
+const slug = ref("SRV");
 const statut = ref("");
 const categorie = ref("");
 const submitted = ref(false);
@@ -280,7 +280,6 @@ const resetForm = () => {
 </script>
 
 
-
 <template>
   <BModal 
       @hide="resetForm" 
@@ -363,6 +362,7 @@ const resetForm = () => {
       <div>
         <input 
           v-model="slug" 
+          disabled
           id="code" 
           class="form-control form-control-sm"  
           type="text"

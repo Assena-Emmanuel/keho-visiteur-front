@@ -65,10 +65,13 @@ import { useNotifiedStore } from "~/stores/notified";
 import { useAuthStore } from "~/stores/auth.js";
 import apiClient from "~/components/api/intercepteur";
 
+
 const notifiedStore = useNotifiedStore();
 const authUser = useAuthStore()
 const visiteur = ref({})
 const modal = ref(false)
+
+
 
 // Définir une propriété calculée pour obtenir les notifications
 const myNotifs = computed(() => notifiedStore.mynotifs);
@@ -100,6 +103,7 @@ channel.bind("visitor.notified", (data) => {
     contact: '07 07 07 07 00',
     nomEmploye: authUser.user.civilite+' '+authUser.user.nom
   }
+
 
   
   // Pousser la nouvelle notification dans mynotifs

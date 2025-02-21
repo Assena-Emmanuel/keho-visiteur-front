@@ -30,7 +30,7 @@ const emit = defineEmits(["update:isOpen", "update:id"]);
 // Variables réactives
 const libelleDepartement = ref("");
 const codeDepartement = ref("");
-const slug = ref("");
+const slug = ref("DPT");
 const statut = ref("");
 const categorie = ref("");
 const submitted = ref(false);
@@ -367,6 +367,7 @@ const resetForm = () => {
         <input 
           v-model="slug" 
           id="code" 
+          disabled
           class="form-control form-control-sm"  
           type="text"
           :class="{

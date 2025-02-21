@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     '~/plugins/vue-awesome-paginate.js',
     '~/plugins/vue3-datatable.js',
     '~/plugins/vue-spinners.js',
+    '~/plugins/vue-notification.js',
   ],
   app: {
     head: {
