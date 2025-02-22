@@ -4,6 +4,7 @@ type IslandComponent<T extends DefineComponent> = T & DefineComponent<{}, {refre
 interface _GlobalComponents {
       'PageHeader': typeof import("../components/global/PageHeader.vue")['default']
     'SiteHeader': typeof import("../components/global/SiteHeader.vue")['default']
+    'AlertMessage': typeof import("../components/AlertMessage.vue")['default']
     'WizarParametrageProfileInformationPersonnelle': typeof import("../components/WizarParametrageProfile/InformationPersonnelle.vue")['default']
     'WizarParametrageProfileInformationProfessionnelle': typeof import("../components/WizarParametrageProfile/InformationProfessionnelle.vue")['default']
     'AccountForgotPassword': typeof import("../components/account/ForgotPassword.vue")['default']
@@ -160,6 +161,7 @@ interface _GlobalComponents {
     'NuxtRouteAnnouncer': IslandComponent<typeof import("../node_modules/nuxt/dist/app/components/server-placeholder")['default']>
       'LazyPageHeader': typeof import("../components/global/PageHeader.vue")['default']
     'LazySiteHeader': typeof import("../components/global/SiteHeader.vue")['default']
+    'LazyAlertMessage': typeof import("../components/AlertMessage.vue")['default']
     'LazyWizarParametrageProfileInformationPersonnelle': typeof import("../components/WizarParametrageProfile/InformationPersonnelle.vue")['default']
     'LazyWizarParametrageProfileInformationProfessionnelle': typeof import("../components/WizarParametrageProfile/InformationProfessionnelle.vue")['default']
     'LazyAccountForgotPassword': typeof import("../components/account/ForgotPassword.vue")['default']
@@ -322,6 +324,7 @@ declare module 'vue' {
 
 export const PageHeader: typeof import("../components/global/PageHeader.vue")['default']
 export const SiteHeader: typeof import("../components/global/SiteHeader.vue")['default']
+export const AlertMessage: typeof import("../components/AlertMessage.vue")['default']
 export const WizarParametrageProfileInformationPersonnelle: typeof import("../components/WizarParametrageProfile/InformationPersonnelle.vue")['default']
 export const WizarParametrageProfileInformationProfessionnelle: typeof import("../components/WizarParametrageProfile/InformationProfessionnelle.vue")['default']
 export const AccountForgotPassword: typeof import("../components/account/ForgotPassword.vue")['default']
@@ -478,6 +481,7 @@ export const NuxtIsland: typeof import("../node_modules/nuxt/dist/app/components
 export const NuxtRouteAnnouncer: IslandComponent<typeof import("../node_modules/nuxt/dist/app/components/server-placeholder")['default']>
 export const LazyPageHeader: typeof import("../components/global/PageHeader.vue")['default']
 export const LazySiteHeader: typeof import("../components/global/SiteHeader.vue")['default']
+export const LazyAlertMessage: typeof import("../components/AlertMessage.vue")['default']
 export const LazyWizarParametrageProfileInformationPersonnelle: typeof import("../components/WizarParametrageProfile/InformationPersonnelle.vue")['default']
 export const LazyWizarParametrageProfileInformationProfessionnelle: typeof import("../components/WizarParametrageProfile/InformationProfessionnelle.vue")['default']
 export const LazyAccountForgotPassword: typeof import("../components/account/ForgotPassword.vue")['default']

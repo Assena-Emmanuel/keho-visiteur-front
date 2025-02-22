@@ -14,13 +14,6 @@ const gestionStore = useGestionStore()
 const { getAll, createResource, getById } = useApi(authStore.token);
 
 
-// Déclaration des props
-// const props = defineProps({
-//   isOpen: Boolean,
-//   id: Number,
-//   isEditMode: Boolean,
-//   selectedIndex: Number, // L'index de l'élément à éditer
-// });
 
 const isOpen = defineModel('isOpen')
 const id = defineModel('id')
@@ -59,20 +52,17 @@ const rules = computed(() => ({
     required,
   },
 
-  icon: {
-    required,
-  },
 
 }));
 
-const v$ = useVuelidate(rules, { libelle, name, target, icon});
+const v$ = useVuelidate(rules, { libelle, name, target});
 
 // Méthodes
 const onSaveMenu = async () => {
   submitted.value = true;
   v$.value.$touch();
 
-  if (v$.value.libelle.$error || v$.value.target.$error || v$.value.name.$error || v$.value.icon.$error) {
+  if (v$.value.libelle.$error || v$.value.target.$error || v$.value.name.$error ) {
     return;
 
   }else{
@@ -92,12 +82,12 @@ const onSaveMenu = async () => {
       statut: statut.value,
       };
 
-      const data = await createResource(`menu`, formData);
-      if(!data.data.error){
-
+      const resp = await createResource(`menu`, formData);
+      if(!resp.data.error){
+        alertMessage(resp.data.message, 'success')
         const data = await getAll("menu");
         gestionStore.setMenus(data.data)
-        alertMessage(data.data.message, 'success')
+        
         resetForm()
         
       }else{
@@ -143,6 +133,7 @@ watch(
         target.value = menu.data.target
         statut.value = menu.data.statut
         type.value = menu.data.type
+        icon.value = menu.data.icon
         menu_id.value = menu.data.menu_id
 
         // console.log("Menu------------------: "+JSON.stringify(menu.data))
@@ -205,6 +196,7 @@ const onUpdateMenu = async () => {
     console.log("Mise ajour: "+id.value+" "+JSON.stringify(response.data));
     if (!response.data.error) {
       const menus = await getAll("menu")
+      alertMessage(response.data.message, "success")
       gestionStore.setMenus(menus.data); 
       erreur.value = false;  // Réinitialiser l'état d'erreur
       isOpen.value = false
@@ -212,8 +204,9 @@ const onUpdateMenu = async () => {
 
     } else {
       // Si une erreur se produit dans la réponse de l'API
-      erreur.value = true;
-      errorMessage.value = "Mise à jour échouée !";
+      // erreur.value = true;
+      // errorMessage.value = "Mise à jour échouée !";
+      alertMessage(response.data.message)
       console.error("Mise ajour: "+response.data.message);
 
     }
@@ -376,10 +369,7 @@ const resetForm = () => {
                     'border border-danger': submitted && v$.icon.$error,
                     'border border-secondary': !(submitted && v$.icon.$error)
                     }">
-                    <div v-if="submitted && v$.icon.$error" class="invalid-feedback">
-                    <span v-if="v$.icon.required.$invalid" class="font-size-12">champ obligatoire
-                    </span>
-                    </div>
+                    
                 </div>
             </div>
         </BCol>

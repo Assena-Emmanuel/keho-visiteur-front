@@ -201,48 +201,46 @@ watch(
 
 // Fonction de mise à jour du département
 const onUpdateprofil = async () => {
-  alert()
   submitted.value = true;
   v$.value.$touch(); // Marquer tous les champs comme touchés pour activer la validation
 
   // Vérification des erreurs de validation
-  if (!id.value || id.value  > 0) {
+  if (!id.value || id.value <= 0) {
+    alert("L'ID est invalide");
     return; // Si des erreurs existent, on arrête la fonction
   }
 
   loadingEdit.value = true;
-  try {
+  console.log(formData.value);
 
-        const response = await apiClient.post(`${this.url}/permissions`,
-          {
-            profil_id: id.value,
-            choices: formData.value,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `${authStore.token}`,
-            },
-          }
-        );
-        
-        console.log("Permission--------------------: "+JSON.stringify(response.data))
-        if (response.status == 201) {
-          resetForm()
-          
-        }else{
-          alert("Error")
-        }
+  try {
+    const response = await apiClient.post("/permissions", {
+      "role_id": id.value,
+      'choices': formData.value
+    }, {
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    });
+
+    if (response.status === 201) {
+      isOpen.value = false
+      isEditMode.value = false
+      id.value = null
+      resetForm();
+    } else {
+      alert("Une erreur est survenue : " + response.statusText);
+    }
 
   } catch (error) {
     // Gestion des erreurs si l'appel API échoue
     errorMessage.value = "Échec de mise à jour !";
     console.error(errorMessage.value, error);
   } finally {
-    // Fin du processus de chargement, que l'appel réussisse ou échoue
     loadingEdit.value = false;
   }
 };
+
 
 const filterOn = computed(() => props.fields.map(field => field.key));
 
@@ -295,6 +293,7 @@ async function getCategorie(id) {
     loading.value = false; 
   }
 }
+
 
 
 const resetForm = () => {
@@ -434,8 +433,6 @@ const resetForm = () => {
       <BButton 
       v-if="!isEditMode" 
       @click="onSaveprofil" 
-      :loading="loadingAdd"
-      loading-text="enregistrement"
       variant="primary" 
       class="w-sm waves-effect waves-light btn btn-sm" 
     >
@@ -447,8 +444,6 @@ const resetForm = () => {
     <BButton 
       v-if="isEditMode" 
       @click="onUpdateprofil" 
-      :loading="loadingEdit"
-      loading-text="modification"
       variant="primary" 
       class="w-sm waves-effect waves-light btn btn-sm" 
     >

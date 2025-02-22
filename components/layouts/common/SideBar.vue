@@ -1,11 +1,25 @@
 <script>
 import { menuItems } from "~/components/layouts/utils/menu.js";
 import MetisMenu from "metismenujs";
+import { useAuthStore } from "~/stores/auth.js";
+import { useApi } from '~/components/api/useApi';
+import apiClient from "~/components/api/intercepteur";
+
 
 export default {
+  setup(){
+    const authStore = useAuthStore()
+    const { getAll, createResource } = useApi(authStore.token);
+
+    return{
+      authStore,getAll, createResource
+    }
+
+  },
   data() {
     return {
-      menuItems
+      menuItems,
+      menus: []
     };
   },
   props: {
@@ -18,6 +32,12 @@ export default {
       required: true
     }
   },
+  computed: {
+    filteredMenus() {
+      return this.menus.filter(item => item.type === 'SIDE');
+    }
+  },
+
   watch: {
     type: {
       immediate: true,
@@ -79,7 +99,7 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     const element = document.getElementById("side-menu");
     if (element) {
       new MetisMenu("#side-menu");
@@ -89,6 +109,24 @@ export default {
         this._activateMenuDropdown();
       });
     }
+
+    
+    // Recuperation des menus en fonction du role connecté
+    const response = await apiClient.get(`/menu_by_role/${this.authStore.user.role_id}`, 
+      {
+      headers: {
+          'Authorization': `Bearer ${this.authStore.token}`,  // Utilisation du token d'authentification
+        },
+      })
+
+    if(!response.data.error){
+      this.menus = response.data
+      console.log("Sidebar--------- "+JSON.stringify(this.menus))
+
+    }else{
+      console.error("Menu error: "+response.message)
+    }
+
   },
   methods: {
     toggleMenu() {
@@ -197,10 +235,10 @@ export default {
     <div data-simplebar class="sidebar-menu-scroll">
       <div id="sidebar-menu">
         <ul class="metismenu list-unstyled" id="side-menu">
-          <template v-for="item in menuItems">
-            <li class="menu-title" v-if="item.isTitle" :key="item.id">
+          <template v-for="item in filteredMenus" :key="item.id">
+            <!-- <li class="menu-title" v-if="item.label" :key="item.id">
               {{ $t(item.label) }}
-            </li>
+            </li> -->
             <li v-if="!item.isTitle && !item.isLayout" :key="item.id">
               <a v-if="hasItems(item)" href="javascript:void(0);" class="is-parent" :class="{
                 'has-arrow': !item.badge,
@@ -215,12 +253,12 @@ export default {
               <nuxt-link :to="item.link" v-if="!hasItems(item)" class="side-nav-link-ref">
                   <img 
                     v-if="item.icon" 
-                    :src="$route.path === item.link ? item.icon.active : item.icon.desactive" 
+                    :src="$route.path === item.link ? item.icon+'.png' : item.icon+'-desactive.png'" 
                     width="25px" class="me-2" alt=""
                   >
                   <!-- <img v-else :src="`${item.icon.desactive}`" width="30px" class="me-2" alt=""> -->
                   <span :style="{color : $route.path === item.link ? '#378DEA':'#878787' }">{{ $t(item.label) }}</span>
-                  <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ $t(item.badge.text) }}</span>
+                  <!-- <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ $t(item.badge.text) }}</span> -->
               </nuxt-link>
 
 

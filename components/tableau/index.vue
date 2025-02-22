@@ -30,7 +30,7 @@ const submitted = ref(false);
 const detailModal = ref(false);
 const localModal = ref(props.modal);
 const isStatutActive = ref(false);
-const totalRows = ref(1);
+// const totalRows = ref(1);
 const currentPage = ref(1);
 const perPage = ref(5);
 const pageOptions = ref([5, 10, 15, 20]);
@@ -44,7 +44,7 @@ const id = ref(null)
 // Computed properties
 const filterOn = computed(() => props.fields.map(field => field.key));
 
-const rows = computed(() => filteredData.value.length);
+const totalRows = computed(() => filteredData.value.length);
 
 const filteredData = computed(() => {
   if (filter.value) {
@@ -81,6 +81,10 @@ const data = computed(() => {
 
   }else if (props.typeForme === "action"){
     return gestionStore.actions
+
+  }else if (props.typeForme === "categorie"){
+    return gestionStore.categories
+
   }
     
   return []
@@ -130,6 +134,10 @@ const showDetailsModal = (row) => {
     id.value = row.id;
   }else if (props.typeForme === "profil") {
     id.value = row.id;
+
+  }else if (props.typeForme === "categorie") {
+    id.value = row.id;
+    
   }
 };
 
@@ -152,6 +160,9 @@ const handleEdit = (row) => {
     emit('data-selected', { id: row.id });
     
   }else if (props.typeForme === "action") {
+    emit('data-selected', { id: row.id });
+    
+  }else if (props.typeForme === "categorie") {
     emit('data-selected', { id: row.id });
     
   }

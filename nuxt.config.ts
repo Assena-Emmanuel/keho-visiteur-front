@@ -7,8 +7,8 @@ export default defineNuxtConfig({
     '~/plugins/vue-awesome-paginate.js',
     '~/plugins/vue3-datatable.js',
     '~/plugins/vue-spinners.js',
-    '~/plugins/vue-notification.js',
   ],
+  
   app: {
     head: {
       htmlAttrs: { dir: "ltr", lang: "fr" },
@@ -33,7 +33,7 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts", "nuxt-easy-lightbox"],
+  modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts", "nuxt-easy-lightbox",],
 
   pinia: {
     autoImports: ["defineStore", ["defineStore", "definePiniaStore"]]

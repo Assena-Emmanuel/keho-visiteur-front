@@ -6,19 +6,18 @@ import { useAuthStore } from "~/stores/auth.js";
 import { useGestionStore } from "~/stores/gestion.js";
 import { useApi } from '~/components/api/useApi';
 
+
 // Stores
 const gestionStore = useGestionStore();
 const authStore = useAuthStore();
-const v$ = useVuelidate();
+// const toast = useToast()
 
 // Variables réactives
 const title = 'Liste des Profils';
 const modal = ref(false);
 const formData = ref({});
-const rowSelect = ref(null);
 const isEditMode = ref(false);
 const selectedIndex = ref(null);
-const data = ref([]);
 const fields = ref([]);
 const isLoading = ref(false);
 
@@ -92,13 +91,18 @@ const handleDataSelected = (payload) => {
   console.log("--------------------index: "+selectedIndex.value+" ---edit :"+isEditMode.value)
 };
 
+function showNotification() {
+
+}
+
 </script>
 
 <template>
     <div>
     <div class="d-flex justify-content-between">
         <div class="mb-0">Gestion des profils</div>
-        <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer {{ modal }}</strong>  </BButton>
+        <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
+        <BButton variant="primary" @click="showNotification" style="width: 100px;" class="btn-sm mb-3"> <strong>Notif</strong>  </BButton>
         <DashboardNotifWeb />
         <FormsFormProfil
             v-model:isOpen="modal"
