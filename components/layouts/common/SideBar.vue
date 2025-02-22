@@ -1,5 +1,4 @@
 <script>
-import { menuItems } from "~/components/layouts/utils/menu.js";
 import MetisMenu from "metismenujs";
 import { useAuthStore } from "~/stores/auth.js";
 import { useApi } from '~/components/api/useApi';
@@ -18,7 +17,6 @@ export default {
   },
   data() {
     return {
-      menuItems,
       menus: []
     };
   },
@@ -121,7 +119,6 @@ export default {
 
     if(!response.data.error){
       this.menus = response.data
-      console.log("Sidebar--------- "+JSON.stringify(this.menus))
 
     }else{
       console.error("Menu error: "+response.message)
@@ -257,8 +254,8 @@ export default {
                     width="25px" class="me-2" alt=""
                   >
                   <!-- <img v-else :src="`${item.icon.desactive}`" width="30px" class="me-2" alt=""> -->
-                  <span :style="{color : $route.path === item.link ? '#378DEA':'#878787' }">{{ $t(item.label) }}</span>
-                  <!-- <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ $t(item.badge.text) }}</span> -->
+                  <span :style="{color : $route.path === item.link ? '#378DEA':'#878787' }">{{ item.label }}</span>
+                  <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ item.badge.text }}</span>
               </nuxt-link>
 
 

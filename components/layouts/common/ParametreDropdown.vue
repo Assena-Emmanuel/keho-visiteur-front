@@ -15,16 +15,16 @@
       </div>
       
       <div style="max-height: 230px" data-simplebar>
-        <nuxt-link to="/parametre-departement" class="text-reset notification-item">
+        <nuxt-link v-for="menu in menus" :key="menu.id" :to="menu.link" class="text-reset notification-item">
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">
-                Gestion des départements 
+                {{ menu.label }}
               </h6>
             </div>
           </div>
         </nuxt-link>
-        <nuxt-link to="/parametre-service" class="text-reset notification-item">
+        <!-- <nuxt-link to="/parametre-service" class="text-reset notification-item">
             <div class="media d-flex">
             <div class="media-body">
               <h6 class="mt-0 mb-1">
@@ -86,7 +86,7 @@
               </h6>
             </div>
           </div>
-        </nuxt-link>
+        </nuxt-link> -->
         
         
       </div>
@@ -94,9 +94,12 @@
   </template>
 
   
-  <script>
-  export default {
-    // Votre logique ici
-  };
+  <script setup>
+  import { defineModel } from "vue";
+
+  const menus = defineModel('menusParam')
+  watch(menus, (newMenus) => {
+    console.log("Menus ----------: "+ JSON.stringify(newMenus))
+  })
   </script>
   
