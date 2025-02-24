@@ -7,7 +7,7 @@
       <div class="p-3">
         <BRow class="align-items-center">
           <BCol>
-            <h4 class="m-0 font-size-16">
+            <h4 class="m-0 font-size-16 text-primary">
               Paramètres
             </h4>
           </BCol>

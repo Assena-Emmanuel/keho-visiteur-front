@@ -38,18 +38,14 @@
 <script setup>
   import { defineModel, ref, watch } from 'vue';
 
-  // const firstName = defineModel('firstName')
-  // const lastName = defineModel('lastName')
-
   const afficherModalNotification = defineModel('afficherModalNotification')
   const visiteur = defineModel('visiteur')
 
-  // const updateModalVisibility = (newVisibility) => {
-  //   afficherModalNotification.value = newVisibility;
-  // };
   const hide = () =>{
     afficherModalNotification.value = false
     visiteur.value = {}
+
+    return navigateTo({ path: "/mes-visiteurs" });
   }
 
 </script>

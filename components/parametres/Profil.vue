@@ -88,7 +88,6 @@ const handleDataSelected = (payload) => {
   // Open modal only if we have a valid id
 //   modal.value = !!payload.id;
   isEditMode.value = !!payload.id;
-  console.log("--------------------index: "+selectedIndex.value+" ---edit :"+isEditMode.value)
 };
 
 function showNotification() {
@@ -102,8 +101,8 @@ function showNotification() {
     <div class="d-flex justify-content-between">
         <div class="mb-0">Gestion des profils</div>
         <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
-        <BButton variant="primary" @click="showNotification" style="width: 100px;" class="btn-sm mb-3"> <strong>Notif</strong>  </BButton>
-        <DashboardNotifWeb />
+        <!-- <BButton variant="primary" @click="showNotification" style="width: 100px;" class="btn-sm mb-3"> <strong>Notif</strong>  </BButton>
+        <DashboardNotifWeb /> -->
         <FormsFormProfil
             v-model:isOpen="modal"
             v-model:id="selectedIndex"

@@ -3,13 +3,16 @@ import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import apiClient from "~/components/api/intercepteur";
 import { useAuthStore } from '@/stores/auth';
+import { useApi } from '~/components/api/useApi';
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 
 export default {
   setup() {
     const authStore = useAuthStore();
     const v$ = useVuelidate();
-    
-    return { v$, authStore };
+    const {getAll, getById} = useApi(authStore.token)
+
+    return { v$, authStore, getAll, getById, ADMIN:1, };
   },
 
   data() {
@@ -62,18 +65,30 @@ export default {
     statut: { required }
   },
 
-  mounted() {
+  async mounted() {
     this.loading = true;
     this.user = this.authStore.user;
     this.token = this.authStore.token;
 
-    console.log('-----------------user:'+JSON.stringify(this.user))
     this.initializeUserInfo();
     this.fetchCategories();
+
     this.loading = false;
   },
 
   methods: {
+    async onDepartement(){
+      if(this.userDepartement){
+        try{
+          const response = await this.getById("categorie", departement.value )
+          if(!response.error){
+            this.selectServices = response.data.children
+          }
+        }catch(e){
+
+        }
+      }
+    },
     initializeUserInfo() {
       
       const user = this.authStore.user;
@@ -282,11 +297,8 @@ export default {
     <BCol>
       <BCard no-body>
         <BCardBody>
-          <div v-if="loading" class="loading-ellipses">
-            <span class="dot">.</span>
-            <span class="dot">.</span>
-            <span class="dot">.</span>
-          </div>
+
+          <ScaleLoader v-if="loading" :loading="loading" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
           <BForm v-if="!loading" action="#">
             <div id="custom-progress-bar" class="progress-nav mb-4">
               <div class="progress">
@@ -556,6 +568,7 @@ export default {
                         v-model="matricule"
                         id="nom"
                         class="form-control border border-black rounded-2"
+                        :disabled="authStore.user.role_id != ADMIN"
                         type="text"
                         :class="{
                           'is-invalid': submitted && v$.matricule.$error,
@@ -582,6 +595,7 @@ export default {
                         v-model="codeVisite"
                         id="nom"
                         class="form-control border border-black rounded-2"
+                        :disabled="authStore.user.role_id != ADMIN"
                         type="text"
                         :class="{
                           'is-invalid': submitted && v$.codeVisite.$error,
@@ -609,6 +623,8 @@ export default {
                         id="departement"
                         class="form-select border border-black rounded-2"
                         aria-label="Default select example"
+                        :disabled="authStore.user.role_id != ADMIN"
+                        @change="onDepartement"
                         :class="{
                           'is-invalid': submitted && v$.userDepartement.$error,
                         }"
@@ -644,6 +660,7 @@ export default {
                         v-model="userService"
                         id="service"
                         class="form-select border border-black rounded-2"
+                        :disabled="authStore.user.role_id != ADMIN"
                         aria-label="Default select example"
                         :class="{
                           'is-invalid': submitted && v$.userService.$error,
@@ -766,38 +783,4 @@ export default {
 }
 </style>
 
-<!-- Loading css -->
-<style scoped>
-.loading-ellipses {
-  font-size: 40px; /* Taille augmentée */
-  color: #3498db;
-  text-align: center;
-  font-weight: bold;
-}
 
-.dot {
-  animation: blink 1s infinite;
-  margin: 0 5px; /* Espacement entre les points */
-}
-
-.dot:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.dot:nth-child(2) {
-  animation-delay: 0.3s;
-}
-
-.dot:nth-child(3) {
-  animation-delay: 0.6s;
-}
-
-@keyframes blink {
-  0%, 20% {
-    opacity: 0;
-  }
-  50%, 100% {
-    opacity: 1;
-  }
-}
-</style>

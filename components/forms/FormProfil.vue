@@ -52,6 +52,15 @@ const rules = computed(() => ({
 
 }));
 
+
+const paginatedMenus = computed(() => {
+    const start = (currentPage.value - 1) * perPage.value
+    const end = start + perPage.value
+    return menus.value.slice(start, end)
+
+});
+
+
 const v$ = useVuelidate(rules, { libelle});
 
 // Méthodes
@@ -153,6 +162,7 @@ watch(
 
             // Mappage des menus et permissions
             menus.value = dataRole.value.menus;
+            totalRows.value = menus.value.length
 
             // Définir les actions comme les fields pour la table
             fields.value = extractActionFields(menus.value);
@@ -171,16 +181,6 @@ watch(
             alert()
           }
           
-          
-
-          // // Initialiser les permissions pour chaque ressource
-          // this.menus.forEach(menu => {
-          //   this.permissions[menu.resourceId] = {};
-          //   menu.permissions.forEach(permission => {
-          //     this.permissions[menu.resourceId][permission.action_lib] = permission.habilitation;
-          //   });
-          // });
-
           
 
         }else{
@@ -304,7 +304,7 @@ const resetForm = () => {
   erreur.value = false
   
   isOpen.value = false
-  // id.value = null
+  id.value = null
   isEditMode.value = false
 
 };
@@ -314,7 +314,7 @@ const resetForm = () => {
   <BModal 
       @hide="resetForm" 
       v-model="isOpen" 
-      size="lg"
+      size="xl"
       title-class="font-18" 
       hide-footer
       :title="isEditMode ? `Modifier le Profil ` : 'Créer un Profil'" 
@@ -382,34 +382,29 @@ const resetForm = () => {
       </BRow>
 
       <table class="table" v-if="id">
-        <thead class="table-dark">
-          <tr>
-            <th>Menu</th>
-            <th v-for="action in fields" :key="action.id">
-              <th>{{ action }}</th>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="menu in menus" :key="menu.resourceId">
-            <td>{{ menu.resourceName }}</td>
-            <td
-              class="text-center"
-              v-for="action in menu.permissions"
-              :key="action.action_id"
-            >
-              <input
-                type="checkbox"
-                :name="`${menu.resourceId}-${action.action_id}`"
-                :checked="action.habilitation ? true : false"
-                v-model="
-                  formData[`${menu.resourceId}-${action.action_id}`]
-                "
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <thead class="table-dark">
+    <tr>
+      <th>Menu</th>
+      <th v-for="action in fields" :key="action.id">
+        <th>{{ action }}</th>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="menu in paginatedMenus" :key="menu.resourceId">
+      <td>{{ menu.resourceName }}</td>
+      <td class="text-center" v-for="action in menu.permissions" :key="action.action_id">
+        <input
+          type="checkbox"
+          :name="`${menu.resourceId}-${action.action_id}`"
+          :checked="action.habilitation ? true : false"
+          v-model="formData[`${menu.resourceId}-${action.action_id}`]"
+        />
+      </td>
+    </tr>
+  </tbody>
+</table>
+
 
       <!-- Pagination -->
       <BRow>

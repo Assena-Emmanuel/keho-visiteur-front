@@ -122,15 +122,7 @@ const showModal = async (notif) =>{
     contact: '',
     nomEmploye: authUser.user.civilite+' '+authUser.user.nom
   }
-  console.log("data-------------------"+notif.id)
-  // const response = await apiClient.get(`/fvisites/${notif.id}`, {
-  //     headers: {
-  //       'Authorization': `Bearer ${authUser.token}`,  
-  //     },
-  // });
-  // if(!response.data.error){
-  //   console.log("data-------------------"+JSON.stringify(response.data.data))
-  // }
+
 
   const response = await apiClient.get(`/user/notifs/${notif.id}/mark-as-read`, {
       headers: {

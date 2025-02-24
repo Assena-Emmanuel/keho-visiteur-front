@@ -71,104 +71,90 @@
   <div class="mb-2"><span>Visites enregistrées</span></div>
   <div>
     <!-- Tableau des visiteurs -->
-    <BRow>
-      <BCol cols="12">
-        <BCard style="min-height: 5em;">
-          <!-- <div v-if="loading" class="loading-ellipses">
-            <span class="dot text-success">.</span>
-            <span class="dot text-primary">.</span>
-            <span class="dot text-danger">.</span>
-          </div> -->
-          <!-- <scale-loader v-if="loading" :loading="loading" color="#FFF" :height="height" :width="width"></scale-loader> -->
-          <pulse-loader  v-if="!loading" :loading="loading" :color="color" :size="size" />
-          <BCardBody v-if="!loading">
-            <BRow class="mb-3">
-              <BCol sm="12" md="2">
-                Debut
-                <BFormInput type="datetime-local" v-model="dateDebut" class="border border-secondary":options="listVisiteur" size="sm" />
-              </BCol>
-              <BCol sm="12" md="2">
-                Fin
-                <BFormInput type="datetime-local" v-model="dateFin" class="border border-secondary":options="listVisiteur" size="sm" />
-              </BCol>
-              <BCol sm="12" md="5">
-                <BFormSelect v-model="visiteurSelectionner" class="mt-4 border border-secondary":options="listVisiteur" size="sm" />
-              </BCol>
-              <BCol sm="12" md="3">
-                <div class="input-group mt-4 border border-secondary rounded-1">
-                    <span class="input-group-text">
-                        <i class="fas fa-search font-size-10"></i>
-                    </span>
-                    <BFormInput v-model="filter" type="search" id="input-small" size="sm"  placeholder="Rechercher..." />
-                </div>
-              </BCol>
-            </BRow>
-            <div class="table-responsive mb-0">
-              <BTable 
-                :items="filteredData" 
-                :fields="fields" 
-                responsive="sm" 
-                :per-page="perPage" 
-                :current-page="currentPage" 
-                v-model:sort-by.sync="sortBy" 
-                v-model:sort-desc.sync="sortDesc" 
-                @filtered="onFiltered" 
-              >
-              :
-                <!-- <template #cell(H Sortie)="row">
-                  <span v-if="!row.item['H Sortie']" class="badge rounded-pill text-bg-danger">Désactivé</span>
-                </template> -->
-
-                <template #cell(Actions)="row">
-                    <div class="d-flex gap-1">
-                        
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex text-primary justify-content-center align-items-center" @click="showDetailsModal">
-                          <i class="fas fa-eye"></i>
+    <BCard style="min-height: 5em;">
+      <!-- <scale-loader v-if="loading" :loading="loading" color="#FFF" :height="height" :width="width"></scale-loader> -->
+      <pulse-loader  v-if="!loading" :loading="loading" :color="color" :size="size" />
+      <BCardBody v-if="!loading">
+        <BRow class="mb-3">
+          <BCol sm="12" md="2">
+            Debut
+            <BFormInput type="datetime-local" v-model="dateDebut" class="border border-secondary":options="listVisiteur" size="sm" />
+          </BCol>
+          <BCol sm="12" md="2">
+            Fin
+            <BFormInput type="datetime-local" v-model="dateFin" class="border border-secondary":options="listVisiteur" size="sm" />
+          </BCol>
+          <BCol sm="12" md="5">
+            <BFormSelect v-model="visiteurSelectionner" class="mt-4 border border-secondary":options="listVisiteur" size="sm" />
+          </BCol>
+          <BCol sm="12" md="3">
+            <div class="input-group mt-4 border border-secondary rounded-1">
+                <span class="input-group-text">
+                    <i class="fas fa-search font-size-10"></i>
+                </span>
+                <BFormInput v-model="filter" type="search" id="input-small" size="sm"  placeholder="Rechercher..." />
+            </div>
+          </BCol>
+        </BRow>
+        <div class="table-responsive mb-0">
+          <vue3-datatable
+                :rows="rows"
+                :columns="cols"
+                :loading="loading"
+                :totalRows="total_rows"
+                :isServerMode="true"
+                :pageSize="params.limit"
+                :pageSizeOptions="arrayLine"
+                :showNumbersCount="3"
+                class="alt-pagination"
+                @change="changeServer"
+            >
+                <template #Actions="data">
+                    <div class="d-flex justify-content-center align-items-center gap-2">  <!-- Ajout de la classe d-flex flex-row -->
+                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="text-primary justify-content-center align-items-center" @click="showDetailsModal">
+                            <i class="fas fa-eye font-size-15"></i>
                         </BButton>
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-warning d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'rejeter'">
-                          <i class="uil uil-ban font-size-15 annuler"></i>
+                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-warning justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'rejeter'">
+                            <i class="uil uil-ban font-size-15 annuler"></i>
                         </BButton>
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item)">
-                          <i class="uil uil-trash-alt font-size-15"></i>
+                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
+                            <i class="uil uil-trash-alt font-size-15"></i>
                         </BButton>
                     </div>
                 </template>
-
-              </BTable>
+            </vue3-datatable>
+        </div>
+        <hr class="border-1 border-secondary">
+        <BRow>
+          <BCol>
+            <div class="dataTables_paginate paging_simple_numbers d-flex justify-content-between">
+              <div id="tickets-table_length" class="dataTables_length">
+                <BCol sm="12" md="6" class="">
+                    <div id="tickets-table_length" class="dataTables_length">
+                        <label class="d-inline-flex align-items-center">
+                        Afficher&nbsp;
+                        <BFormSelect class="border border-secondary" v-model="perPage" size="sm" :options="pageOptions"></BFormSelect>éléments&nbsp;
+                        
+                        </label>
+                    </div>
+                </BCol>
+              </div>
+              <ul class="pagination pagination-rounded mb-0">
+                <!-- <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" /> -->
+                <BPagination
+                  v-model="currentPage"
+                  :total-rows="pagination.total"
+                  :per-page="pagination.perPage"
+                  :align="'fill'"
+                  size="sm"
+                  class="my-0"
+                />
+              </ul>
             </div>
-            <hr class="border-1 border-secondary">
-            <BRow>
-              <BCol>
-                <div class="dataTables_paginate paging_simple_numbers d-flex justify-content-between">
-                  <div id="tickets-table_length" class="dataTables_length">
-                    <BCol sm="12" md="6" class="">
-                        <div id="tickets-table_length" class="dataTables_length">
-                            <label class="d-inline-flex align-items-center">
-                            Afficher&nbsp;
-                            <BFormSelect class="border border-secondary" v-model="perPage" size="sm" :options="pageOptions"></BFormSelect>éléments&nbsp;
-                            
-                            </label>
-                        </div>
-                    </BCol>
-                  </div>
-                  <ul class="pagination pagination-rounded mb-0">
-                    <!-- <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" /> -->
-                    <BPagination
-                      v-model="currentPage"
-                      :total-rows="pagination.total"
-                      :per-page="pagination.perPage"
-                      :align="'fill'"
-                      size="sm"
-                      class="my-0"
-                    />
-                  </ul>
-                </div>
-              </BCol>
-            </BRow>
-          </BCardBody>
-        </BCard>
-      </BCol>
-    </BRow>
+          </BCol>
+        </BRow>
+      </BCardBody>
+    </BCard>
 </div>
 </template>
 
@@ -178,7 +164,6 @@ import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/auth.js';
 import apiClient from '../api/intercepteur';
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-import axios from 'axios';
 
 // Déclaration des variables réactives
 const authStore = useAuthStore();

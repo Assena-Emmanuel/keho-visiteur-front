@@ -7,6 +7,8 @@ export default defineNuxtConfig({
     '~/plugins/vue-awesome-paginate.js',
     '~/plugins/vue3-datatable.js',
     '~/plugins/vue-spinners.js',
+    '~/plugins/vue3-easy-data-table.js',
+    '~/plugins/vue3-form-wizard.js',
   ],
   
   app: {

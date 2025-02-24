@@ -34,7 +34,7 @@ const handleDataSelected = (payload) => {
 
 const openAddModal = () => {
     modal.value = true;
-    isEditMode.value = false;
+
 };
 
 // Fonction pour récupérer tous les utilisateurs
@@ -50,7 +50,6 @@ const allUsers = async () => {
         if (!response.data.error) {
             data.value = response.data.data;
             gestionStore.setUsers(data.value)
-            console.log("All--------------------------------------: "+JSON.stringify(data.value))
             
         }
 
@@ -77,12 +76,8 @@ onMounted(async () => {
         <div class="mb-0">Gestion des Utilisateurs</div>
         <BButton variant="primary" style="width: 100px;" @click="openAddModal" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
         <FormsFormUser 
-            v-if="selectedRow"
-            :isOpen="modal"
-            :isEditMode="isEditMode"
-            :uuid="selectedRow"
-            @update:isOpen="modal = $event"
-            @update:uuid="modal = $event"
+            v-model:isOpen="modal"
+            v-model:uuid="selectedRow"
 
         />
     </div>
