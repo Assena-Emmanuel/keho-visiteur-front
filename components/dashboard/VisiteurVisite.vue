@@ -28,16 +28,17 @@
               <!-- Info visiteur -->
 
                 <div class="card rounded-0 col-sm-6 col-md-6 p-0" style="box-shadow: none;">
-                    <div class="card-header rounded-0 text-light fw-bold" style="background-color: #B3D9F6;">
+                    <div class="card-header rounded-0 text-light fw-bold" style="background-color: #265FFB;">
                         VISITEUR
                     </div>
                     <div class="card-boby " style="background-color: #f6f6f6;">
                       <!-- <PulseLoader v-if="isLoading" :loading="isLoading" size="40px" color="#4fa94d" /> -->
-                        <div v-if="isLoading" class="loading-ellipses">
+                        <!-- <div v-if="isLoading" class="loading-ellipses">
                           <span class="dot text-primary">.</span>
                           <span class="dot text-success">.</span>
                           <span class="dot text-danger">.</span>
-                        </div>
+                        </div> -->
+                        <ScaleLoader :loading="isLoading" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
                         <div v-if="!isLoading" class="">
                             <div class="row">
                                 <div style="height: 100%;" class="col-sm-6 col-md-6 containerimgVisiteur">
@@ -114,15 +115,16 @@
 
                 <!-- Visité -->
                 <div class="card rounded-0 border-0 col-sm-6 col-md-6 p-0 visite" style="box-shadow: none; margin-left: 5px;">
-                    <div class="card-header rounded-0 text-light fw-bold" style="background-color: #B3D9F6;">
+                    <div class="card-header rounded-0 text-light fw-bold" style="background-color: #FAD400;">
                         HOTE
                     </div>
                     <div class="card-boby " style="background-color: #f6f6f6;">
-                        <div v-if="isLoadingUser" class="loading-ellipses">
+                        <!-- <div v-if="isLoadingUser" class="loading-ellipses">
                           <span class="dot text-primary">.</span>
                           <span class="dot text-success">.</span>
                           <span class="dot text-danger">.</span>
-                        </div>
+                        </div> -->
+                        <ScaleLoader :loading="isLoadingUser" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
                         <div v-if="!isLoadingUser" class="">
                             <div class="row ">
                                 <div style="height: 100%;" class="col-sm-6 col-md-6 containerimgVisiteur">
@@ -203,7 +205,7 @@
         class=""
         size="md"
     >
-    <div class="card">
+    <div class="card shadow-none">
       <div class=" ticket">
         <div class="d-flex justify-content-center mt-4"><img src="/images/total-removebg.png" alt="" width="100"></div>
         <div class="text-center">
@@ -234,7 +236,10 @@
     </div>
     <div class="d-flex justify-content-between align-items-center">
         <button class="btn text-danger" @click="hide">Annuler</button>
-        <button class="btn btn-success"><i class="uil uil-print"></i></button>
+        <button class="btn btn-success" @click="imprimerTicket(codeVisiteur)">
+          <i v-if="!loadingImpression" class="uil uil-print"></i>
+          <i v-else class="fas fa-spinner fa-spin"></i> 
+        </button>
       </div>
   </BModal>
 
@@ -246,12 +251,15 @@
   import { ref, onMounted } from 'vue';
   import apiClient from '../api/intercepteur';
   import { useAuthStore } from '~/stores/auth.js';
-
+  
+  import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 
   // Props
   const props = defineProps({
     uuid: String,
   });
+
+  const codeVisiteur = ref("")
 
   // Variables réactives
   const isOpen = ref(false);
@@ -266,6 +274,8 @@
     visiteur:[]
 
   });
+  const loadingImpression = ref(false)
+
 
   const employe = ref({
     nomPrenom:"",
@@ -340,6 +350,7 @@
         });
 
         if (!response.data.error) {
+          codeVisiteur.value = response.data.data.fvisite.code_fvisite
           if (!response.data.data.fvisite.delegation) {
             const data = response.data.data;
             // Remplissage des données dans la structure réactive `visiteurs`
@@ -393,6 +404,51 @@
     fetchVisitorData();
     userData()
   });
+
+  const imprimerTicket = async (codeV) => {
+    loadingImpression.value = true
+    try{
+      try {
+        const response = await apiClient.get(`/fvisites/print/${codeV}`, {
+          headers: {
+            Authorization: `Bearer ${authStore.token}`,
+          },
+          responseType: 'blob',  // Assure-toi que la réponse est traitée comme un blob (fichier binaire)
+        });
+
+        if (response.status === 200) {
+
+          console.log("Ticket imprimé avec succès:", JSON.stringify(response.data));
+          // Créer un objet URL pour ouvrir le PDF dans un nouvel onglet
+          // const fileURL = URL.createObjectURL(response.data);
+
+          // Ouvrir le PDF dans un nouvel onglet
+          window.open(fileURL, '_blank');
+          console.log("Ticket imprimé avec succès:", response.data);
+        } else {
+          console.error("Erreur dans la réponse de l'API");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la requête:", error);
+        if (error.response && error.response.status === 403) {
+          console.error("Problème d'autorisation (CORS ou Token expiré)");
+        } else {
+          console.error("Autre erreur:", error);
+        }
+      }
+
+    }catch(e){
+      console.log("Erreur lors de l'impression: "+e)
+
+    }finally{
+      loadingImpression.value = false
+    }
+    
+};
+
+
+
+
 </script>
 
 
@@ -587,7 +643,7 @@
     background-size: contain;
     /* background-position: center; */
     block-size: 100%;
-    height: 60vh;
+    height: 55vh;
     inline-size: 100%;
   }
 
@@ -629,38 +685,5 @@
   }
 }
 
-/* Loading */
-.loading-ellipses {
-  font-size: 70px; /* Taille augmentée */
-  color: #3498db;
-  text-align: center;
-  font-weight: bold;
-}
 
-.dot {
-  animation: blink 1s infinite;
-  margin: 0 5px; /* Espacement entre les points */
-}
-
-.dot:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.dot:nth-child(2) {
-  animation-delay: 0.3s;
-}
-
-.dot:nth-child(3) {
-  animation-delay: 0.6s;
-}
-
-@keyframes blink {
-  0%, 20% {
-    opacity: 0;
-  }
-  50%, 100% {
-    opacity: 1;
-  }
-}
-  
 </style>
