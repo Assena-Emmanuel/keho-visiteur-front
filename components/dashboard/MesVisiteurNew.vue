@@ -116,7 +116,7 @@
                   </div>
               </BCol>
               <BCol sm="12" md="1">
-                  <BButton class="mt-4" size="sm">Rechercher</BButton>
+                  <BButton class="mt-4" size="sm" @click="recherche">Rechercher</BButton>
               </BCol>
           </BRow>
           <div class="d-flex justify-content-end mb-3" style="margin-top: -5px;">
@@ -259,10 +259,12 @@ const items = ref([]);
 const loading = ref(false);
 const serverItemsLength = ref(0);
 const searchField = ["visiteur", "entreprise", "numero_piece", "code_visite", "code_visiteur", "employe", "lib_visite"];
-const searchValue = ref("");
 const detailModal = ref(false)
 const data = ref([])
 const loadingDetail = ref(false)
+const dateDebut = ref(null)
+const dateFin = ref(null)
+const searchValue = ref(null)
 const serverOptions = ref({
   page: 1,
   rowsPerPage: 5,
@@ -286,6 +288,67 @@ function resetAction(){
   }
   
 }
+
+// recherche coté server
+const recherche = async () => {
+  loading.value = true;
+  try {
+    const param = {
+      page: 1,
+      limit: 5,
+      sort_type: null,
+      code_employe: null,
+      date_debut: null,
+      date_fin: null
+    }
+
+    // Vérification si dateDebut et dateFin sont définis
+    if (dateDebut.value != null && dateFin.value != null && searchValue.value == null) {
+      param.sort_type = 3;
+      param.date_debut = dateDebut.value;
+      param.date_fin = dateFin.value;
+      // alert(4); // Retirer si plus nécessaire pour le débogage
+    } 
+    // Vérification si searchValue est défini et pas dateDebut et dateFin
+    else if (dateDebut.value == null && dateFin.value == null && searchValue.value != null) {
+      // alert(2); // Retirer si plus nécessaire pour le débogage
+      param.sort_type = 2;
+      param.code_employe = searchValue.value;
+    } 
+    // Tous les critères sont définis
+    else if (dateDebut.value && dateFin.value && searchValue.value) {
+      param.sort_type = 4;
+      param.date_debut = dateDebut.value;
+      param.date_fin = dateFin.value;
+      param.code_employe = searchValue.value;
+      // alert(4); // Retirer si plus nécessaire pour le débogage
+    }
+
+    // Envoi de la requête à l'API
+    const response = await apiClient.get("/fvisites/lvisite", {
+      params: param,
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    });
+
+    // Vérification de la réponse de l'API
+    if (!response.data.error) {
+      console.log("Réponse reçue:", response.data.data);
+      const data = response.data.data;
+      items.value = data?.data;
+      serverItemsLength.value = response.data.data.total;
+    } else {
+      console.error("Erreur dans la réponse API:", response.data.error);
+    }
+
+  } catch (e) {
+    console.error("Erreur lors de la récupération des données:", e);
+  } finally {
+    loading.value = false;
+  }
+}
+
 
 // Fonction pour charger les données depuis le serveur
 const loadFromServer = async () => {
