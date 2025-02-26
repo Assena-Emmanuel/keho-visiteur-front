@@ -91,9 +91,9 @@ watch(
   async (newUuid) => {
   if (newUuid) {
     isEditMode.value = true
-    progressBarValue.value = 30
     data.value = await getUser(newUuid); 
     if(data.value) {
+      console.log("DATA----------------------: "+JSON.stringify(data.value))
       nom.value = data.value.nom;
       prenom.value = data.value.prenom;
       e_mail.value = data.value.email;
@@ -102,8 +102,8 @@ watch(
       civilite.value = data.value.civilite;
       uuid.value = data.value.uuid;
       role.value = data.value.role_id
-      typeUser.value = data.value.type_user
-      typePiece.value = data.value.type_piece
+      // typeUser.value = data.value.type_user
+      // typePiece.value = data.value.type_piece
 
       matricule.value = data.value.visite ? data.value.visite.matricule : "";
       codeVisite.value = data.value.visite ? data.value.visite.code_visite : "";
@@ -188,14 +188,12 @@ const toggleTabWizard = (tab) => {
 const onUpdateUser = async () => {
   submitted.value = true;
   v$.value.$touch();
-  if (v$.value.typeUser.$error || 
-    v$.value.role.$error) {
-    return;
-  }
-    loadingEdit.value = true;
 
-    if(uuid.value){
-      try {
+  if (v$.value.codeVisite.$error || v$.value.departement.$error || v$.value.service.$error || v$.value.role.$error || v$.value.matricule.$error) {
+    return;
+  } else {
+    loadingEdit.value = true;
+    try {
       const formData = new FormData();
       formData.append('nom', nom.value);
       formData.append('prenom', prenom.value);
@@ -217,83 +215,60 @@ const onUpdateUser = async () => {
         headers: { 'Authorization': `Bearer ${authStore.token}` },
       });
 
-
       if(!response.data.error){
-        successmsg(response.data.message);
+        const users = await getAll("user")
+        gestionStore.setUsers(users.data)
 
-        try{
-          const users = await getAll("user")
-          gestionStore.setUsers(users.data)
+        isOpen.value = false
+        loadingCreer.value = false;
+        uuid.value = null
+        isEditMode.value = false
+        wizard.value.reset()
 
-          isOpen.value = false
-          loadingCreer.value = false;
-          uuid.value = null
-          isEditMode.value = false
-          resetForm();
-        }catch(e){
-          console.error("Erreur lors de la recuperation: "+e)
-        }
-        
-
-        
-
-        
-        
+        successmsg("Utilisateur créé avec succès!");
+        resetForm();
       }else{
-        successmsg(response.data.message, "error");
-        console.error("----- Erreur :", response.data.message);
+        console.error("----- Erreur lors de la création de l'utilisateur :", response.data.message);
       }
       
     } catch (error) {
-      console.error("Erreur lors de la modification de l'utilisateur :", error);
+      console.error("Erreur lors de la création de l'utilisateur :", error);
     } finally {
       loadingEdit.value = false;
     }
-    }else{
-      console.error("Error: uuid obligatoire")
-    }
-
-    
+  }
 };
 
 
-const validatePersonnelInfo = () => {
+const validatePersonnelInfo = () =>{
   next.value = true
   v$.value.$touch();
-  if (v$.value.nom.$error || 
+  if(v$.value.nom.$error || 
     v$.value.prenom.$error ||
     v$.value.e_mail.$error ||
     v$.value.telephone1.$error ||
     v$.value.telephone2.$error ||
-    v$.value.civilite.$error) {
-      return;
+    v$.value.civilite.$error ){
+      return
   }
 
-  next.value = false;
+  next.value = false
+  toggleWizard(2, 50)
 
-  if (isEditMode) {
-    // Si en mode édition, on passe directement à l'étape 2 avec une barre de progression à 100
-    toggleWizard(2, 100);
-  } else {
-    toggleWizard(2, 50); // Progression normale en mode création
-  }
 }
 
-const validateProfessionnelInfo = () => {
-  next.value = true;
+const validateProfessionnelInfo = () =>{
+  next.value = true
   v$.value.$touch();
-  if (v$.value.typeUser.$error || 
-    v$.value.role.$error) {
-    return;
+  if(v$.value.typeUser.$error || 
+    v$.value.role.$error ){
+      return
   }
 
+  next.value = false
+  toggleWizard(3, 100)
 
-  next.value = false;
-  
-  // Si en mode édition, on passe à l'étape finale avec une barre de progression à 100
-  toggleWizard(3, 100);
 }
-
 
 const validateSecuritylInfo = () =>{
   next.value = true
@@ -362,7 +337,6 @@ const onSave = async () => {
         successmsg("Utilisateur créé avec succès!");
         resetForm();
       }else{
-        successmsg("Utilisateur créé avec succès!");
         console.error("----- Erreur lors de la création de l'utilisateur :", response.data.message);
       }
 
@@ -398,10 +372,11 @@ const resetForm = () => {
   submitted.value = false;
   loadingDetail.value = false
   loadingCreer.value = false
+
   isOpen.value = false
   uuid.value = null
   isEditMode.value = false
-  toggleWizard(1, 18)
+
   nom.value = '';
   prenom.value = '';
   civilite.value = '';
@@ -447,14 +422,14 @@ const successmsg = (message, type = 'success') => {
     <div v-if="!loadingDetail" class="wizard shadow-none">
       <BCard no-body >
         <BCardBody class="shadow-none">
-          <!-- <BCardTitle class="mb-3">Basic Wizard</BCardTitle> -->
+          <BCardTitle class="mb-3">Basic Wizard</BCardTitle>
           <BForm action="#">
             <div id="custom-progress-bar" class="progress-nav mb-4">
               <div class="progress">
                 <div class="progress-bar" role="progressbar" :style="`width: ${progressBarValue}%;`" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
               </div>
 
-              <ul v-if="!isEditMode" class="nav nav-pills d-flex justify-content-around wizard-steps" role="tablist">
+              <ul class="nav nav-pills d-flex justify-content-around wizard-steps" role="tablist">
                 <li class="nav-item" role="presentation">
                   <button class="nav-link wizard-step" id="pills-gen-info-tab" type="button" role="tab" :class="{ active: activeTab == 1, done: activeTab > 1 }" @click="toggleWizard(1, 18)">
                     <i class="wizard-icon mdi mdi-account-circle font-size-24"></i>
@@ -470,24 +445,6 @@ const successmsg = (message, type = 'success') => {
                     <i class="wizard-icon mdi mdi-checkbox-marked-circle-outline font-size-24"></i>
                   </button>
                 </li>
-              </ul>
-
-              <ul v-if="isEditMode" class="nav nav-pills d-flex justify-content-around wizard-steps" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link wizard-step" id="pills-gen-info-tab" type="button" role="tab" :class="{ active: activeTab == 1, done: activeTab > 1 }" @click="toggleWizard(1, 18)">
-                    <i class="wizard-icon mdi mdi-account-circle font-size-24"></i>
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link wizard-step" id="pills-info-desc-tab" type="button" role="tab" :class="{ active: activeTab == 2, done: activeTab > 2 }" @click="toggleWizard(2, 100)">
-                    <i class="wizard-icon mdi mdi-face-profile font-size-24"></i>
-                  </button>
-                </li>
-                <!-- <li class="nav-item" role="presentation" >
-                  <button class="nav-link wizard-step" id="pills-success-tab" type="button" role="tab" :class="{ active: activeTab == 3, done: activeTab > 3 }" @click="toggleWizard(3, 100)">
-                    <i class="wizard-icon mdi mdi-checkbox-marked-circle-outline font-size-24"></i>
-                  </button>
-                </li> -->
               </ul>
             </div>
 
@@ -642,9 +599,9 @@ const successmsg = (message, type = 'success') => {
                 
                 <BRow>
                   <BCol sm="3" class="mb-3">
-                    <label for="user" style="font-size: 12px; font-weight: bolder">Type utilisateur</label>
+                    <label for="role" style="font-size: 12px; font-weight: bolder">Type utilisateur</label>
                     <div class="input-group">
-                      <select v-model="typeUser" id="user" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
+                      <select v-model="typeUser" id="role" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': next && v$.typeUser.$error}"
                       >
                         <option value="S">Standart</option> 
@@ -681,11 +638,11 @@ const successmsg = (message, type = 'success') => {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="matricule" style="font-size: 12px; font-weight: bolder">Matricule</label>
+                    <label for="nom" style="font-size: 12px; font-weight: bolder">Matricule</label>
                     <div class="input-group">
                       <input 
                         v-model="matricule" 
-                        id="matricule" 
+                        id="nom" 
                         class="form-control border border-secondary rounded-2" 
                         type="text"
                         :class="{
@@ -698,11 +655,11 @@ const successmsg = (message, type = 'success') => {
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="code" style="font-size: 12px; font-weight: bolder">Code Visite</label>
+                    <label for="nom" style="font-size: 12px; font-weight: bolder">Code Visite</label>
                     <div class="input-group">
                       <input 
                         v-model="codeVisite" 
-                        id="code" 
+                        id="nom" 
                         class="form-control border border-secondary rounded-2" 
                         type="text"
                         :class="{
@@ -759,16 +716,11 @@ const successmsg = (message, type = 'success') => {
                   </BCol>
 
                   <div class="d-flex justify-content-end justify-content-md-between">
-                    <BButton v-if="isEditMode" variant="primary" class="d-flex" @click="toggleWizard(1, 18)">
+                    <BButton variant="primary" class="d-flex" @click="toggleWizard(1, 30)">
                       <span class="px-md-5">retour</span>
                     </BButton>
-                    <BButton v-if="!isEditMode" variant="primary" class="d-flex" @click="toggleWizard(1, 18)">
-                      <span class="px-md-5">retour</span>
-                    </BButton>
-                    <BButton variant="primary" v-if="!isEditMode" class="ms-2" @click="validateProfessionnelInfo">
-                      <span class="px-md-5">Suivant</span>
-                    </BButton>
-                    <BButton variant="primary" v-if="isEditMode" class="ms-2" @click="onUpdateUser">
+
+                    <BButton variant="primary" class="ms-2" @click="validateProfessionnelInfo">
                       <span class="px-md-5" v-if="!loadingEdit">Modifier</span>
                       <ScaleLoader v-if="loadingEdit" :loading="loadingEdit" :height="'25px'" :color="'#FFFFFF'" />
                     </BButton>
@@ -780,9 +732,8 @@ const successmsg = (message, type = 'success') => {
 
 
               </div>
-
-              <div v-if="!isEditMode" class="tab-pane fade" :class="activeTab == 3 && 'show active'" id="pills-success" role="tabpanel" aria-labelledby="pills-success-tab">
-                <!-- <Step3 @onBack="toggleWizard(2, 50)" /> -->
+<!-- 
+              <div class="tab-pane fade" :class="activeTab == 3 && 'show active'" id="pills-success" role="tabpanel" aria-labelledby="pills-success-tab">
 
                 <BRow>
 
@@ -829,13 +780,13 @@ const successmsg = (message, type = 'success') => {
                   <BButton variant="primary" @click="toggleWizard(2, 50)">
                     <span class="px-md-5">Retour</span>
                   </BButton>
-                  <BButton variant="primary" class="ms-2" @click="onSave">
-                    <span v-if="!loadingEdit" class="px-md-5">Enregistrer</span>
-                    <ScaleLoader v-if="loadingEdit" :loading="loadingEdit" style="margin: 10em 0;" :height="'25px'" :color="'#FE0201'" />
+                  <BButton variant="primary" class="ms-2">
+                    <span v-if="loadingCreer" class="px-md-5">Enregistrer</span>
+                    <ScaleLoader v-if="loadingCreer" :loading="loadingCreer" style="margin: 10em 0;" :height="'25px'" :color="'#FE0201'" />
                   </BButton>
                 </div>
 
-              </div>
+              </div> -->
 
 
 

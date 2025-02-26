@@ -7,6 +7,7 @@ import Utilisateur from '~/components/parametres/Utilisateur.vue'
 import Agence from '~/components/parametres/Agence.vue';
 import Menu from '~/components/parametres/Menu.vue';
 import Categorie from '~/components/parametres/Categorie.vue'
+import Action from '~/components/parametres/Action.vue'
 
 const route = useRoute();
 const title = route.params.slug;
@@ -25,4 +26,5 @@ const typeForm = route.params.slug;
   <Agence v-if="typeForm == 'agence'" />
   <Menu v-if="typeForm == 'menu'" />
   <Categorie v-if="typeForm == 'categorie'" />
+  <Action v-if="typeForm == 'action'" />
 </template>

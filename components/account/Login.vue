@@ -3,13 +3,13 @@ import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import { useNotifiedStore } from "~/stores/notified";
-import  PulseLoader from 'vue-spinner/src/PulseLoader.vue'
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue' 
 import axios from 'axios';
 
 
 export default {
   components: {
-    PulseLoader,
+    ScaleLoader,
 
   },
   setup() {
@@ -31,7 +31,7 @@ export default {
       countdown: 0,
       height: 25,        
       width: 25,         
-      size: "20",
+      height: "20px",
       color: "#FFFFFF"
     };
   },
@@ -193,7 +193,7 @@ export default {
           <span v-if="!processing">Se connecter</span>
           
           <!-- Affiche PulseLoader à la place de ScaleLoader si nécessaire -->
-          <pulse-loader :loading="processing" :color="color" :size="size" />
+          <ScaleLoader :loading="processing" :height="height" :color="color" />
         </BButton>
         
       </div>

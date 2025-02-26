@@ -10,8 +10,6 @@ import { useGestionStore } from "~/stores/gestion.js";
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 
 
-
-
 // Stores
 const authStore = useAuthStore();
 const {getAll, getById} = useApi(authStore.token)
@@ -23,9 +21,8 @@ const loading = ref(false);
 const loadingDetail = ref(false); 
 const loadingEdit = ref(false); 
 const loadingCreer = ref(false); 
-const wizard = ref(null)
 
-const progressBarValue = ref(18);
+const progressBarValue = ref(34);
 const activeTab = ref(1);
 const activeTabArrow = ref(2);
 const activeTabprofessionnelle = ref(false);
@@ -47,19 +44,11 @@ const selectDepartements = ref(null);
 const selectServices = ref(null);
 const selectRoles = ref(null);
 const next = ref(false);
+const uuid = ref(null)
 let data = ref({})
 const password = ref(null)
 const confirmPassword = ref(null)
-const typePiece = ref(null)
-const allTypePiece = ref([])
-const numPiece = ref(null)
-const typeUser = ref(null)
-const estDiff = ref(false)
-
-const regex = ref({
-  errorMatricule: false,
-  errorCodeVisite: false
-})
+const role_id = ref(null)
 
 // Vuelidate - Validation rules
 const rules = {
@@ -68,32 +57,30 @@ const rules = {
   prenom: { required },
   civilite: { required },
   telephone1: { required },
-  telephone2: { required },
+  matricule: { required },
   codeVisite: { required },
   departement: { required },
-  password: { required },
-  confirmPassword: { required },
   service: { required },
   role: { required },
-  typeUser: { required },
 };
 
-const v$ = useVuelidate(rules, { e_mail,confirmPassword, password, nom, prenom, civilite, telephone1,telephone2,  role, typeUser });
+const v$ = useVuelidate(rules, { e_mail, nom, prenom, civilite, telephone1, matricule, codeVisite, departement, service, role });
 
-const isOpen = defineModel('isOpen')
-const uuid = defineModel('uuid')
-const isEditMode = ref(false)
-
+// Props
+const props = defineProps({
+  isOpen: Boolean,
+  isEditMode: Boolean,
+  uuid: String,
+});
 
 // Watchers
 watch(
-  () => uuid.value, 
+  () => props.uuid, 
   async (newUuid) => {
   if (newUuid) {
-    isEditMode.value = true
-    progressBarValue.value = 30
     data.value = await getUser(newUuid); 
     if(data.value) {
+      console.log("USER ---------------: "+JSON.stringify(data.value))
       nom.value = data.value.nom;
       prenom.value = data.value.prenom;
       e_mail.value = data.value.email;
@@ -102,8 +89,6 @@ watch(
       civilite.value = data.value.civilite;
       uuid.value = data.value.uuid;
       role.value = data.value.role_id
-      typeUser.value = data.value.type_user
-      typePiece.value = data.value.type_piece
 
       matricule.value = data.value.visite ? data.value.visite.matricule : "";
       codeVisite.value = data.value.visite ? data.value.visite.code_visite : "";
@@ -137,9 +122,10 @@ onMounted(async () => {
     const departements = await toutesCategories("DPT");
     selectDepartements.value = departements;
 
-    selectRoles.value = await roles();
+    // const services = await toutesCategories("SRV");
+    // selectServices.value = services;
 
-    allTypePiece.value = await toutesCategories("TPI");
+    selectRoles.value = await roles();
     
   } catch (error) {
     console.error('Erreur lors de la récupération des données:', error);
@@ -172,30 +158,29 @@ async function roles() {
   }
 }
 
+// Gestion des étapes du formulaire
+const onNext = (step, length) => {
+  next.value = true;
+  v$.value.$touch();
 
-const toggleWizard = (tab, value) => {
-    activeTab.value = tab
-    progressBarValue.value = value
+  if (v$.value.e_mail.$error || v$.value.nom.$error || v$.value.prenom.$error || v$.value.telephone1.$error) {
+    activeTabprofessionnelle.value = false;
+  } else {
+    activeTabprofessionnelle.value = true;
+    next.value = false;
+    toggleWizard(step, length);
   }
-
-const toggleTabWizard = (tab) => {
-  activeTabArrow.value = tab;
-}
-
-
-
+};
 
 const onUpdateUser = async () => {
   submitted.value = true;
   v$.value.$touch();
-  if (v$.value.typeUser.$error || 
-    v$.value.role.$error) {
-    return;
-  }
-    loadingEdit.value = true;
 
-    if(uuid.value){
-      try {
+  if (v$.value.codeVisite.$error || v$.value.departement.$error || v$.value.service.$error || v$.value.role.$error || v$.value.matricule.$error) {
+    return;
+  } else {
+    loadingEdit.value = true;
+    try {
       const formData = new FormData();
       formData.append('nom', nom.value);
       formData.append('prenom', prenom.value);
@@ -204,8 +189,6 @@ const onUpdateUser = async () => {
       formData.append('telephone2', telephone2.value);
       formData.append('civilite', civilite.value);
       formData.append('matricule', matricule.value);
-      formData.append('type_user', typeUser.value);
-      formData.append('role_id', role.value);
       formData.append('departement_id', departement.value);
       formData.append('service_id', service.value);
 
@@ -213,135 +196,68 @@ const onUpdateUser = async () => {
         formData.append('image', photo.value);
       }
 
+      console.log("VISIte-------"+  matricule.value)
       const response = await apiClient.post(`/user/${uuid.value}`, formData, {
         headers: { 'Authorization': `Bearer ${authStore.token}` },
       });
 
-
       if(!response.data.error){
-        successmsg(response.data.message);
-
-        try{
-          const users = await getAll("user")
-          gestionStore.setUsers(users.data)
-
-          isOpen.value = false
-          loadingCreer.value = false;
-          uuid.value = null
-          isEditMode.value = false
-          resetForm();
-        }catch(e){
-          console.error("Erreur lors de la recuperation: "+e)
-        }
+        emit("update:isOpen", false);
+        emit('update:uuid', null);
+        const users = await getAll("user")
         
-
-        
-
-        
-        
+        gestionStore.setUsers(users.data)
+        successmsg("Utilisateur créé avec succès!");
+        resetForm();
       }else{
-        successmsg(response.data.message, "error");
-        console.error("----- Erreur :", response.data.message);
+        console.error("----- Erreur lors de la création de l'utilisateur :", response.data.message);
       }
       
     } catch (error) {
-      console.error("Erreur lors de la modification de l'utilisateur :", error);
+      console.error("Erreur lors de la création de l'utilisateur :", error);
     } finally {
       loadingEdit.value = false;
     }
-    }else{
-      console.error("Error: uuid obligatoire")
-    }
-
-    
+  }
 };
 
-
-const validatePersonnelInfo = () => {
-  next.value = true
-  v$.value.$touch();
-  if (v$.value.nom.$error || 
-    v$.value.prenom.$error ||
-    v$.value.e_mail.$error ||
-    v$.value.telephone1.$error ||
-    v$.value.telephone2.$error ||
-    v$.value.civilite.$error) {
-      return;
+const onPasswordNext = () => {
+  // Vous pouvez valider ici les champs de mot de passe
+  if (!v$.value.password || !v$.value.confirmPassword) {
+    return; // Ne permet pas de continuer si les champs de mot de passe sont vides
   }
 
-  next.value = false;
-
-  if (isEditMode) {
-    // Si en mode édition, on passe directement à l'étape 2 avec une barre de progression à 100
-    toggleWizard(2, 100);
-  } else {
-    toggleWizard(2, 50); // Progression normale en mode création
-  }
-}
-
-const validateProfessionnelInfo = () => {
-  next.value = true;
-  v$.value.$touch();
-  if (v$.value.typeUser.$error || 
-    v$.value.role.$error) {
-    return;
+  // Vérifiez si les mots de passe correspondent
+  if (v$.value.password.$model !== v$.value.confirmPassword.$model) {
+    // Gérer l'erreur ici
+    return; // Ne permet pas de continuer si les mots de passe ne correspondent pas
   }
 
-
-  next.value = false;
-  
-  // Si en mode édition, on passe à l'étape finale avec une barre de progression à 100
-  toggleWizard(3, 100);
-}
-
-
-const validateSecuritylInfo = () =>{
-  next.value = true
-  v$.value.$touch();
-  if(v$.value.password.$error || 
-    v$.value.confirmPassword.$error ){
-      return
-
-  }else if(password.value !== confirmPassword.value){
-    estDiff.value = true
-    return
-  }
-
-  next.value = false
-  onSave()
-
-}
+  // Si tout est correct, permettre la navigation à l'étape suivante
+  activeTabMotDePasse.value = true;
+  toggleWizard(3, 100); // Passe à l'étape du mot de passe
+};
 
 
 const onSave = async () => {
   submitted.value = true;
   v$.value.$touch();
 
-  if (v$.value.confirmPassword.$error || v$.value.password.$error ) {
+  if (v$.value.codeVisite.$error || v$.value.departement.$error || v$.value.service.$error || v$.value.role.$error || v$.value.matricule.$error) {
     return;
   } else {
-    if(password.value !== confirmPassword.value){
-      estDiff.value = true
-      return;
-    }
     loadingCreer.value = true;
     try {
       const formData = new FormData();
       formData.append('nom', nom.value);
       formData.append('prenom', prenom.value);
       formData.append('email', e_mail.value);
-      formData.append('password', password.value);
       formData.append('telephone1', telephone1.value);
       formData.append('telephone2', telephone2.value);
-      formData.append('type_user', typeUser.value);
-      formData.append('role_id', role.value);
       formData.append('civilite', civilite.value);
       formData.append('matricule', matricule.value);
-      formData.append('code_visite', codeVisite.value);
       formData.append('departement_id', departement.value);
       formData.append('service_id', service.value);
-      formData.append('type_piece_id', typePiece.value);
-      formData.append('numero_piece', numPiece.value);
 
       if (photo.value) {
         formData.append('image', photo.value);
@@ -354,15 +270,9 @@ const onSave = async () => {
       if(!response.data.error){
         const users = await getAll("user")
         gestionStore.setUsers(users.data)
-        isOpen.value = false
-        loadingCreer.value = false;
-        uuid.value = null
-        isEditMode.value = false
-        wizard.value.reset()
         successmsg("Utilisateur créé avec succès!");
         resetForm();
       }else{
-        successmsg("Utilisateur créé avec succès!");
         console.error("----- Erreur lors de la création de l'utilisateur :", response.data.message);
       }
 
@@ -391,17 +301,21 @@ const onDepartement = async () => {
   }
 };
 
-
+const emit = defineEmits(["update:isOpen", "update:uuid"]);
 
 // Réinitialiser le formulaire
 const resetForm = () => {
   submitted.value = false;
   loadingDetail.value = false
   loadingCreer.value = false
-  isOpen.value = false
-  uuid.value = null
-  isEditMode.value = false
-  toggleWizard(1, 18)
+  emit("update:isOpen", false);
+  emit('update:uuid', null);
+  toggleWizard(1, 18);
+  activeTabprofessionnelle.value = false;
+  if (v$.value) {
+    v$.value.$reset();  
+  }
+
   nom.value = '';
   prenom.value = '';
   civilite.value = '';
@@ -415,18 +329,16 @@ const resetForm = () => {
   departement.value = '';
   service.value = '';
 
-  
-
 };
 
-
+const toggleWizard = (tab, value) => {
+  activeTab.value = tab;
+  progressBarValue.value = value;
+};
 
 const successmsg = (message, type = 'success') => {
   Swal.fire('Succès!', `${message}!`, `${type}`);
 };
-
-
-
 </script>
 
 
@@ -434,69 +346,53 @@ const successmsg = (message, type = 'success') => {
 <template>
   <BModal 
       @hide="resetForm" 
-      size="xl"
-      v-model="isOpen" 
+      size="lg"
+      :modelValue="isOpen" 
+      @update:modelValue="$emit('update:modelValue', $event)"
       :title="isEditMode ? `Modifier les informations` : 'Création d\'Utilisateur'" 
       title-class="font-18" 
       hide-footer
       no-close-on-backdrop
-      
   >
   
     <ScaleLoader v-if="loadingDetail" :loading="loadingDetail" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
-    <div v-if="!loadingDetail" class="wizard shadow-none">
-      <BCard no-body >
-        <BCardBody class="shadow-none">
-          <!-- <BCardTitle class="mb-3">Basic Wizard</BCardTitle> -->
-          <BForm action="#">
+      <BForm v-else action="#">
             <div id="custom-progress-bar" class="progress-nav mb-4">
               <div class="progress">
                 <div class="progress-bar" role="progressbar" :style="`width: ${progressBarValue}%;`" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
               </div>
-
-              <ul v-if="!isEditMode" class="nav nav-pills d-flex justify-content-around wizard-steps" role="tablist">
+              
+              <ul class="nav nav-pills d-flex justify-content-evenly wizard-steps" role="tablist">
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link wizard-step" id="pills-gen-info-tab" type="button" role="tab" :class="{ active: activeTab == 1, done: activeTab > 1 }" @click="toggleWizard(1, 18)">
+                  <button class="nav-link wizard-step" id="pills-gen-info-tab" type="button" role="tab" :class="{ 
+                    active: activeTab == 1, done: activeTab > 1 }" @click="toggleWizard(1, 18)">
                     <i class="wizard-icon mdi mdi-account-circle font-size-24"></i>
                   </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link wizard-step" id="pills-info-desc-tab" type="button" role="tab" :class="{ active: activeTab == 2, done: activeTab > 2 }" @click="toggleWizard(2, 50)">
-                    <i class="wizard-icon mdi mdi-face-profile font-size-24"></i>
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link wizard-step" id="pills-success-tab" type="button" role="tab" :class="{ active: activeTab == 3, done: activeTab > 3 }" @click="toggleWizard(3, 100)">
-                    <i class="wizard-icon mdi mdi-checkbox-marked-circle-outline font-size-24"></i>
-                  </button>
-                </li>
-              </ul>
 
-              <ul v-if="isEditMode" class="nav nav-pills d-flex justify-content-around wizard-steps" role="tablist">
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link wizard-step" id="pills-gen-info-tab" type="button" role="tab" :class="{ active: activeTab == 1, done: activeTab > 1 }" @click="toggleWizard(1, 18)">
-                    <i class="wizard-icon mdi mdi-account-circle font-size-24"></i>
+                  <button class="nav-link wizard-step" :disabled="!activeTabprofessionnelle" id="pills-success-tab" type="button" role="tab" :class="{ 
+                    active: activeTab == 2, done: activeTab > 2 }" @click="toggleWizard(2, 46)">
+                    <i class="wizard-icon mdi mdi-briefcase font-size-24"></i>
+
                   </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link wizard-step" id="pills-info-desc-tab" type="button" role="tab" :class="{ active: activeTab == 2, done: activeTab > 2 }" @click="toggleWizard(2, 100)">
-                    <i class="wizard-icon mdi mdi-face-profile font-size-24"></i>
+                  <button class="nav-link wizard-step" :disabled="!activeTabSecurity" id="pills-success-tab" type="button" role="tab" :class="{ 
+                    active: activeTab == 3, done: activeTab > 2 }" @click="onNext">
+                    <i class="wizard-icon mdi mdi-shield font-size-24"></i>
+
                   </button>
                 </li>
-                <!-- <li class="nav-item" role="presentation" >
-                  <button class="nav-link wizard-step" id="pills-success-tab" type="button" role="tab" :class="{ active: activeTab == 3, done: activeTab > 3 }" @click="toggleWizard(3, 100)">
-                    <i class="wizard-icon mdi mdi-checkbox-marked-circle-outline font-size-24"></i>
-                  </button>
-                </li> -->
               </ul>
             </div>
 
             <div class="tab-content">
+
+              <!-- Informations personnelles -->
               <div class="tab-pane fade" :class="activeTab == 1 && 'show active'" id="pills-gen-info" role="tabpanel" aria-labelledby="pills-gen-info-tab">
-                <!-- <Step1 @onNext="toggleWizard(2, 50)" /> -->
-
-
-                <BRow class="mt-3">
+                <BRow class="mt-3 mb-4">
+                  <h4 class="text-center font-size-20 mb-5">Informations Personnelles</h4>
                   <BCol sm="2" class="mb-3">
                     <label for="civilite" style="font-size: 12px; font-weight: bolder">Civilité</label>
                     <div class="input-group">
@@ -586,28 +482,28 @@ const successmsg = (message, type = 'success') => {
                     />
                   </BCol>
 
-                  <BCol sm="3" md="3" class="mb-3" v-if="!isEditMode">
-                    <label for="typePiece" style="font-size: 12px; font-weight: bolder">Type pièce</label>
+                  <BCol sm="3" md="3" class="mb-3">
+                    <label for="role" style="font-size: 12px; font-weight: bolder">Type pièce</label>
                     <div class="input-group">
-                      <select v-model="typePiece" id="typePiece" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
+                      <select v-model="role" id="role" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
                         'is-invalid': submitted && v$.role.$error}"
                       >
-                        <option 
-                          v-for="piece in allTypePiece" 
-                          :key="piece.id" 
-                          :value="piece.id"
-                          :selected="piece.id == role_id"
+                        <!-- <option 
+                          v-for="role in selectRoles" 
+                          :key="role.id" 
+                          :value="role.id"
+                          :selected="role.id == role_id"
                         >
 
-                        {{ piece.libelle }}
+                        {{ role.libelle }}
 
-                        </option> 
+                        </option>  -->
                       </select>
                       
                     </div>
                   </BCol>
 
-                  <BCol sm="3" class="mb-3" v-if="!isEditMode">
+                  <BCol sm="3" class="mb-3">
                     <label for="numPiece" style="font-size: 12px; font-weight: bolder">Numéro pièce</label>
                     <input v-model="numPiece" 
                       type="text" 
@@ -625,43 +521,25 @@ const successmsg = (message, type = 'success') => {
                       id="photo" 
                     />
                   </BCol>
-                  
-                  <div class="d-flex justify-content-end">
-                    <BButton variant="primary" class="px-5" @click="validatePersonnelInfo">
+                  <div class="d-flex justify-content-end mt-5">
+                    <BButton variant="primary" class="px-5" @click="onNext">
                       Suivant
                     </BButton>
                   </div>
-
                 </BRow>
-
-
-
               </div>
 
-              <div class="tab-pane fade" :class="activeTab == 2 && 'show active'" id="pills-info-desc" role="tabpanel" aria-labelledby="pills-info-desc-tab">
-                
+              <!-- Information professionnelles -->
+                <!-- <Step2  @onBack="toggleWizard(1, 18)" /> -->
+              <!-- </div> -->
+              <div class="tab-pane fade" :class="activeTab == 2 && 'show active'" id="steparrow-description-info" role="tabpanel" aria-labelledby="steparrow-description-info-tab">
                 <BRow>
-                  <BCol sm="3" class="mb-3">
-                    <label for="user" style="font-size: 12px; font-weight: bolder">Type utilisateur</label>
-                    <div class="input-group">
-                      <select v-model="typeUser" id="user" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': next && v$.typeUser.$error}"
-                      >
-                        <option value="S">Standart</option> 
-                        <option value="V">Visiteur</option> 
-                        <option value="A">Administration</option> 
-                      </select>
-                      <div v-if="next && v$.typeUser.$error" class="invalid-feedback">
-                        <span v-if="v$.typeUser.required.$invalid">Type utilisateur obligatoire
-                        </span>
-                      </div>
-                    </div>
-                  </BCol>
-                  <BCol sm="3" class="mb-3">
+
+                  <BCol sm="6" class="mb-3">
                     <label for="role" style="font-size: 12px; font-weight: bolder">Rôle</label>
                     <div class="input-group">
                       <select v-model="role" id="role" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
-                        'is-invalid': next && v$.role.$error}"
+                        'is-invalid': submitted && v$.role.$error}"
                       >
                         <option 
                           v-for="role in selectRoles" 
@@ -674,52 +552,54 @@ const successmsg = (message, type = 'success') => {
 
                         </option> 
                       </select>
-                      <div v-if="next && v$.role.$error" class="invalid-feedback">
-                        <span v-if="v$.role.required.$invalid">rôle obligatoire
+                      <div v-if="submitted && v$.role.$error" class="invalid-feedback">
+                        <span v-if="v$.role.required.$invalid">Service obligatoire
                         </span>
                       </div>
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="matricule" style="font-size: 12px; font-weight: bolder">Matricule</label>
+                    <label for="nom" style="font-size: 12px; font-weight: bolder">Matricule</label>
                     <div class="input-group">
                       <input 
                         v-model="matricule" 
-                        id="matricule" 
+                        id="nom" 
                         class="form-control border border-secondary rounded-2" 
                         type="text"
                         :class="{
-                        'is-invalid': next && regex.errorMatricule
+                        'is-invalid': submitted && v$.matricule.$error
                       }">
-                      <div v-if="next && regex.errorMatricule" class="invalid-feedback">
-                        <span v-if="regex.errorMatricule">Le matricule doit suivre le format XXX123
+                      <div v-if="submitted && v$.matricule.$error" class="invalid-feedback">
+                        <span v-if="v$.matricule.required.$invalid">Matricule obligatoire
                         </span>
                       </div>
                     </div>
                   </BCol>
                   <BCol sm="3" class="mb-3">
-                    <label for="code" style="font-size: 12px; font-weight: bolder">Code Visite</label>
+                    <label for="nom" style="font-size: 12px; font-weight: bolder">Code Visite</label>
                     <div class="input-group">
                       <input 
                         v-model="codeVisite" 
-                        id="code" 
+                        id="nom" 
                         class="form-control border border-secondary rounded-2" 
                         type="text"
                         :class="{
-                        'is-invalid': next && regex.errorCodeVisite
+                        'is-invalid': submitted && v$.codeVisite.$error
                       }">
-                      <div v-if="next && regex.errorCodeVisite" class="invalid-feedback">
-                        <span v-if="regex.errorCodeVisite">Le code visite doit suivre le format VTR-001
+                      <div v-if="submitted && v$.codeVisite.$error" class="invalid-feedback">
+                        <span v-if="v$.codeVisite.required.$invalid">Code visite obligatoire
                         </span>
                       </div>
                     </div>
                   </BCol>
-
-
+                  
+                  
                   <BCol sm="6" class="mb-3">
                     <label for="departement" style="font-size: 12px; font-weight: bolder">Département</label>
                     <div class="input-group">
-                      <select v-model="departement" @change="onDepartement" id="departement" class="form-select border border-secondary rounded-2" aria-label="Default select example">
+                      <select v-model="departement" @change="onDepartement" id="departement" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
+                        'is-invalid': submitted && v$.departement.$error}"
+                      >
                         <option 
                           v-for="departement in selectDepartements" 
                           :key="departement.code" 
@@ -731,16 +611,18 @@ const successmsg = (message, type = 'success') => {
                         </option>
 
                       </select>
-                      <!-- <div v-if="submitted && v$.departement.$error" class="invalid-feedback">
+                      <div v-if="submitted && v$.departement.$error" class="invalid-feedback">
                         <span v-if="v$.departement.required.$invalid">Département obligatoire
                         </span>
-                      </div> -->
+                      </div>
                     </div>
                   </BCol>
                   <BCol sm="6" class="mb-3">
                     <label for="service" style="font-size: 12px; font-weight: bolder">Service</label>
                     <div class="input-group">
-                      <select v-model="service" id="service" class="form-select border border-secondary rounded-2" aria-label="Default select example">
+                      <select v-model="service" id="service" class="form-select border border-secondary rounded-2" aria-label="Default select example" :class="{
+                        'is-invalid': submitted && v$.service.$error}"
+                      >
                         <option 
                           v-for="service in selectServices" 
                           :key="service.id" 
@@ -751,100 +633,57 @@ const successmsg = (message, type = 'success') => {
 
                         </option> 
                       </select>
-                      <!-- <div v-if="submitted && v$.service.$error" class="invalid-feedback">
+                      <div v-if="submitted && v$.service.$error" class="invalid-feedback">
                         <span v-if="v$.service.required.$invalid">Service obligatoire
                         </span>
-                      </div> -->
+                      </div>
                     </div>
                   </BCol>
 
-                  <div class="d-flex justify-content-end justify-content-md-between">
-                    <BButton v-if="isEditMode" variant="primary" class="d-flex" @click="toggleWizard(1, 18)">
-                      <span class="px-md-5">retour</span>
+                  <div class="mt-4 d-flex justify-content-between">
+                    
+                    <BButton  class="btn px-5" @onBack="toggleWizard(1, 18)">
+                      Retour
                     </BButton>
-                    <BButton v-if="!isEditMode" variant="primary" class="d-flex" @click="toggleWizard(1, 18)">
-                      <span class="px-md-5">retour</span>
+                    <BButton variant="primary" class="px-5" @click="onNext">
+                      Suivant
                     </BButton>
-                    <BButton variant="primary" v-if="!isEditMode" class="ms-2" @click="validateProfessionnelInfo">
-                      <span class="px-md-5">Suivant</span>
-                    </BButton>
-                    <BButton variant="primary" v-if="isEditMode" class="ms-2" @click="onUpdateUser">
-                      <span class="px-md-5" v-if="!loadingEdit">Modifier</span>
-                      <ScaleLoader v-if="loadingEdit" :loading="loadingEdit" :height="'25px'" :color="'#FFFFFF'" />
-                    </BButton>
+                    
                   </div>
-
+                  
                 </BRow>
-
-
-
-
               </div>
 
-              <div v-if="!isEditMode" class="tab-pane fade" :class="activeTab == 3 && 'show active'" id="pills-success" role="tabpanel" aria-labelledby="pills-success-tab">
-                <!-- <Step3 @onBack="toggleWizard(2, 50)" /> -->
-
-                <BRow>
-
-                <BCol sm="6" class="mb-3">
-                  <label for="password" style="font-size: 12px; font-weight: bolder">Mot de passe</label>
-                  <div class="input-group">
-                    <input 
-                      v-model="password" 
-                      id="password" 
-                      class="form-control border border-secondary rounded-2" 
-                      type="password"
-                      :class="{
-                      'is-invalid': submitted && (v$.password.$error)
-                    }">
-                    <div v-if="submitted && v$.password.$error" class="invalid-feedback">
-                      <span v-if="v$.password.required.$invalid">mot de passe obligatoire
-                      </span>
-                    </div>
-                  </div>
-                </BCol>
-
-                <BCol sm="6" class="mb-3">
-                  <label for="confirmPassword" style="font-size: 12px; font-weight: bolder">Confirmer mot de passe</label>
-                  <div class="input-group">
-                    <input 
-                      v-model="confirmPassword" 
-                      id="confirmPassword" 
-                      class="form-control border border-secondary rounded-2" 
-                      type="password"
-                      :class="{
-                      'is-invalid': submitted && (v$.password.$error || confirmPassword !== password)
-
-                    }">
-                    <div v-if="submitted" class="invalid-feedback">
-                      <span v-if="v$.confirmPassword.$error && v$.confirmPassword.required.$invalid">confirmation du mot de passe obligatoire
-                      </span>
-                      <span v-if="estDiff" class="text-danger"> Mot de passe different!</span>
-                    </div>
-                  </div>
-                </BCol>
-                </BRow>
-
-                <div class="d-flex justify-content-end justify-content-md-between">
-                  <BButton variant="primary" @click="toggleWizard(2, 50)">
-                    <span class="px-md-5">Retour</span>
+              <!-- Securité -->
+              <div class="tab-pane fade" :class="activeTab == 3 && 'show active'" id="steparrow-description-info" role="tabpanel" aria-labelledby="steparrow-description-info-tab">
+                
+                
+                <div class="mt-4 d-flex justify-content-center">
+                  <BButton
+                      v-if="isEditMode" 
+                      @click="onUpdateUser" 
+                      variant="primary" 
+                      class="w-sm waves-effect waves-light btn btn-sm" 
+                      :loading="loadingEdit" 
+                      loading-text="Modification"
+                  >
+                    <span class="px-md-5">Modifier</span>
                   </BButton>
-                  <BButton variant="primary" class="ms-2" @click="onSave">
-                    <span v-if="!loadingEdit" class="px-md-5">Enregistrer</span>
-                    <ScaleLoader v-if="loadingEdit" :loading="loadingEdit" style="margin: 10em 0;" :height="'25px'" :color="'#FE0201'" />
+                  <BButton 
+                    v-if="!isEditMode" 
+                    variant="primary" 
+                    class="ms-2" 
+                    @click="onSave"
+                    :loading="loadingCreer" 
+                    loading-text="creation"
+                  >
+                    <span class="px-md-5">Enregistrer</span>
                   </BButton>
                 </div>
-
+                
               </div>
-
-
-
             </div>
           </BForm>
-        </BCardBody>
-      </BCard>
-
-    </div>
 
     
 
@@ -912,4 +751,37 @@ const successmsg = (message, type = 'success') => {
   }
 }
 </style>
+<style scoped>
+.loading-ellipses {
+  font-size: 40px; /* Taille augmentée */
+  color: #3498db;
+  text-align: center;
+  font-weight: bold;
+}
 
+.dot {
+  animation: blink 1s infinite;
+  margin: 0 5px; /* Espacement entre les points */
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes blink {
+  0%, 20% {
+    opacity: 0;
+  }
+  50%, 100% {
+    opacity: 1;
+  }
+}
+</style>

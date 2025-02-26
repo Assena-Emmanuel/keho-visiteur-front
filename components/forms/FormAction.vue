@@ -14,6 +14,13 @@ const gestionStore = useGestionStore()
 const { getAll, createResource, getById } = useApi(authStore.token);
 
 
+// Déclaration des props
+// const props = defineProps({
+//   isOpen: Boolean,
+//   id: Number,
+//   isEditMode: Boolean,
+//   selectedIndex: Number, // L'index de l'élément à éditer
+// });
 
 const isOpen = defineModel('isOpen')
 const id = defineModel('id')
@@ -29,14 +36,14 @@ const loadingAdd = ref(false);
 const errorMessage = ref("")
 const erreur = ref(false)
 const libelle = ref("");
-const target = ref("");
+const lastLibelle = ref("")
+const code = ref("");
 const type = ref("");
 const icon = ref("");
-const position = ref("");
-const name = ref("");
-const statut = ref("");
+
+const statut = ref(1);
 const menu_id = ref(null);
-const menus = ref([])
+const actions = ref([])
 
 // Validation avec Vuelidate
 const rules = computed(() => ({
@@ -44,25 +51,22 @@ const rules = computed(() => ({
     required,
   },
 
-  name: {
+  code: {
     required,
   },
 
-  target: {
-    required,
-  },
 
 
 }));
 
-const v$ = useVuelidate(rules, { libelle, name, target});
+const v$ = useVuelidate(rules, { libelle, code});
 
 // Méthodes
-const onSaveMenu = async () => {
+const onSaveAction = async () => {
   submitted.value = true;
   v$.value.$touch();
 
-  if (v$.value.libelle.$error || v$.value.target.$error || v$.value.name.$error ) {
+  if (v$.value.libelle.$error || v$.value.code.$error) {
     return;
 
   }else{
@@ -73,21 +77,18 @@ const onSaveMenu = async () => {
 
       const formData = {
       libelle: libelle.value,
-      name: name.value,
-      target: target.value,
-      type: type.value,
-      menu_id: menu_id.value,
+      code: code.value,
       icon: icon.value,
-      position: 0,
+      position: null,
       statut: statut.value,
       };
 
-      const resp = await createResource(`menu`, formData);
-      if(!resp.data.error){
-        alertMessage(resp.data.message, 'success')
-        const data = await getAll("menu");
-        gestionStore.setMenus(data.data)
-        
+      const data = await createResource(`action`, formData);
+      if(!data.data.error){
+
+        const data = await getAll("action");
+        gestionStore.setActions(data.data)
+        alertMessage(data.data.message, 'success')
         resetForm()
         
       }else{
@@ -109,7 +110,7 @@ const onSaveMenu = async () => {
 onMounted(async () => {
 
 try {
-  // recuperation des menus
+  // recuperation des actions
   
 } catch (error) {
   console.error('Erreur lors de la récupération des données:', error);
@@ -122,24 +123,22 @@ watch(
   () => id.value,  
   async (newid) => {  
     if (newid) {
-      loading.value = true
+      
       isOpen.value = true
       isEditMode.value = true
       // recuperation du menu
       try{
-        const menu = await getById("menu", newid);
+        loading.value = true
+        const menu = await getById("action", newid);
         libelle.value = menu.data.libelle
-        name.value = menu.data.name
-        target.value = menu.data.target
-        statut.value = menu.data.statut
-        type.value = menu.data.type
+        lastLibelle.value = menu.data.libelle
+        code.value = menu.data.code
         icon.value = menu.data.icon
-        menu_id.value = menu.data.menu_id
-
-        // console.log("Menu------------------: "+JSON.stringify(menu.data))
-        // tous les menus
-        const menus = await getAll("menu")
-        menus.value = menus.data
+        statut.value = menu.data.statut
+      
+        // tous les actions
+        const actions = await getAll("action")
+        actions.value = actions.data
 
       }catch(e){
         console.error("error Menu: "+e)
@@ -159,13 +158,13 @@ watch(
 );
 
 // Fonction de mise à jour du département
-const onUpdateMenu = async () => {
+const onUpdateAction = async () => {
   submitted.value = true;
   v$.value.$touch();
   
   
   // Vérification des erreurs de validation
-  if (v$.value.libelle.$error  || v$.value.name.$error || v$.value.target.$error) {
+  if (v$.value.libelle.$error  || v$.value.code.$error) {
 
     return; // Si des erreurs existent, on arrête la fonction
   }
@@ -175,18 +174,17 @@ const onUpdateMenu = async () => {
   try {
     // Préparation des données à envoyer via FormData
     const formData = {
-      libelle: libelle.value,
-      name: name.value,
-      target: target.value,
-      type: type.value,
-      menu_id: menu_id.value,
+      code: code.value,
       icon: icon.value,
-      position: 0,
       statut: statut.value,
     };
 
+    if(libelle.value !== lastLibelle.value){
+        formData["libelle"] = libelle.value
+    }
+
     // Appel API pour mettre à jour le menu
-    const response = await  apiClient.put(`/menu/${id.value}`, formData, {
+    const response = await  apiClient.put(`/action/${id.value}`, formData, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`,  // Utilisation du token d'authentification
       },
@@ -195,18 +193,17 @@ const onUpdateMenu = async () => {
     // Vérification de la réponse
     console.log("Mise ajour: "+id.value+" "+JSON.stringify(response.data));
     if (!response.data.error) {
-      const menus = await getAll("menu")
-      alertMessage(response.data.message, "success")
-      gestionStore.setMenus(menus.data); 
+      const actions = await getAll("action")
+      console.log("Data--------------------: +"+JSON.stringify(actions))
+      gestionStore.setActions(actions.data); 
       erreur.value = false;  // Réinitialiser l'état d'erreur
       isOpen.value = false
       // resetForm(); 
 
     } else {
       // Si une erreur se produit dans la réponse de l'API
-      // erreur.value = true;
-      // errorMessage.value = "Mise à jour échouée !";
-      alertMessage(response.data.message)
+      erreur.value = true;
+      errorMessage.value = "Mise à jour échouée !";
       console.error("Mise ajour: "+response.data.message);
 
     }
@@ -242,14 +239,10 @@ function alertMessage(message, icon = "error") {
 
 
 const resetForm = () => {
-  libelle.value = "";
-  name.value = "";
+    libelle.value = "";
   icon.value = "";
-  target.value = "";
-  type.value = "";
-  position.value = "";
+  code.value = "";
   statut.value = "";
-  menu_id.value = "";
 
   submitted.value = false;
   erreur.value = false
@@ -300,60 +293,28 @@ const resetForm = () => {
 
         <BCol md="6">
             <div class="mb-3">
-                <label for="target" style="font-size: 12px;">Target </label>
+                <label for="code" style="font-size: 12px;">Code </label>
                 <div>
                     <input 
-                      v-model="target" 
-                      id="target" 
+                      v-model="code" 
+                      id="code" 
                       class="form-control form-control-sm"  
                       type="text"
                       :class="{
-                      'is-invalid': submitted && v$.target.$error,
-                      'border border-danger': submitted && v$.target.$error,
-                      'border border-secondary': !(submitted && v$.target.$error)
+                      'is-invalid': submitted && v$.code.$error,
+                      'border border-danger': submitted && v$.code.$error,
+                      'border border-secondary': !(submitted && v$.code.$error)
                       }"
                     >
-                    <div v-if="submitted && target==''" class="invalid-feedback">
-                    <span v-if="v$.target.required.$invalid" class="font-size-12">champ obligatoire
+                    <div v-if="submitted && code==''" class="invalid-feedback">
+                    <span v-if="v$.code.required.$invalid" class="font-size-12">champ obligatoire
                     </span>
                     </div>
                 </div>
             </div>
         </BCol>
 
-        <BCol md="6">
-            <div class="mb-3">
-                <label for="type" style="font-size: 12px;">Type </label>
-                <div class="input-group">
-                    <select v-model="type" id="type" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example">
-                        <option value="PARA" :selected="target === 'PARAM' ">PARAMETRES</option>
-                        <option value="SIDE" :selected="target === 'SIDE' ">SIDEBAR</option>
-                    </select>
-                </div>
-            </div>
-        </BCol>
         
-        <BCol md="6">
-            <div class="mb-3">
-                <label for="name" style="font-size: 12px;">Name </label>
-                <div>
-                    <input 
-                    v-model="name" 
-                    id="name" 
-                    class="form-control form-control-sm"  
-                    type="text"
-                    :class="{
-                    'is-invalid': submitted && v$.name.$error,
-                    'border border-danger': submitted && v$.name.$error,
-                    'border border-secondary': !(submitted && v$.name.$error)
-                    }">
-                    <div v-if="submitted && v$.name.$error" class="invalid-feedback">
-                    <span v-if="v$.name.required.$invalid" class="font-size-12">champ obligatoire
-                    </span>
-                    </div>
-                </div>
-            </div>
-        </BCol>
 
         <BCol md="6">
             <div class="mb-3">
@@ -362,14 +323,19 @@ const resetForm = () => {
                     <input 
                     v-model="icon" 
                     id="icon" 
-                    class="form-control form-control-sm"  
+                    class="form-control form-control-sm border border-secondary"  
                     type="text"
+                    >
+                    <!-- 
                     :class="{
                     'is-invalid': submitted && v$.icon.$error,
                     'border border-danger': submitted && v$.icon.$error,
                     'border border-secondary': !(submitted && v$.icon.$error)
-                    }">
-                    
+                    }"
+                    <div v-if="submitted && v$.icon.$error" class="invalid-feedback">
+                    <span v-if="v$.icon.required.$invalid" class="font-size-12">champ obligatoire
+                    </span>
+                    </div> -->
                 </div>
             </div>
         </BCol>
@@ -386,26 +352,17 @@ const resetForm = () => {
             </div>
         </BCol>
         
-        <BCol md="6">
-            <div class="mb-3">
-                <label for="menu" style="font-size: 12px;">Menu </label>
-                <div class="input-group">
-                    <select v-model="menu_id" id="menu" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example">
-                        <option v-for="menu in menus" :key="menu.id" :value="menu.id" :selected="menu_id == menu.id ">{{ menu.libelle }}</option>
-                    </select>
-                </div>
-            </div>
-        </BCol>
+
 
     </BRow>
 
     <div class="mt-4 d-flex justify-content-center">
-      <BButton v-if="!isEditMode" @click="onSaveMenu" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+      <BButton v-if="!isEditMode" @click="onSaveAction" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
         
         <span v-if="!loadingAdd">Enregistrer</span>
         <ScaleLoader :loading="loadingAdd" :height="'20px'" :color="'#FFFFFF'" />
       </BButton>
-      <BButton v-if="isEditMode" @click="onUpdateMenu" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+      <BButton v-if="isEditMode" @click="onUpdateAction" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
         
         <span v-if="!loadingEdit">Modifier</span>
         <ScaleLoader :loading="loadingEdit" :height="'20px'" :color="'#FFFFFF'" />

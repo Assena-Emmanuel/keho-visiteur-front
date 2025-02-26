@@ -1,534 +1,516 @@
 <template>
   <DashboardCommonStat />
-  
-
-  <!-- Modal détail -->
-  <BModal v-if="detailData.visiteurs" v-model="detailModal" hide-footer title="Détails des Visites" >
-    <div class="d-flex justify-content-end">
-        <BButton variant="primary" size="sm" style="padding: 2px;">
-            <i class="uil uil-print font-size-15 annuler"></i> Imprimer
-        </BButton>
-    </div>
-    <div v-for="item in detailData.visiteurs" :key="item['Code visite']">
-      <div class="text-center"><span class="h4">M. {{  }}</span> <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">Délégué</span>
-        <div class="bg-secondary text-center text-light mt-1">En délégation</div>
+    <!-- Modal détail -->
+    <BModal v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur" >
+    <ScaleLoader :loading="loadingDetail" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
+    <div v-if="data && data.visiteurs && !loadingDetail"  v-for="item in data.visiteurs" :key="item['Code visite']">
+      <div class="text-center"><h3>{{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</h3>
+        <span v-if="item.delegation && item.chef_equipe " class="badge bg-danger rounded">délégué</span>
+      </div>
+      <div class="d-flex justify-content-between">
+        <div>
+          <span v-if="data.fvisite.statut==2" class="text-succes px-2 ms-2">statut: <span class="">terminé</span></span>
+          <span v-if="data.fvisite.statut==1" class="text-warning px-2 ms-2">statut: <span class="">Notifié</span></span>
+          <span v-if="data.fvisite.statut==0" class="text-warning px-2 ms-2">statut: <span class="">En cours</span></span>
+          <span v-if="data.fvisite.statut==3" class="text-danger px-2 ms-2">statut: <span class="">Rejeté</span></span>
+          <span v-if="data.fvisite.statut==4" class="text-info px-2 ms-2">statut: <span class="">Confirmé</span></span>
+          <span v-if="data.fvisite.statut==5" class="text-succes px-2 ms-2">statut: <span class="">Clôturé</span></span>
+        </div>
+        <div><small class=" px-2 ms-2 "><i class="fa fa-clock"></i> <small>{{ formatDateTime(data.fvisite.created_at)  }}</small></small></div>
       </div>
       <hr class="text-secondary">
-      <div class="d-flex justify-content-between my-3">
-          <span class="border border-primary rounded px-2 ms-2 text-primary fw-bold"><span>{{ item.Date }}</span></span>
-          <span class="border border-success rounded px-2 ms-2 text-success">visite: <span class="fw-bold">Terminé</span></span>
-
-      </div>
       <div class="row">
-          
         <div class="col col-md-6">
-          <p><strong>Téléphone:</strong> {{ item.Telephone }}</p>
+          <p><strong>Téléphone:</strong> {{ item.visiteur.users.telephone2 }}</p>
         </div>
         <div class="col col-md-6">
-          <p><strong>Société:</strong> {{ item.Société }}</p>
+          <p><strong>Société:</strong> {{ item.visiteur.entreprise.libelle }}</p>
         </div>
       </div>
       <div class="row">
         <div class="col col-md-6">
-          <p><strong>E-mail:</strong> {{ item.Email }}</p>
+          <p><strong>E-mail:</strong> {{ item.visiteur.users.email }}</p>
         </div>
         <div class="col col-md-6">
-          <p><strong>Code visiteur:</strong> {{ item['Code visiteur'] }}</p>
+          <p><strong>Code visiteur:</strong> {{ data.fvisite.code_fvisite }}</p>
         </div>
       </div>
       <div class="row">
         <div class="col col-md-6">
-          <p><strong>Type pièce:</strong> {{ item.TypePiece }}</p>
+          <p><strong>Type pièce:</strong> {{ item.visiteur.type_piece.code == 'CNI' ? item.visiteur.type_piece.code :  item.visiteur.libelle }}</p>
         </div>
         <div class="col col-md-6">
-          <p><strong>Num pièce:</strong> {{ item.CNI }}</p>
+          <p><strong>Num pièce:</strong> {{ item.visiteur.numero_piece }}</p>
         </div>
       </div>
-      <div class="row">
+      <!-- <div class="row">
         <div class="col col-md-6">
           <p><strong>Employé:</strong> {{ item.Employé }}</p>
         </div>
         <div class="col col-md-6">
           <p><strong>Code:</strong> {{ item["Code visite"] }}</p>
         </div>
-      </div>
+      </div> -->
       <div class="row">
         <div class="col col-md-6">
-          <p><strong>Heure d'entrée:</strong> {{ item['H entrée'] }}</p>
+          <p><strong>Heure d'entrée:</strong> {{ data.fvisite.heure_entree }}</p>
         </div>
         <div class="col col-md-6">
-          <p><strong>Heure de Sortie:</strong> {{ item["H Sortie"] }}</p>
+          <p><strong>Heure de Sortie:</strong> {{ !data.fvisite.heure_fin ? "---------" : data.fvisite.heure_fin }}</p>
         </div>
       </div>
+      <div class="bg-danger text-center text-light" v-if="item.delegation">En délégation</div>
+      <hr />
     </div>
-
-    <div class="d-flex justify-content-evenly mb-3">
-      <div class="piece" align="center" @click="showImg('rectoVisible')">
-        <div>Recto</div>
-        <img :src="recto" alt="recto" width="200" height="90" />
-      </div>
-      <VueEasyLightbox
-            :visible="rectoVisible"
-            :imgs="recto"
-            @hide="onHide('rectoVisible')"
-        />
-      
-      <div>
-        <div class="piece" align="center" @click="showImg('versoVisible')">
-          <div>Verso</div>
-          <img  :src="verso" width="200" height="90" alt="verso" />
-        </div>
-        <VueEasyLightbox
-            :visible="versoVisible"
-            :imgs="verso"
-            @hide="onHide('versoVisible')"
-          />
-          <!-- :src="`data:${detailData.visiteurs[0].visiteur.mime_type_v};base64,${detailData.visiteurs[0].visiteur.image_p}`" -->
-      </div>
-    </div>
-
-    <div class="d-flex justify-content-end" v-if="detailData.enDelegation">
+    <div class="d-flex justify-content-end" v-if="data && data.visiteurs && data.visiteurs.length > 1 && !loadingDetail">
       <BPagination
-        v-model="page"
-        :total-rows="detailData.visiteurs.length"
-        :per-page="itemsPerPage"
-        aria-controls="modal-pagination"
-      ></BPagination>
+      v-model="page"
+      :total-rows="data.length"
+      :per-page="itemsPerPage"
+      aria-controls="modal-pagination"
+    ></BPagination>
     </div>
     
-  </BModal>
+  </BModal>  
 
+  <BCard style="min-height: 10em;">
+    <BCardBody>
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-3xl">Visites enregistrées</h3>
+        </div>
 
-
-  <div class="mb-2"><span>Visites enregistrées</span></div>
-  <div>
-    <!-- Tableau des visiteurs -->
-    <BRow>
-      <BCol cols="12">
-        <BCard no-body>
-          <div v-if="loading" class="loading-ellipses">
-            <span class="dot text-success">.</span>
-            <span class="dot text-primary">.</span>
-            <span class="dot text-danger">.</span>
-          </div>
-          <BCardBody v-if="!loading && data">
-            <BRow class="mb-3">
-              <BCol sm="12" md="2">
-                Debut
-                <BFormInput type="datetime-local" v-model="dateDebut" class="border border-secondary":options="listVisiteur" size="sm" />
-              </BCol>
-              <BCol sm="12" md="2">
-                Fin
-                <BFormInput type="datetime-local" v-model="dateFin" class="border border-secondary":options="listVisiteur" size="sm" />
-              </BCol>
-              <BCol sm="12" md="5">
-                <BFormSelect v-model="visiteurSelectionner" class="mt-4 border border-secondary":options="listVisiteur" size="sm" />
+          <BRow class="mb-3">
+              <BCol sm="12" md="3">
+              Debut
+              <BFormInput
+                  type="datetime-local"
+                  v-model="dateDebut"
+                  class="border border-secondary"
+                  size="sm"
+              />
               </BCol>
               <BCol sm="12" md="3">
-                <div class="input-group mt-4 border border-secondary rounded-1">
-                    <span class="input-group-text">
-                        <i class="fas fa-search font-size-10"></i>
-                    </span>
-                    <BFormInput v-model="filter" type="search" id="input-small" size="sm"  placeholder="Rechercher..." />
-                </div>
+              Fin
+              <BFormInput
+                  type="datetime-local"
+                  v-model="dateFin"
+                  class="border border-secondary"
+                  size="sm"
+              />
               </BCol>
-            </BRow>
-            <div class="table-responsive mb-0">
-            
-              <BTable 
-                :items="filteredData" 
-                :fields="fields" 
-                responsive="sm" 
-                :per-page="perPage" 
-                :current-page="currentPage" 
-                v-model:sort-by.sync="sortBy" 
-                v-model:sort-desc.sync="sortDesc" 
-                @filtered="onFiltered" 
-              >
-              :
-                <template #cell(Statut)="row">
-                  <span v-if="row.item.Statut" class="badge rounded-pill text-bg-success">activé</span>
-                  <span v-if="!row.item.Statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
-                </template>
-
-                <template #cell(Actions)="row">
-                    <div class="d-flex gap-1">
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex text-primary justify-content-center align-items-center" @click="showDetailsModal(row.item)">
-                          <i class="fas fa-eye"></i>
-                        </BButton>
-
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex text-primary justify-content-center align-items-center" @click="showTicket(row.item)">
-                          <i class="uil uil-print font-size-15"></i>
-                        </BButton>
-
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-warning d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'rejeter'">
-                          <i class="uil uil-ban font-size-15 annuler"></i>
-                        </BButton>
-
-                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
-                          <i class="uil uil-trash-alt font-size-15"></i>
-                        </BButton>
-                        
-                    </div>
-                </template>
-
-              </BTable>
-            </div>
-            <hr class="border-1 border-secondary">
-            <BRow>
-              <BCol>
-                <div class="dataTables_paginate paging_simple_numbers d-flex justify-content-between">
-                  <div id="tickets-table_length" class="dataTables_length">
-                    <BCol sm="12" md="6" class="">
-                        <div id="tickets-table_length" class="dataTables_length">
-                            <label class="d-inline-flex align-items-center">
-                            Afficher&nbsp;
-                            <BFormSelect class="border border-secondary" v-model="perPage" size="sm" :options="pageOptions"></BFormSelect>éléments&nbsp;
-                            
-                            </label>
-                        </div>
-                    </BCol>
+              <BCol sm="12" md="5">
+                  <div>
+                      <div class="input-group mt-4 border border-secondary rounded-1">
+                      <span class="input-group-text">
+                          <i class="fas fa-search font-size-10"></i>
+                      </span>
+                      <BFormInput
+                          v-model="searchValue"
+                          type="search"
+                          id="input-small"
+                          size="sm"
+                          placeholder="Rechercher..."
+                      />
+                      </div>
                   </div>
-                  <ul class="pagination pagination-rounded mb-0">
-                    <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" />
-                  </ul>
-                </div>
               </BCol>
-            </BRow>
-          </BCardBody>
-        </BCard>
-      </BCol>
-    </BRow>
-</div>
+              <BCol sm="12" md="1">
+                  <BButton class="mt-4" size="sm">Rechercher</BButton>
+              </BCol>
+          </BRow>
 
-<!-- Affiche ticket -->
+        <!-- Table avec pagination -->
+        <EasyDataTable
+          v-model:server-options="serverOptions"
+          :server-items-length="serverItemsLength"
+          :loading="loading"
+          :headers="headers"
+          :items="items"
+          rows-of-page-separator-message="sur"
+          buttons-pagination
+          table-class-name="customize-table"
+          header-text-direction="center"
+          body-text-direction="center"
+          :rows-items="range"
+          :rows-per-page="range[0]"
+          empty-message="Aucune donnée disponible"
+          rows-per-page-message="Ligne par page"
+          :search-field="searchField"
+          :search-value="searchValue"
 
+          >
+
+          <template #item-actions="item">
+              <div class="d-flex gap-1">
+                <BButton 
+                  v-if="permissions.some(perm => perm.show)" 
+                  style="width: 15px; height: 15px;" 
+                  variant="white" 
+                  size="sm" 
+                  class="d-flex text-primary justify-content-center align-items-center" 
+                  @click="showDetailsModal(item.uuid)"
+                >
+                  <i class="fas fa-eye"></i>
+                </BButton>
+
+                 <!-- Bouton d'impression (prt) -->
+                <BButton 
+                  v-if="permissions.some(perm => perm.prt)" 
+                  style="width: 15px; height: 15px;" 
+                  variant="white" 
+                  size="sm" 
+                  class="d-flex text-primary justify-content-center align-items-center" 
+                  @click="showTicket(row.item)"
+                >
+                  <i class="uil uil-print font-size-15"></i>
+                </BButton>
+
+                <!-- Bouton de modification (edit) -->
+                <BButton 
+                  v-if="permissions.some(perm => perm.edit)" 
+                  style="width: 15px; height: 15px;" 
+                  variant="white" 
+                  size="sm" 
+                  class="mr-1 fw-bold text-warning d-flex justify-content-center align-items-center" 
+                  @click="rejet(item.uuid)" 
+                  v-b-tooltip.hover.bottom="'rejeter'"
+                >
+                  <i class="uil uil-ban font-size-15 annuler"></i>
+                </BButton>
+
+                <!-- Bouton de suppression (del) -->
+                <BButton 
+                  v-if="permissions.some(perm => perm.del)" 
+                  style="width: 15px; height: 15px;" 
+                  variant="white" 
+                  size="sm" 
+                  class="px-2 text-danger d-flex justify-content-center align-items-center" 
+                  @click="confirmDelete(item.uuid)"
+                >
+                  <i class="uil uil-trash-alt font-size-15"></i>
+                </BButton>
+                      
+              </div>
+          </template>
+
+          <template #item-heure_fin="item">
+              <div>
+                  <span>----</span>
+              </div>
+          </template>
+
+          <!-- Personnaliser le loading -->
+          <template #loading>
+              <ScaleLoader :loading="loading" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
+          </template>
+          
+
+          </EasyDataTable>
+      </div>
+    </BCardBody>
+  </BCard>
 </template>
-<script>
-import apiClient from '../api/intercepteur';
+
+<script setup>
 import { useAuthStore } from "~/stores/auth.js";
-import { PulseLoader } from '@saeris/vue-spinners'
+import apiClient from "../api/intercepteur";
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
+import Swal from 'sweetalert2';
 
+const authStore = useAuthStore();
 
-export default {
-components: {
-  PulseLoader
-},
-setup(){
-  const authStore = useAuthStore()
+const headers = [
+  { text: "Date", value: "created_at", sortable: true },
+  { text: "Nom & Prénoms", value: "visiteur" },
+  { text: "CNI", value: "numero_piece"},
+  { text: "Société", value: "entreprise"},
+  { text: "Code visiteur", value: "code_visiteur" },
+  { text: "Code visite", value: "code_visite" },
+  { text: "Employé", value: "employe" },
+  { text: "Visite", value: "lib_visite" },
+  { text: "H entrée", value: "heure_entree" },
+  { text: "Statut", value: "lib_statut" },
+  { text: "H Sortie", value: "heure_fin" },
+  { text: "Actions", value: "Actions" },
+];
+const permissions = ref([])
+const range = ref([5,10,15,20])
+const items = ref([]);
+const loading = ref(false);
+const serverItemsLength = ref(0);
+const searchField = ["visiteur", "entreprise", "numero_piece", "code_visite", "code_visiteur", "employe", "lib_visite"];
+const searchValue = ref("");
+const detailModal = ref(false)
+const data = ref([])
+const loadingDetail = ref(false)
+const serverOptions = ref({
+  page: 1,
+  rowsPerPage: 5,
+  sortBy: 1,
+  code_employe: '',
+});
 
-  return{
-    authStore
-  }
-},
-  data() {
-      return {
-        rectoVisible : false,
-        versoVisible : false,
-        isOpen: false,
-        imgs : [
-          "/images/bg-qrcode.png",
-          "/images/pdf.png",
-          "/images/pdf.png",
-        ],
-        detailData:{
-          enDelegation:false,
-          visiteurs:[]
-        },
-        page: 1,
-        itemsPerPage: 1,
-        loading: false,
-        detailModal: false,
-        isActive: 'Jour' ,
-        verso:"",
-        recto:"",
-        dateDebut: '',
-        dateFin: '',
-        visiteurSelectionner: null,
-        listVisiteur : [
-        {value: null, text: 'Liste Employes'},
-        {value: '1', text: 'YAO EMMANUEL (ADE)'},
-        {value: '2', text: 'ABOU AZIZ (VST-002)'},
-        ],
+// Fonction pour charger les données depuis le serveur
+const loadFromServer = async () => {
+  loading.value = true;
+  try {
+      const response = await apiClient.get("/fvisites/lvisite", {
+      params: {
+        page: serverOptions.value.page,
+        limit: serverOptions.value.rowsPerPage,
+        sort_type: serverOptions.value.sortBy,
+        code_employe: serverOptions.value.code_employe,
+      },
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
 
-      totalRows: 1,
-      currentPage: 1,
-      perPage: 5,
-      pageOptions: [5, 10, 15, 20],
-      filter: "", 
-      sortBy: "age",
-      sortDesc: false,
+    });
+
+    if (!response.data.error) {
       
-      fields: [
-          {key:"created_at", label: "Date"},
-          {key:"visiteur", label: "Nom & Prénoms"},
-          {key:"numero_piece",label: "CNI"},
-          {key:"entreprise", label: "Société"},
-          {key:"code_visiteur", label: "Code visiteur"},
-          {key:"code_visite", label: "Code visite"},
-          {key:"employe", label: "Employé"},
-          {key:"lib_visite", label: "Visite"},
-          {key:"heure_entree", label: "H entrée"},
-          {key:"lib_statut", label: "statut"},
-          {key:"heure_fin", label: "H Sortie"},
-          {key: "Actions"},
-      ],
-      title: null,
-      data: [],
+      const data = response.data.data;
+      items.value = data?.data;
+      serverItemsLength.value = response.data.data.total;
 
-  };
-},
-
-  methods: {
-    showTicket(row){
-      return navigateTo({
-        path: `/visiteur/visiteurVisite/${row.uuid}`, // Envoie le paramètre dans l'URL
-      });
-
-    },
-
-    hide(){
-      this.isOpen = false
-    }, 
-
-    showImg(type){
-      // this.indexRef = index;
-      this[type] = true;
-      // console.log("show")
-    },
-
-    onHide(type){
-      this[type] = false;
-      // console.log(`recto: ${this.rectoVisible} et verso: ${this.versoVisible}`)
-    },
-      onFiltered(filteredItems) {
-        // Update totalRows and reset to first page after filtering
-        this.totalRows = filteredItems.length;
-        this.currentPage = 1;
-      },
-
-      handleEdit(index, data) {
-        this.$swal.fire({
-        text: "Voulez-vous rejeter?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Oui',
-        cancelButtonText: 'Non',
-        reverseButtons: true // Inverser l'ordre des boutons
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Logique pour supprimer l'élément ici
-          this.deleteItem(code);
-
-          this.$swal.fire(
-            'Rejeter!',
-            'Visite rejetée',
-            'success'
-          );
-        }
-      });
-      },
-
-      async showDetailsModal(row){
-        
-        if(row.uuid){
-          const response = await apiClient.get(`/fvisites/${row.uuid}`, {
-            headers: {
-              'Authorization': `Bearer ${this.authStore.token}`,
-            },
-          })
-          if(!response.data.error){
-            this.detailData.visiteurs = response.data.data.visiteurs
-            console.log("Donnée----------------------------: "+JSON.stringify(this.detailData.visiteurs))
-            this.verso = `data:${this.detailData.visiteurs[0].visiteur.mime_type_v};base64,${this.detailData.visiteurs[0].visiteur.image_v}`
-            this.recto = `data:${this.detailData.visiteurs[0].visiteur.mime_type_p};base64,${this.detailData.visiteurs[0].visiteur.image_p}`
-            // detailData.visiteurs[0].visiteur.image_p
-            this.detailModal = !this.detailModal
-          }else{
-            console.error("Erreur fiche visite :",response.data.message)
-          }
-
-        }else{
-          console.error("----------- aucune donnée ------------")
-
-        }
-      },
-
-      confirmDelete(code) {
-      this.$swal.fire({
-        title: 'Êtes-vous sûr?',
-        text: "Cette action est irréversible!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Oui',
-        cancelButtonText: 'Non',
-        reverseButtons: true // Inverser l'ordre des boutons
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Logique pour supprimer l'élément ici
-          this.deleteItem(code);
-
-          this.$swal.fire(
-            'Supprimé!',
-            'Votre élément a été supprimé.',
-            'success'
-          );
-        }
-      });
-    },
-
-  },
-  computed: {
-  /**
-   * Dynamically generate filterOn based on fields
-   */
-  filterOn() {
-    // Return an array of keys from fields
-    return this.fields.map(field => field.key);
-  },
-
-  /**
-   * Total no. of records
-   */
-  rows() {
-    return this.filteredData.length;
-  },
-
-  /**
-   * Filtered data based on search input
-   */
-  filteredData() {
-    if (this.filter) {
-      return this.data.filter(item =>
-        this.filterOn.some(key =>
-          String(item[key]).toLowerCase().includes(this.filter.toLowerCase())
-        )
-      );
     }
-    return this.data;
-  },
-  paginatedData() {
-    const start = (this.page - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    return this.data.slice(start, end);
+
+  } catch (e) {
+    console.error("Erreur lors de la récupération des données: " + e);
+
+  } finally {
+    loading.value = false;
+
   }
-},
-async mounted() {
-  this.totalRows = this.data.length;
+};
 
-  // recuperer les visiteurs 
-  this.loading = true
-  const params = {
-    page: 1,
-    limit: 5,
-    sort_type: 1,
-  };
-  const response = await apiClient.get("/fvisites/lvisite", {
-    params,
-    headers: {
-      'Authorization': `Bearer ${this.authStore.token}`,
-    }
-  });
+// Appel initial pour charger les données
+ onMounted( async () => {
+  loadFromServer();
+  
+  const code = "visiteur"
+  const response = await apiClient.get(`/permissions/menu_action/${authStore.user.role_id}/${code}`, 
+  {
+  headers: {
+      'Authorization': `Bearer ${authStore.token}`,  // Utilisation du token d'authentification
+      },
+  })
 
   if(!response.data.error){
-    // console.log("Mes Visiteur: ------------------------------ "+JSON.stringify(response.data.data.data))
-    this.data = response.data.data.data
+    permissions.value = response.data
+    console.log("permissionVisiteur----------------: "+JSON.stringify(permissions.value))
+
+  }else{
+    console.error("Menu error: "+response.message)
 
   }
+  
+});
 
-  // const respUser = await apiClient.get("/user", {
-  //   headers: {
-  //     'Authorization': `Bearer ${this.authStore.token}`,
-  //   }
-  // });
-  // if(!respUser.data.error){
-  //   respUser.data.data.map(user =>{
-  //     lis
-  //   })
-  //   console.log("----------------"+JSON.stringify(respUser.data.data))
-  // }
+// Utilisation de debounce pour éviter des appels rapides au serveur
+watch(serverOptions, (value) => { 
+  loadFromServer(); 
+  }, 
+  { deep: true }
+  );
 
-  this.loading = false
-},
+
+const formatDateTime = (dateTime) => {
+      // Convertir la date en objet Date
+      const date = new Date(dateTime);
+      
+      // Formatter la date et l'heure au format 'YYYY-MM-DD HH:mm'
+      const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      };
+      
+      return date.toLocaleString('fr-FR', options); // Utiliser le format français
 }
+
+// Fonction pour afficher/modifier les détails d'un visiteur
+const showDetailsModal = async (uuid) => {
+  if(uuid){
+    detailModal.value = !detailModal.value;
+    loadingDetail.value = true
+    const response = await apiClient(`fvisites/${uuid}`, {
+      headers: {
+        Authorization : `Bearer ${authStore.token}`
+      }
+    })
+
+    if(!response.data.error){
+      data.value = response.data.data
+      console.log("Info-----------: "+JSON.stringify(data.value))
+
+    }else{
+      console.error(response.data)
+    }
+
+  }else{
+    console.error("uuid obligatoire")
+  }
+  loadingDetail.value = false
+  
+};
+
+
+
+
+
+
+const confirmDelete = async (uuid) => {
+  console.log("Uuid ---- "+uuid)
+  if (uuid) {
+    // Afficher la confirmation de suppression
+    Swal.fire({
+      title: 'Êtes-vous sûr?',
+      text: 'Cette action est irréversible!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Oui',
+      cancelButtonText: 'Non',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        // Afficher un indicateur de chargement pendant la suppression
+        const swalLoading = Swal.fire({
+          title: 'Suppression en cours...',
+          text: 'Veuillez patienter.',
+          icon: 'info',
+          showConfirmButton: false,
+          allowOutsideClick: false,  // Empêche de fermer la popup avant la fin du processus
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        try {
+          const response = await apiClient.delete(`fvisites/hdelete/${uuid}`, {
+            headers: {
+              Authorization: `Bearer ${authStore.token}`
+            }
+          });
+
+          if (!response.data.error) {
+            
+            console.log("Sup-----------: " + JSON.stringify(response.data));
+            loadFromServer();
+            // Fermer l'alerte de chargement et afficher une alerte de succès
+            swalLoading.close();
+            Swal.fire('Supprimé!', `${response.data.message}`, 'success');
+          } else {
+            console.error(response.data);
+            swalLoading.close();
+            Swal.fire('Erreur', 'Impossible de supprimer l\'élément', 'error');
+          }
+
+        } catch (error) {
+          swalLoading.close();
+          Swal.fire('Erreur', 'Une erreur est survenue lors de la suppression.', 'error');
+        }
+      }
+    });
+  }
+};
+
+
+
+const rejet = async (uuid) => {
+  console.log("----------",uuid)
+  if (uuid) {
+    // Afficher la confirmation de suppression
+    Swal.fire({
+      title: 'Êtes-vous de vouloir REJETER?',
+      text: 'Cette action est irréversible!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Oui',
+      cancelButtonText: 'Non',
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        // Afficher un indicateur de chargement pendant la suppression
+        const swalLoading = Swal.fire({
+          title: 'Rejet en cours...',
+          text: 'Veuillez patienter.',
+          icon: 'info',
+          showConfirmButton: false,
+          allowOutsideClick: false,  // Empêche de fermer la popup avant la fin du processus
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        try {
+          if (!authStore.token) {
+            Swal.fire('Erreur', 'Vous devez être connecté pour effectuer cette action', 'error');
+            return;
+
+          }
+
+          const response = await apiClient.post(`fvisites/rejet/${uuid}`, null, {
+            headers: {
+              Authorization: `Bearer ${authStore.token}`,  // Le token est bien ajouté ici
+              'Accept': 'application/json',  // Ajoutez cet en-tête pour demander une réponse JSON
+              'X-CSRF-TOKEN': ''  // Si nécessaire, ajoutez le token CSRF
+            },
+          });
+          if (!response.data.error) {
+            
+            console.log("REje-----------: " + JSON.stringify(response.data));
+            loadFromServer();
+            // Fermer l'alerte de chargement et afficher une alerte de succès
+            swalLoading.close();
+            Swal.fire('Supprimé!', `${response.data.message}`, 'success');
+          } else {
+            console.error(response.data);
+            swalLoading.close();
+            Swal.fire('Erreur', 'Impossible de supprimer l\'élément', 'error');
+          }
+
+        } catch (error) {
+          swalLoading.close();
+          console.error( error);
+          Swal.fire('Erreur', 'Une erreur est survenue lors du rejet de la visite.', 'error');
+        }
+      }
+    });
+  }
+};
+
+
+
+
+
+
+
+
+const hideModal = () => {
+  detailModal.value = false
+}
+
 </script>
 
 <style>
-.activeVisiteur {
-  background-color: #007bff; 
-  color: white;
-}
-.largeur{
-  width: 90px;
-  padding: 0;
-}
-.btn-inactive {
-  border: 1px solid gray; /* Bordure grise */
-  background-color: white; /* Fond blanc */
-  color: gray; /* Couleur du texte */
-}
-</style>
+  .customize-table{
+      --easy-table-header-font-size: 14px;
+      --easy-table-body-row-height: 30px;
+      --easy-table-body-row-font-size: 14px;
 
-<style scoped>
-.image-container {
-display: flex;           /* Utilisation de Flexbox */
-flex-wrap: wrap;          /* Permet aux images de se replier si nécessaire */
-justify-content: center;  /* Aligne les images à gauche */
-}
+      --easy-table-header-item-padding: 10px 15px;
 
-.pic {
-margin-right: 10px; /* Espacement entre les images */
-margin-bottom: 10px; /* Espacement vertical entre les images */
-}
+      --easy-table-body-item-padding: 12px 5px;
 
-img {
-max-width: 100%; /* S'assure que les images ne débordent pas */
-height: auto;
-}
-
-.piece:hover {
-cursor: pointer;
-}
-
-
-/* spinner */
-.loading-ellipses {
-  font-size: 40px; /* Taille augmentée */
-  text-align: center;
-  font-weight: bold;
-}
-
-.dot {
-  animation: blink 1s infinite;
-  margin: 0 5px; /* Espacement entre les points */
-}
-
-.dot:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.dot:nth-child(2) {
-  animation-delay: 0.3s;
-}
-
-.dot:nth-child(3) {
-  animation-delay: 0.6s;
-}
-
-@keyframes blink {
-  0%, 20% {
-    opacity: 0;
+      
   }
-  50%, 100% {
-    opacity: 1;
-  }
-}
-/* end spinner */
-
-
 </style>
-

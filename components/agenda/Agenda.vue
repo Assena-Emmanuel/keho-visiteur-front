@@ -34,7 +34,7 @@
       </BRow>
 
       <!-- Modal pour ajouter ou modifier un événement -->
-      <BModal v-model="modalVisible" :title="isEditing ? 'Modifier l\'événement' : 'Ajouter un événement'" hide-footer>
+      <!-- <BModal v-model="modalVisible" :title="isEditing ? 'Modifier l\'événement' : 'Ajouter un événement'" hide-footer>
         <div>
           <BAlert variant="danger"v-model="error" dismissible>
             {{ errorMsg }}
@@ -67,7 +67,8 @@
 
           
         </BForm>
-      </BModal>
+      </BModal> -->
+    
     </BCardBody>
   </BCard>
 </template>
@@ -135,6 +136,7 @@ export default {
       }
       this.modalVisible = true;
     },
+    
     addEvent() {
       if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
         if (!this.selectedDate) {

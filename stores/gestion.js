@@ -9,6 +9,7 @@ export const useGestionStore = defineStore('gestion', {
     categories: [],
     agences: [],
     menus: [],
+    actions: [],
     users: [],
     profils: [],
 
@@ -32,6 +33,9 @@ export const useGestionStore = defineStore('gestion', {
     },
     setProfils(profils) {
       this.profils = profils;
+    },
+    setActions(actions) {
+      this.actions = actions;
     },
     setUsers(user) {
         this.users = user;

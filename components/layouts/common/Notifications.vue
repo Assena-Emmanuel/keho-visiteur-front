@@ -65,10 +65,13 @@ import { useNotifiedStore } from "~/stores/notified";
 import { useAuthStore } from "~/stores/auth.js";
 import apiClient from "~/components/api/intercepteur";
 
+
 const notifiedStore = useNotifiedStore();
 const authUser = useAuthStore()
 const visiteur = ref({})
 const modal = ref(false)
+
+
 
 // Définir une propriété calculée pour obtenir les notifications
 const myNotifs = computed(() => notifiedStore.mynotifs);
@@ -101,6 +104,7 @@ channel.bind("visitor.notified", (data) => {
     nomEmploye: authUser.user.civilite+' '+authUser.user.nom
   }
 
+
   
   // Pousser la nouvelle notification dans mynotifs
   notifiedStore.mynotifs.push(newNotification);
@@ -118,15 +122,7 @@ const showModal = async (notif) =>{
     contact: '',
     nomEmploye: authUser.user.civilite+' '+authUser.user.nom
   }
-  console.log("data-------------------"+notif.id)
-  // const response = await apiClient.get(`/fvisites/${notif.id}`, {
-  //     headers: {
-  //       'Authorization': `Bearer ${authUser.token}`,  
-  //     },
-  // });
-  // if(!response.data.error){
-  //   console.log("data-------------------"+JSON.stringify(response.data.data))
-  // }
+
 
   const response = await apiClient.get(`/user/notifs/${notif.id}/mark-as-read`, {
       headers: {

@@ -29,6 +29,8 @@ type NuxtAppInjections =
   InjectionType<typeof import("../../plugins/vue-awesome-paginate.js").default> &
   InjectionType<typeof import("../../plugins/vue3-datatable.js").default> &
   InjectionType<typeof import("../../plugins/vue-spinners.js").default> &
+  InjectionType<typeof import("../../plugins/vue3-easy-data-table.js").default> &
+  InjectionType<typeof import("../../plugins/vue3-form-wizard.js").default> &
   InjectionType<typeof import("../../plugins/i18n.client.js").default> &
   InjectionType<typeof import("../../plugins/piniaPersistedState.js").default> &
   InjectionType<typeof import("../../plugins/pusher.js").default> &

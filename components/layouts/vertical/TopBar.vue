@@ -6,6 +6,7 @@ import AppList from "~/components/layouts/common/AppList.vue";
 import Notifications from "~/components/layouts/common/Notifications.vue";
 import Profile from "~/components/layouts/common/Profile.vue";
 import { useAuthStore } from '~/stores/auth';
+import apiClient from "~/components/api/intercepteur";
 
 
 export default {
@@ -24,24 +25,42 @@ export default {
       value: null,
       config: useRuntimeConfig(),
       user: null,
+      menus: [],
     };
   },
   components: {
     HederLogo,
-    // AppSearch,
-    // MobileAppSearch,
-    // LanguageDropdown,
     AppList,
     Notifications,
     Profile
   },
-  mounted() {
+  async mounted() {
     this.user = this.authStore.user;
+
+    // Recuperation des menus en fonction du role connecté
+    const response = await apiClient.get(`/menu_by_role/${this.authStore.user.role_id}`, 
+      {
+      headers: {
+          'Authorization': `Bearer ${this.authStore.token}`,  // Utilisation du token d'authentification
+        },
+      })
+
+    if(!response.data.error){
+      this.menus = response.data.filter(item => item.type === 'PARA');
+
+    }else{
+      console.error("Menu error: "+response.message)
+    }
   },
 
-  computed(){
-    this.user = this.authStore.user;
+  computed: {
+    // Accéder à l'utilisateur sans mutation
+    user() {
+      return this.authStore.user;
+    },
+    
   },
+
 
 
   methods: {
@@ -98,12 +117,17 @@ export default {
         </div>
     
         <div class="d-flex gap-3">
-          <LayoutsCommonParametreDropdown/>
+          <LayoutsCommonParametreDropdown v-model:menusParam="menus" v-if="menus.length != 0" />
           <Notifications />
            <div class="d-flex align-items-center">
-            <button @click="toggleRightSidebar" class="btn btn-outline-secondary " v-if="user"  style="width: 100%; padding: 1px 3px;">
-              <img class="rounded-circle header-profile-user" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
+            <button @click="toggleRightSidebar" class="btn btn-outline-secondary" v-if="user"  style="width: 100%; padding: 1px 3px;">
+
+              <img v-if="user.image" class="rounded-circle header-profile-user" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
+              <img v-else-if="!user.image && user.civilite == 'M.' " class="rounded-circle header-profile-user" src="/public/images/office-man.png" alt="Header Avatar" />
+              <img v-else-if="!user.image && user.civilite != 'M.' " class="rounded-circle header-profile-user" src="/public/images/woman.png" alt="Header Avatar" />
+
               <span class="d-none d-xl-inline-block ms-1 fw-medium font-size-15">{{ user.nom + ' ' + user.prenom }}</span>
+
            </button>
            </div>
 

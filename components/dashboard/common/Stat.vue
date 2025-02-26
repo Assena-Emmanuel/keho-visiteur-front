@@ -5,11 +5,11 @@ export default {
   data() {
     return {
       datas: [
-        {titre: "Visiteurs", valeur: 123},
-        {titre: "Visites", valeur: 111},
+        {titre: "Total Visiteurs", valeur: 123},
+        {titre: "Total Visite Visites", valeur: 111},
         // {titre: "Sur RDV", valeur: 0},
         // {titre: "Inopinées", valeur: 0},
-        {titre: "Rejetées", valeur: 12},
+        {titre: "Totals Visites Rejetées", valeur: 12},
       ],
       dataStatic: [
         {imageUrl: '/images/stats/visiteurs.png', couleur: '#60F6FD'},
