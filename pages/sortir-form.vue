@@ -63,7 +63,10 @@
 
                 
             <div class="d-flex justify-content-center mt-4">
-                <BButton @click="handleSortie" variant="outline-primary" style="width: 200px;" id="btnSortie">Sortie</BButton>
+                <BButton @click="handleSortie" variant="outline-primary" style="width: 200px;" id="btnSortie">
+                  <span v-if="!loading">Sortie</span>
+                  <ScaleLoader :loading="loading"  :height="'15px'" :color="'#FFFFFF'" />
+                </BButton>
             </div>
         </BForm>
         </BCardBody>
@@ -77,12 +80,17 @@
     });
   import { useVuelidate } from "@vuelidate/core";
   import { required } from "@vuelidate/validators";
-  import Multiselect from 'vue-multiselect'
+  import apiClient from "../components/api/intercepteur";
+  import Swal from "sweetalert2";
+  import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
+
   
   export default {
-
+    components:{
+      ScaleLoader
+    },
     setup() {
-      return { v$: useVuelidate() };
+      return { v$: useVuelidate()};
     },
     data() {
       return {
@@ -91,24 +99,77 @@
         employ: "",
         submitted: false,
         currentPage: 1,
-
+        loading: false,
         codeVisiteur: null,
 
       };
     },
     methods: {
+      
       nameWithLang ({code}) {
         return `${code}`
       },
-      handleSortie(){
+      async handleSortie(){
         this.submitted = true;
+        this.loading = true
         this.v$.$touch();
         if (this.v$.codeVisite.$error || 
             this.v$.codeVisite.$error
         ) {
             return;
         }else{
-            this.submitted = false
+          try{
+              const response = await apiClient.post("/fvisites/sortie",{
+                  code_visite: this.codeVisite,
+                  code_visiteur: this.codeVisiteur
+                });
+
+              if(!response.data.error){
+                this.submitted = false
+                this.codeVisite = null
+                this.codeVisiteur = null
+                console.log("Sortie----------------: "+JSON.stringify(response.data))
+                Swal.fire({
+                  position: "top",
+                  icon: 'success',
+                  text: "Sortie validée!",
+                  showConfirmButton: false,
+                  timer: 2000,
+                  customClass: {
+                    popup: 'custom-popup',
+                    icon: 'custom-icon',
+                    title: 'custom-title'
+                  }
+                });
+
+              }else{
+                let msg = ""
+                if(response.data.data.code_visiteur){
+                  msg += response.data.data.code_visiteur[0]
+                }
+                if(response.data.data.code_visite){
+                  msg += "\n"+response.data.data.code_visite[0]
+                }
+
+                Swal.fire({
+                  position: "top",
+                  icon: 'error',
+                  text: msg,
+                  showConfirmButton: false,
+                  timer: 2000,
+                  customClass: {
+                    popup: 'custom-popup',
+                    icon: 'custom-icon',
+                    title: 'custom-title'
+                  }
+                });
+              }
+              
+          }catch(e){
+
+          }finally{
+            this.loading = false
+          }
         }
       }
     },

@@ -1,6 +1,25 @@
 <template>
     <BCard no-body>
       <BCardBody>
+        <div class="mt-3 mb-3 ">
+            <multiselect 
+                v-model="codeVisite" 
+                class="w-50"
+                :options="options" 
+                :option-height=31
+                :custom-label="nameWithLang" 
+                placeholder="Selectionnez un employé" 
+                :style="{border: !(submitted && v$.codeVisiteur.$error) && '1px solid #0052a5'}"
+                label="code"
+                track-by="code"
+                :select-label="'sélectionner'"
+                :deselect-label="'désélectionner'"
+                :class="{
+                    'is-invalid': submitted && v$.codeVisiteur.$error,
+                    'border border-danger': submitted && v$.codeVisiteur.$error,
+                }"
+            ></multiselect>
+        </div>
         <BRow>
           <BCol md="">
             <vue-cal
@@ -30,9 +49,11 @@
   import { title } from 'process';
   import VueCal from 'vue-cal';
   import 'vue-cal/dist/vuecal.css';
+  import Multiselect from 'vue-multiselect'
+
   
   export default {
-    components: { VueCal },
+    components: { VueCal, Multiselect },
     data() {
       return {
         date: "2025-02-26",
@@ -59,16 +80,31 @@
         ],
         isEditing: false,
         editingIndex: null,
+        codeVisite: null,
+        options: [
+          {code: 'VTR-001'},
+          {code: 'VTR-002'},
+          {code: 'VTR-101'},
+          {code: 'VTR-211'},
+          {code: 'VTR-777'}
+        ]  
       };
     },
-    computed: {
-    dateToday() {
-      const today = new Date();
-      console.log("Date-------------: "+today.toISOString().split('T')[0])
-      return today.toISOString().split('T')[0]; // "2025-02-26"
+    props: {
+        codeVsiste: String,
     },
+
+    computed: {
+        dateToday() {
+        const today = new Date();
+        console.log("Date-------------: "+today.toISOString().split('T')[0])
+        return today.toISOString().split('T')[0]; // "2025-02-26"
+        },
   },
     methods: {
+        nameWithLang ({code}) {
+        return `${code}`
+      },
       onCellFocus(date) {
         this.selectedDate = new Date(date);
       },
@@ -196,6 +232,7 @@
   };
   </script>
   
+  <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
   <style>
   .event-1 {
     background-color: rgba(232, 245, 233, 0.7) !important;

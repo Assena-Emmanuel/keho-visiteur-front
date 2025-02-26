@@ -167,7 +167,7 @@
                                 <span>---/--/---</span>
                             </div>
                             <div class="mx-5 mb-3 mt-3 planning">
-                                <button class="btn btn-outline-dark fw-bold w-100 rounded-0">
+                                <button class="btn btn-outline-dark fw-bold w-100 rounded-0" @click="onPlanning">
                                     <div class="row">
                                         <div class="col-5 text-start"><i class="uil uil-schedule"></i></div>
                                     <div class="col-7 text-start">Planning</div>
@@ -338,6 +338,10 @@
       }
   }
 
+  const onPlanning = () =>{
+    return navigateTo({ path: "/agenda/agenda" });
+  }
+
   const fetchVisitorData = async () => {
     if (props.uuid) {
       
@@ -379,9 +383,8 @@
               heure_entree: data.fvisite.heure_entree,
               visiteur: data.visiteurs
             };
-            console.log("En delegation-----------------------------: "+JSON.stringify(visiteurs.value.visiteur.length))
           }else{
-            console.log("En delegation-----------------------------: "+JSON.stringify(response.data.data))
+            console.error("En delegation "+JSON.stringify(response.data.data))
 
           }
 
@@ -408,35 +411,9 @@
   const imprimerTicket = async (codeV) => {
     loadingImpression.value = true
     try{
-      try {
-        const response = await apiClient.get(`/fvisites/print/${codeV}`, {
-          headers: {
-            Authorization: `Bearer ${authStore.token}`,
-          },
-          responseType: 'blob',  // Assure-toi que la réponse est traitée comme un blob (fichier binaire)
-        });
-
-        if (response.status === 200) {
-
-          console.log("Ticket imprimé avec succès:", JSON.stringify(response.data));
-          // Créer un objet URL pour ouvrir le PDF dans un nouvel onglet
-          // const fileURL = URL.createObjectURL(response.data);
-
-          // Ouvrir le PDF dans un nouvel onglet
-          window.open(fileURL, '_blank');
-          console.log("Ticket imprimé avec succès:", response.data);
-        } else {
-          console.error("Erreur dans la réponse de l'API");
-        }
-      } catch (error) {
-        console.error("Erreur lors de la requête:", error);
-        if (error.response && error.response.status === 403) {
-          console.error("Problème d'autorisation (CORS ou Token expiré)");
-        } else {
-          console.error("Autre erreur:", error);
-        }
+      if(codeV){
+        window.open(`https://visitors.kehogroupe-ci.com/api/fvisites/print/${codeV}`, '_blank');
       }
-
     }catch(e){
       console.log("Erreur lors de l'impression: "+e)
 

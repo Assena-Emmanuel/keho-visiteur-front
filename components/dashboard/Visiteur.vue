@@ -246,7 +246,7 @@ const headers = [
   { text: "CNI", value: "numero_piece"},
   { text: "Société", value: "entreprise"},
   { text: "Code visiteur", value: "code_visiteur" },
-  { text: "Code visite", value: "code_visite" },
+  { text: "Code visite", value: "code_fvisite" },
   { text: "Employé", value: "employe" },
   { text: "Visite", value: "lib_visite" },
   { text: "H entrée", value: "heure_entree" },
