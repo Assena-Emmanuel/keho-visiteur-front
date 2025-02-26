@@ -169,7 +169,7 @@ export default {
         </div>
         <div class="p-3">
           <div class="text-center">
-            <img v-if="!user.image" class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
+            <img v-if="user.image" class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
             <img v-else-if="!user.image && user.civilite == 'M.' " class="rounded-circle header-profile-user" src="/public/images/office-man.png" alt="Header Avatar" />
             <img v-else-if="!user.image && user.civilite != 'M.' " class="rounded-circle header-profile-user" src="/public/images/woman.png" alt="Header Avatar" />
             

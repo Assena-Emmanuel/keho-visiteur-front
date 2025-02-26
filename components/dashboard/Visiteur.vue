@@ -116,9 +116,19 @@
                   </div>
               </BCol>
               <BCol sm="12" md="1">
-                  <BButton class="mt-4" size="sm">Rechercher</BButton>
+                  <BButton class="mt-4" size="sm" @click="recherche">Rechercher</BButton>
               </BCol>
+            
           </BRow>
+          <div class="d-flex justify-content-end mb-3" style="margin-top: -5px;">
+            <button 
+              @click="resetAction" 
+              :disabled="loadingReset"
+              class="btn btn-outline-primary">
+              <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
+              <i v-else class="fas fa-spinner fa-spin"></i> 
+            </button>
+          </div>
 
         <!-- Table avec pagination -->
         <EasyDataTable
@@ -141,6 +151,16 @@
 
           >
 
+
+          <template #item-lib_statut="item">
+            <span v-if="item.statut == 0" class="text-warning">{{ item.lib_statut }}</span>
+            <span v-if="item.statut == 1" class="text-info">{{ item.lib_statut }}</span>
+            <span v-if="item.statut == 2" class="text-success">{{ item.lib_statut }}</span>
+            <span v-if="item.statut == 3" class="text-danger">{{ item.lib_statut }}</span>
+            <span v-if="item.statut == 4" class="text-success">{{ item.lib_statut }}</span>
+            <span v-if="item.statut == 5" class="text-dark">{{ item.lib_statut }}</span>
+          </template>
+
           <template #item-actions="item">
               <div class="d-flex gap-1">
                 <BButton 
@@ -161,7 +181,7 @@
                   variant="white" 
                   size="sm" 
                   class="d-flex text-primary justify-content-center align-items-center" 
-                  @click="showTicket(row.item)"
+                  @click="showTicket(item.uuid)"
                 >
                   <i class="uil uil-print font-size-15"></i>
                 </BButton>
@@ -234,6 +254,7 @@ const headers = [
   { text: "H Sortie", value: "heure_fin" },
   { text: "Actions", value: "Actions" },
 ];
+const loadingReset = ref(false)
 const permissions = ref([])
 const range = ref([5,10,15,20])
 const items = ref([]);
@@ -244,12 +265,31 @@ const searchValue = ref("");
 const detailModal = ref(false)
 const data = ref([])
 const loadingDetail = ref(false)
+const dateDebut = ref(null)
+const dateFin = ref(null)
 const serverOptions = ref({
   page: 1,
   rowsPerPage: 5,
   sortBy: 1,
   code_employe: '',
 });
+
+
+// reactualiser
+function resetAction(){
+  loadingReset.value = true
+  try{
+    loadFromServer()
+    searchValue.value = null
+    dateDebut.value = null
+    dateFin.value = null
+  }catch{
+    console.error("Erreur de lors de la reactualisation")
+  }finally{
+    loadingReset.value = false
+  }
+  
+}
 
 // Fonction pour charger les données depuis le serveur
 const loadFromServer = async () => {
@@ -299,7 +339,6 @@ const loadFromServer = async () => {
 
   if(!response.data.error){
     permissions.value = response.data
-    console.log("permissionVisiteur----------------: "+JSON.stringify(permissions.value))
 
   }else{
     console.error("Menu error: "+response.message)
@@ -307,6 +346,66 @@ const loadFromServer = async () => {
   }
   
 });
+
+// recherche coté server
+const recherche = async () => {
+  loading.value = true;
+  try {
+    const param = {
+      page: 1,
+      limit: 5,
+      sort_type: null,
+      code_employe: null,
+      date_debut: null,
+      date_fin: null
+    }
+
+    // Vérification si dateDebut et dateFin sont définis
+    if (dateDebut.value != null && dateFin.value != null && searchValue.value == null) {
+      param.sort_type = 3;
+      param.date_debut = dateDebut.value;
+      param.date_fin = dateFin.value;
+      // alert(4); // Retirer si plus nécessaire pour le débogage
+    } 
+    // Vérification si searchValue est défini et pas dateDebut et dateFin
+    else if (dateDebut.value == null && dateFin.value == null && searchValue.value != null) {
+      // alert(2); // Retirer si plus nécessaire pour le débogage
+      param.sort_type = 2;
+      param.code_employe = searchValue.value;
+    } 
+    // Tous les critères sont définis
+    else if (dateDebut.value && dateFin.value && searchValue.value) {
+      param.sort_type = 4;
+      param.date_debut = dateDebut.value;
+      param.date_fin = dateFin.value;
+      param.code_employe = searchValue.value;
+      // alert(4); // Retirer si plus nécessaire pour le débogage
+    }
+
+    // Envoi de la requête à l'API
+    const response = await apiClient.get("/fvisites/lvisite", {
+      params: param,
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    });
+
+    // Vérification de la réponse de l'API
+    if (!response.data.error) {
+      console.log("Réponse reçue:", response.data.data);
+      const data = response.data.data;
+      items.value = data?.data;
+      serverItemsLength.value = response.data.data.total;
+    } else {
+      console.error("Erreur dans la réponse API:", response.data.error);
+    }
+
+  } catch (e) {
+    console.error("Erreur lors de la récupération des données:", e);
+  } finally {
+    loading.value = false;
+  }
+}
 
 // Utilisation de debounce pour éviter des appels rapides au serveur
 watch(serverOptions, (value) => { 
@@ -346,7 +445,6 @@ const showDetailsModal = async (uuid) => {
 
     if(!response.data.error){
       data.value = response.data.data
-      console.log("Info-----------: "+JSON.stringify(data.value))
 
     }else{
       console.error(response.data)
@@ -365,7 +463,6 @@ const showDetailsModal = async (uuid) => {
 
 
 const confirmDelete = async (uuid) => {
-  console.log("Uuid ---- "+uuid)
   if (uuid) {
     // Afficher la confirmation de suppression
     Swal.fire({
@@ -424,7 +521,6 @@ const confirmDelete = async (uuid) => {
 
 
 const rejet = async (uuid) => {
-  console.log("----------",uuid)
   if (uuid) {
     // Afficher la confirmation de suppression
     Swal.fire({
@@ -466,8 +562,6 @@ const rejet = async (uuid) => {
             },
           });
           if (!response.data.error) {
-            
-            console.log("REje-----------: " + JSON.stringify(response.data));
             loadFromServer();
             // Fermer l'alerte de chargement et afficher une alerte de succès
             swalLoading.close();
@@ -489,7 +583,11 @@ const rejet = async (uuid) => {
 };
 
 
-
+const showTicket = async (uuid) =>{
+  if(uuid){
+    return navigateTo(`/visiteur/visiteurVisite/${uuid}`)
+  }
+}
 
 
 

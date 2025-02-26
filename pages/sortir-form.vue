@@ -3,12 +3,17 @@
       
       <BCard
       border-variant="primary"
-      style="background-color: white; width: 500px; margin-top: 15em;" id="qr-topbar"
+      style="background-color: white; width: 500px; margin-top: 10em;" id="qr-topbar"
       >
-
+        <BCardHeader style="background-color: none;">
+          <div class="d-flex justify-content-center">
+            <div>
+              <img src="/images/total-removebg.png" width="100" height="100" alt="logo-light" />
+            </div>
+          </div>
+        </BCardHeader>
       
 
-      <!-- <BCard no-body class="border-0" title="Je m'identifie" style="background-color: white;" id="qr-topbar"> -->
         <BCardBody>
           <BForm>
 
