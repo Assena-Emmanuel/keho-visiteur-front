@@ -21,5 +21,6 @@ export default {
 <template>
   <SiteHeader :title="title" />
   <PageHeader :title="title" :items="items" />
+  
   <DashboardVisiteur />
 </template>

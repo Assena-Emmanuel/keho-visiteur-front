@@ -1,43 +1,45 @@
 <script setup>
-import { ref,  onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import apiClient from "~/components/api/intercepteur";
 import { useAuthStore } from "~/stores/auth.js";
 
-
 // Props
 const props = defineProps({
-  id : Number,
+  id: Number,
 });
 
-// Reactive
-const detailDept = ref({})
+// Reactive variables
+const detailDept = ref({});
 const loading = ref(false);
+const errorMessage = ref(""); // Nouvelle variable pour gérer les erreurs
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
-// recuperer les infos du user
+// Récupérer les infos du user au montage du composant
 onMounted(async () => {
-
-loading.value = true
-try {
+  loading.value = true;
+  errorMessage.value = ""; // Réinitialiser le message d'erreur
+  try {
     const response = await apiClient.get(`/categorie/${props.id}`, {
       headers: { 
         'Authorization': `Bearer ${authStore.token}`, 
-      }
+      },
     });
 
     if (!response.data.error) {
-        detailDept.value = response.data.data; 
+      detailDept.value = { ...response.data.data }; // Copier les données de manière sécurisée
+
     }
 
-} catch (error) {
-    console.error('Erreur durant la recuperation du departement:', error);
-}finally{
-    loading.value = false
-}
-})
-
+  } catch (error) {
+    console.error('Erreur durant la récupération du département:', error);
+    errorMessage.value = "Une erreur est survenue lors de la récupération des données.";
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
+
 
 <template>
     <!-- Détail Département -->
@@ -55,8 +57,13 @@ try {
         <div class="text-primary h5">
             <i class="fas fa-building me-2"></i> Département: <span class="fw-bold">{{ detailDept.libelle }}</span>
         </div>
-        <div class="text-primary h5">
+        <div class="d-flex justify-content-between">
+          <div class="h5">
             <i class="fas fa-hashtag me-2"></i> Code: <span class="fw-bold badge text-bg-info">{{ detailDept.code }}</span>
+          </div>
+          <div class="h5">
+            <i class="fas fa-hashtag me-2"></i> Slug: <span class="fw-bold badge text-bg-info">{{ detailDept.slug }}</span>
+          </div>
         </div>
         </div>
 
@@ -68,21 +75,14 @@ try {
 
         <!-- Liste des services -->
         <ul class="list-group">
-        <li class="list-group-item d-flex justify-content-between align-items-center">
+        <li v-if="detailDept.children" v-for="service in detailDept.children" class="list-group-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-            <i class="fas fa-laptop-code me-3 text-muted"></i>
-            <strong>Informatique</strong>
+            <span>*</span>
+            <strong>{{ service.libelle }}</strong>
             </div>
-            <span class="badge bg-secondary rounded-pill">SEV003</span>
+            <span class="badge bg-secondary rounded-pill">{{ service.slug }}</span>
         </li>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-            <i class="fas fa-code me-3 text-muted"></i>
-            <strong>Développement</strong>
-            </div>
-            <span class="badge bg-secondary rounded-pill">SEV005</span>
-        </li>
-        <!-- Ajoutez d'autres services ici si nécessaire -->
+
         </ul>
     </div>
     </div>

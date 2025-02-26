@@ -2,12 +2,13 @@ import { useAuthStore } from "~/stores/auth.js";
 
 export default defineNuxtRouteMiddleware((to, from) => {
   
-  const publicPages = ["/login", "/register", "/forgot-password", "/otp", "/reset-password", "/visiteur-form", "/visiteur-save", "/qrcode", "/form-sortie"];
+  const publicPages = ["/login", "/register", "/forgot-password", "/otp", "/reset-password", "/visiteur-form", "/visiteur-save", "/qrcode", "/form-sortie", "/form-sortie-new", "recapitulatif"];
   const authPage = !publicPages.includes(to.fullPath);
 
   if (typeof window !== "undefined") {
-    const token = useCookie('token');
-    if (authPage && !token.value) {
+    const authStore = useAuthStore()
+
+    if (authPage && !authStore.token) {
       return navigateTo({ path: "/login" });
     }
 

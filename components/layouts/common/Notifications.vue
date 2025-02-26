@@ -23,7 +23,10 @@
     </div>
 
     <!-- Popup de la notification -->
-    <DashboardNotification :afficherModalNotification="false" />
+    <DashboardNotification
+      v-model:afficher-modal-notification="modal"
+      v-model:visiteur="visiteur"
+    />
 
     <div style="max-height: 230px" data-simplebar class="bg-danger">
       <template v-if="myNotifs.length > 0">
@@ -32,6 +35,7 @@
           :key="notif.id"
           href="#"
           class="text-reset notification-item"
+          @click="showModal(notif)"
         >
           <div class="media d-flex">
             <div class="media-body">
@@ -48,23 +52,32 @@
       </template>
     </div>
   </BDropdown>
+
+  <!-- Modal détail visiteur -->
+  
+  <!-- <DashboardNotification :afficher-modal-notification="modal" /> -->
 </template>
 
 <script setup>
+
 import { computed, onMounted } from "vue";
 import { useNotifiedStore } from "~/stores/notified";
 import { useAuthStore } from "~/stores/auth.js";
+import apiClient from "~/components/api/intercepteur";
+
 
 const notifiedStore = useNotifiedStore();
+const authUser = useAuthStore()
+const visiteur = ref({})
+const modal = ref(false)
+
+
 
 // Définir une propriété calculée pour obtenir les notifications
 const myNotifs = computed(() => notifiedStore.mynotifs);
 
 // Utilisateur connecté
-const user = useAuthStore()
-const id = parseInt(user.id, 10);
-
-const userId = id;
+const userId = parseInt(authUser.user.id, 10);
 
 const pusher = useNuxtApp().$pusher;
 let channel;
@@ -74,7 +87,7 @@ onMounted(() => {
   notifiedStore.getNotification();
 });
 
-channel = pusher.subscribe(`App.User.${userId}`);
+channel = pusher.subscribe(`App.Models.User.${userId}`);
 channel.bind("visitor.notified", (data) => {
   const newNotification = {
     id: data.id,
@@ -82,7 +95,50 @@ channel.bind("visitor.notified", (data) => {
     message: data.message,
   };
 
+  modal.value = true
+  visiteur.value = {
+    id: data.id,
+    nom: data.visitor_nom+" "+data.visitor_prenom ,
+    entreprise: 'KEHO GROUPE',
+    contact: '07 07 07 07 00',
+    nomEmploye: authUser.user.civilite+' '+authUser.user.nom
+  }
+
+
+  
   // Pousser la nouvelle notification dans mynotifs
   notifiedStore.mynotifs.push(newNotification);
 });
+
+
+
+const showModal = async (notif) =>{
+  modal.value = !modal.value
+  
+  visiteur.value = {
+    id: notif.id,
+    nom: notif.visitor_nom+" "+notif.visitor_prenom ,
+    entreprise: '',
+    contact: '',
+    nomEmploye: authUser.user.civilite+' '+authUser.user.nom
+  }
+
+
+  const response = await apiClient.get(`/user/notifs/${notif.id}/mark-as-read`, {
+      headers: {
+        'Authorization': `Bearer ${authUser.token}`,  
+      },
+  });
+
+  if(response.data.error){
+    console.log("Erreur "+response.data.message)
+  }else{
+    notifiedStore.getNotification();
+  }
+
+}
+
+
+
 </script>
+

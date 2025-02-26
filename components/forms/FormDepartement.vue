@@ -4,8 +4,17 @@ import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import { useAuthStore } from "~/stores/auth.js";
 import apiClient from '~/components/api/intercepteur';
+import { useGestionStore } from "~/stores/gestion.js";
+import { useApi } from '~/components/api/useApi';
+import Swal from "sweetalert2";
+
+
 
 const authStore = useAuthStore()
+const gestionStore = useGestionStore()
+const SLUG = "DPT"
+
+const { getCategorieBySlug, createResource } = useApi(authStore.token);
 
 // Déclaration des props
 const props = defineProps({
@@ -21,15 +30,24 @@ const emit = defineEmits(["update:isOpen", "update:id"]);
 // Variables réactives
 const libelleDepartement = ref("");
 const codeDepartement = ref("");
-const slug = ref("");
+const slug = ref("DPT");
 const statut = ref("");
 const categorie = ref("");
 const submitted = ref(false);
 const loading = ref(false);
 const loadingEdit = ref(false);
+const loadingAdd = ref(false);
 const departementPrincipale = ref("");
 const selectDepartements = ref({})
+const errorMessage = ref("")
+const erreur = ref(false)
 
+const ediData = ref({
+  libelle:null,
+  slug:null,
+  code:null,
+  statut:null,
+})
 
 // Validation avec Vuelidate
 const rules = computed(() => ({
@@ -40,12 +58,68 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, { libelleDepartement, codeDepartement, slug });
 
+
+function alertMessage(message, icon = "error") {
+    Swal.fire({
+      position: "top",
+      icon,
+      text: message,
+      showConfirmButton: false,
+      timer: 2000,
+      customClass: {
+        popup: 'custom-popup',
+        icon: 'custom-icon',
+        title: 'custom-title'
+      }
+    });
+  }
+
 // Méthodes
-const onSaveDepartement = () => {
+const onSaveDepartement = async () => {
   submitted.value = true;
   v$.value.$touch();
+
   if (v$.value.libelleDepartement.$error || v$.value.codeDepartement.$error) {
+    alert()
     return;
+
+  }else{
+    loadingAdd.value = true
+
+    try{
+      const formData = {
+      libelle: libelleDepartement.value,
+      slug: slug.value,
+      code: codeDepartement.value,
+      position: 1,
+      statut: statut.value || 1,
+      categorie_id: null, 
+
+    };
+      
+      const response = await createResource("categorie", formData);
+
+      if (!response.data.error) {
+        const data = await getCategorieBySlug(SLUG);
+        gestionStore.setDepartements(data.data.data)
+        alertMessage(data.data.message, 'success')
+        resetForm();  
+
+
+      } else {
+        erreur.value = true
+        errorMessage.value = "Creation echouée !";
+        console.error(response.data.message);
+
+      }
+    }catch(error){
+      console.error("error creer : "+error.message);
+
+    }finally{
+      loadingAdd.value = false
+      erreur.value = false
+    }
+    
   }
 };
 
@@ -72,48 +146,84 @@ watch(
   { immediate: true }  // Lance le watch dès que possible, même si la prop est déjà présente
 );
 
+// Fonction de mise à jour du département
 const onUpdateDepartement = async () => {
   submitted.value = true;
-  v$.value.$touch();
-  if (v$.value.libelleDepartement.$error || 
-    v$.value.codeDepartement.$error || 
-    v$.value.slug.$error 
-  ) {
-    return;
-  }else{
-    loadingEdit.value = true;
-    try {
-      // Effectuer l'appel API pour récupérer les données de l'utilisateur
-      const formData = new FormData();
-      formData.append('libelle', libelleDepartement.value);
-      formData.append('slug', slug.value);
-      formData.append('code', codeDepartement.value);
-      formData.append('position', 0);
-      formData.append('statut', statut.value);
-      formData.append('categorie_id', departementPrincipale.value || 0);
+  v$.value.$touch(); // Marquer tous les champs comme touchés pour activer la validation
 
-      const response = await apiClient.post(`/categorie/${props.id}`, formData, {
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`,  // Utilisation du token d'authentification
-        }
-      });
+  // Vérification des erreurs de validation
+  if (v$.value.$invalid) {
+    return; // Si des erreurs existent, on arrête la fonction
+  }
+
+  loadingEdit.value = true;
+  try {
+    // Préparation des données à envoyer via FormData
+    const formData = new FormData();
+    formData.append('slug', slug.value);
+    formData.append('code', codeDepartement.value);
+    formData.append('position', 1);  // Exemple de valeur pour position
+    formData.append('statut', statut.value);
+
+
+
+    // Si la valeur de libelle a changé, on l'ajoute au formData
+    if (ediData.value.libelle !== libelleDepartement.value) {
+      formData.append('libelle', libelleDepartement.value);
+    }
+
+    // Appel API pour mettre à jour le département
+    const response = await apiClient.put(`/categorie/${props.id}`, formData, {
+      headers: {
+        'Authorization': `Bearer ${authStore.token}`,  // Utilisation du token d'authentification
+      },
+    });
+
     // Vérification de la réponse
     if (!response.data.error) {
-        successmsg(response.data.message);  
-        resetForm(); 
-      } else {
-        console.error("Erreur lors de la mise à jour de l'utilisateur:", response.data.error);
-
-      }
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour du departement :", error);
-
-    } finally {
-      // Fin du processus de chargement
-      loadingEdit.value = false;
+      console.log("Modification réussie : ", response.data.message);
+      departements();  // Recharger les départements après la mise à jour
+      erreur.value = false;  // Réinitialiser l'état d'erreur
+      resetForm();  // Réinitialiser le formulaire après une mise à jour réussie
+    } else {
+      // Si une erreur se produit dans la réponse de l'API
+      erreur.value = true;
+      errorMessage.value = "Mise à jour échouée !";
+      console.error(response.data.message);
     }
+
+  } catch (error) {
+    // Gestion des erreurs si l'appel API échoue
+    errorMessage.value = "Échec de mise à jour !";
+    console.error(errorMessage.value, error);
+  } finally {
+    // Fin du processus de chargement, que l'appel réussisse ou échoue
+    loadingEdit.value = false;
   }
 };
+
+
+// Obtenir tous les departements
+const departements = async () => {
+    try {
+        const slug = "DPT";
+        const response = await apiClient.get(`/categorie_by_slug/${slug}`, {
+            headers: {
+                'Authorization': `Bearer ${authStore.token}`,
+            },
+        });
+
+        if (!response.data.error) {
+            gestionStore.setDepartements(response.data.data);
+        }
+    } catch (error) {
+        if (error.response && error.response.status === 401) {
+            console.error("Erreur 401 : Jeton invalide ou utilisateur non authentifié.");
+        } else {
+            console.error("Erreur lors de la récupération des départements :", error);
+        }
+    } 
+  }
 
 // Fonction asynchrone pour récupérer l'utilisateur par uuid
 async function getCategorie(id) {
@@ -131,7 +241,9 @@ async function getCategorie(id) {
       codeDepartement.value = response.data.data.code
       statut.value = response.data.data.statut
       departementPrincipale.value = response.data.data.categorie_id
-      console.log('-------------------------- cat: '+JSON.stringify(response.data.data))
+
+      // conserver une copie des infos afin de verifier qu'est ce qui changé lors de la mise a jour
+      ediData.value.libelle = response.data.data.libelle
     }
   } catch (error) {
     console.error('Erreur durant la recuperation de la categorie:', error);
@@ -161,6 +273,7 @@ const resetForm = () => {
   codeDepartement.value = "";
   slug.value = "";
   submitted.value = false;
+  erreur.value = false
   
   emit("update:isOpen", false);
   emit("update:id", null);
@@ -179,6 +292,7 @@ const resetForm = () => {
       :title="isEditMode ? `Modifier le département ` : 'Création du département'" 
       title-class="font-18" 
       hide-footer
+      no-close-on-backdrop
   >
 
   <div v-if="loading" class="loading-ellipses">
@@ -188,6 +302,9 @@ const resetForm = () => {
   </div>
 
   <BForm v-else class="form-vertical px-3" role="form">
+    <div class="alert alert-danger" v-if="erreur">
+      {{ errorMessage }}
+    </div>
 
     <div class="row mb-3">
       <div class="col-sm-8 col-md-8">
@@ -250,6 +367,7 @@ const resetForm = () => {
         <input 
           v-model="slug" 
           id="code" 
+          disabled
           class="form-control form-control-sm"  
           type="text"
           :class="{
@@ -266,7 +384,7 @@ const resetForm = () => {
     </div>
 
 
-    <div class="mb-3">
+    <!-- <div class="mb-3">
       <label for="departement" style="font-size: 12px">Département Principal</label>
       <div class="input-group">
         <select v-model="departementPrincipale" id="departement" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example"
@@ -284,10 +402,11 @@ const resetForm = () => {
 
         </select>
       </div>
-    </div>
+    </div> -->
 
     <div class="mt-4 d-flex justify-content-center">
-      <BButton v-if="!isEditMode" @click="onSaveDepartement" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
+      <BButton :loading="loadingAdd" 
+      loading-text="enregistrement" v-if="!isEditMode" @click="onSaveDepartement" variant="primary" class="w-sm waves-effect waves-light btn btn-sm" >
         Enregistrer
       </BButton>
       <BButton 

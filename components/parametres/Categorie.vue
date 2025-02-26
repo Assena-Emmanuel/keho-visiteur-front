@@ -1,109 +1,133 @@
 <script>
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
-export default{
+import { useAuthStore } from "~/stores/auth.js";
+import { useGestionStore } from "~/stores/gestion.js";
+import { useApi } from '~/components/api/useApi';
+
+export default {
     setup() {
-        return { v$: useVuelidate() };
-    },
-    data(){
-        return{
-        title: 'Liste des Catégories',
-        modal: false,
-        isEditMode: false,  // Mode de modification ou ajout
-        selectedIndex: null,  // Index de l'élément sélectionné pour la modification
-        data: [
-  {
-    "Slug": "homepage",
-    "Code": "HP001",
-    "Libellé": "Accueil",
-    "Catégorie": "Page",
-    "Position": 1,
-    "Statut": "Actif"
-  },
-  {
-    "Slug": "about-us",
-    "Code": "AB002",
-    "Libellé": "À propos",
-    "Catégorie": "Page",
-    "Position": 2,
-    "Statut": "Actif"
-  },
-  {
-    "Slug": "contact",
-    "Code": "CT003",
-    "Libellé": "Contact",
-    "Catégorie": "Page",
-    "Position": 3,
-    "Statut": "Inactif"
-  },
-  {
-    "Slug": "services",
-    "Code": "SV004",
-    "Libellé": "Services",
-    "Catégorie": "Section",
-    "Position": 4,
-    "Statut": "Actif"
-  },
-  {
-    "Slug": "blog",
-    "Code": "BL005",
-    "Libellé": "Blog",
-    "Catégorie": "Section",
-    "Position": 5,
-    "Statut": "Inactif"
-  },
-  {
-    "Slug": "careers",
-    "Code": "CR006",
-    "Libellé": "Carrières",
-    "Catégorie": "Section",
-    "Position": 6,
-    "Statut": "Actif"
-  }
-]
-,
-        fields: [
-            {key: "Slug"},
-            {key: "Code"},
-            {key: "Libellé"},
-            {key: "Catégorie"},
-            {key: "Position"},
-            {key: "Statut"},
+        const gestionStore = useGestionStore();
+        const authStore = useAuthStore();
+        const v$ = useVuelidate();
+        const  { getAll,  } = useApi(authStore.token)
+
+        // Variables réactives
+        const title = 'Liste des categories';
+        const modal = ref(false);
+        const formData = ref({});
+        const rowSelect = ref(null);
+        const isEditMode = ref(false);
+        const selectedIndex = ref(null);
+        const data = ref([]);
+        const fields = ref([]);
+        const isLoading = ref(false);
+
+        const openModal = (isEditMode, data) => {
+            isEditMode.value = isEditMode;
+            modal.value = true;
+            formData.value = data;
+        };
+
+        const openAddModal = () => {
+            modal.value = !modal.value;
+            isEditMode.value = false;
+        };
+
+        const categories = async () => {
+        fields.value = [
+            {key: "slug"},
+            {key: "libelle" },
+            {key: "code"},
+            {key: "statut"},
             {key: "Actions"},
         ]
-    }
+
+            if (gestionStore.categories.length === 0) {
+              try {
+                  isLoading.value = true;
+                  const response = await getAll("categorie")
+
+                  if (!response.error) {
+                    gestionStore.setCategories(response.data);
+
+                  }
+              } catch (error) {
+                  if (error.response && error.response.status === 401) {
+                      console.error("Erreur 401 : Jeton invalide ou utilisateur non authentifié.");
+
+                  } else {
+                      console.error("Erreur lors de la récupération des profild :", error);
+
+                  }
+              } finally {
+                  isLoading.value = false;
+                  
+              }
+            }
+        };
+
+        // Appeler categories au montage du composant
+        onMounted(categories);
+
+        return {
+            v$,
+            authStore,
+            gestionStore,
+            title,
+            modal,
+            formData,
+            rowSelect,
+            isEditMode,
+            selectedIndex,
+            data,
+            fields,
+            isLoading,
+            openModal,
+            openAddModal,
+            categories,
+        };
     },
-    props:{
-            typeForme: String,
+
+    props: {
+        typeForme: String,
+    },
+
+    validations: {
+        libelleDepartement: {
+            required,
         },
+        codeDepartement: {
+            required,
+        },
+    },
 
     methods: {
-        openModal(isEditMode, index = null, type) {
-            this.isEditMode = isEditMode;
-            this.selectedIndex = index;
-            this.modal = true; 
-            this.typeForme = type
+        handleDataSelected(payload) {
+            this.selectedIndex = payload.id;
+            this.modal = true;
+            this.isEditMode = !!payload.id;
+
         },
 
-        openAddModal(){
-            this.modal = !this.modal
-            this.isEditMode = false
-        }
+        updateEditMode(value) {
+            this.isEditMode = value;
+        },
 
-    }
-    
-}
+        
+    },
+};
 </script>
+
 <template>
     <div>
     <div class="d-flex justify-content-between">
-        <div class="mb-0">Gestion des Catégories</div>
-        <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
-        <FormsFormCategorie 
-            :modelValue="modal"
-            @update:modelValue="modal = $event"
-            :isEditMode="isEditMode"
-            :selectedIndex="selectedIndex" 
+        <div class="mb-0">Gestion des Categories</div>
+        <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong> </BButton>
+
+        <FormsFormCategorie
+            v-model:isOpen="modal"
+            v-model:id="selectedIndex"
         />
 
     </div>
@@ -111,11 +135,17 @@ export default{
 
     <Tableau 
         :fields="fields" 
-        :data="data" 
         :title="title" 
         :show-addbtn="true" 
         :typeForme="'categorie'" 
-        @edit="openModal(true, $event.index, $event.type)"
+        :is-loading="isLoading"
+        @edit="openModal(true, $event)"
+        @data-selected="handleDataSelected"
     />
 </div>
 </template>
+
+
+
+
+

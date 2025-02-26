@@ -1,12 +1,19 @@
 <template>
-    <BModal @update:modelValue="afficherModalNotification = $event" :modelValue="afficherModalNotification" title="Notification et envoi du visiteur" hide-footer>
+    <BModal 
+      :modelValue="afficherModalNotification" 
+      title="Notification et envoi du visiteur" 
+      hide-footer
+      no-close-on-backdrop
+      @hide="hide"
+      @update:modelValue="updateModalVisibility"
+    >
       <div class="d-flex justify-content-center gap-3 pb-2">
         <div style="height: 100%;">
           <BImg thumbnail fluid src="/images/pages/personne.png" width="140" height="100" alt="Image 1" />
         </div>
         <div >
           <div>
-            <p>Bonjour monsieur <strong>{{ nomEmploye }}</strong><br>Vous avez un visiteur en Salle</p>
+            <p>Bonjour monsieur <strong>{{ visiteur.nomEmploye }}</strong><br>Vous avez un visiteur en Salle</p>
           </div>
           <div>
             <div class="d-flex justify-content-between line font-size-12 line">
@@ -28,22 +35,19 @@
       </div>
     </BModal>
 </template>
-<script>
-    export default {
-        data(){
-            return{
-                nomEmploye: 'KOUADIO Konan Jean',
-                visiteur: {
-                nom: 'Koffi Jean',
-                entreprise: 'KEHO GROUPE',
-                contact: '07 07 07 07 00'
-                },
-            }
-        },
-        props:{
-          afficherModalNotification: Boolean,
-        }
-    }
+<script setup>
+  import { defineModel, ref, watch } from 'vue';
+
+  const afficherModalNotification = defineModel('afficherModalNotification')
+  const visiteur = defineModel('visiteur')
+
+  const hide = () =>{
+    afficherModalNotification.value = false
+    visiteur.value = {}
+
+    return navigateTo({ path: "/mes-visiteurs" });
+  }
+
 </script>
 <style>
 .line{

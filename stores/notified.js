@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 import { useAuthStore } from "~/stores/auth.js";
+import apiClient from "~/components/api/intercepteur";
 
 export const useNotifiedStore = defineStore("notified", {
   state: () => ({
@@ -10,9 +11,7 @@ export const useNotifiedStore = defineStore("notified", {
   actions: {
     async getNotification() {
       const authToken = useAuthStore()
-
-      const response = await axios.get(
-        `${useRuntimeConfig().public.API_URL}/user/notifs`,
+      const response = await apiClient.get(`user/notifs`,
         {
           headers: {
             Authorization: `Bearer ${authToken.token}`, // Ajoutez le token Bearer ici
@@ -21,27 +20,30 @@ export const useNotifiedStore = defineStore("notified", {
         }
       );
 
+      this.notifications = []
+      this.mynotifs = []
+
       if (response.status === 200) {
        // this.notifications = response.data;
+       
        let notifs = JSON.parse(JSON.stringify(response.data));
 
        if(parseInt(notifs.code)===1){
-        
-        this.notifications.push(...notifs.data);
 
+        this.notifications.push(...notifs.data);
+       
         this.mynotifs = this.notifications.map(notification => notification.data);
      
-
-
        }
     
-        
-       
       } else {
         console.error("Error fetching notifications: " + response.status);
+
       }
 
      
     },
+
+
   },
 });

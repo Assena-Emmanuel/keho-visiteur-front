@@ -2,290 +2,151 @@
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
 import apiClient from "~/components/api/intercepteur";
-import { useUserStore } from '@/stores/user';
+import { useAuthStore } from '@/stores/auth';
+import { useApi } from '~/components/api/useApi';
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 
 export default {
   setup() {
-    const authStore = useAuthStore(); // Initialisation du store
-    const config = useRuntimeConfig();
+    const authStore = useAuthStore();
+    const v$ = useVuelidate();
+    const {getAll, getById} = useApi(authStore.token)
 
-      return { v$: useVuelidate(), authStore, config  };
-    },
+    return { v$, authStore, getAll, getById, ADMIN:1, };
+  },
+
   data() {
     return {
       progressBarValue: 34,
       activeTab: 1,
       activeTabArrow: 2,
       activeTabprofessionnelle: false,
-      selectDepartements:"",
-      selectServices:"",
-      token : "",
-      user: "",
+      selectDepartements: "",
+      selectServices: "",
       show: false,
-      // infos personnelles
-        test : "",
-        nom: "",
-        prenom: "",
-        civilite: "",
-        email : "",
-        civilite: "",
-        mobile1: "",
-        mobile2: "",
-        photo: "",
-        // infos professionnelles
-        matricule: "",
-        codeVisite: "",
-        userDepartement: "",
-        userService: "",
-        processing: false,
-        submitted: false,
-        next: false,
-        statut: ""
+      loading: false,
+      token: "",
+      user: "",
+      test: "",
+      nom: "",
+      prenom: "",
+      civilite: "",
+      email: "",
+      mobile1: "",
+      mobile2: "",
+      photo: "",
+      matricule: "",
+      codeVisite: "",
+      userDepartement: "",
+      userService: "",
+      submitted: false,
+      next: false,
+      statut: ""
     };
   },
-  computed:{
+  
+  computed: {
     user() {
       return this.authStore.user;
     }
   },
+
   validations: {
-      email: {
-        required,
-        email
-      },
-      nom: {
-        required,
-      },
-      prenom: {
-        required,
-      },
-      civilite: {
-        required,
-      },
-      mobile1: {
-        required,
-      },
-      matricule:{
-        required
-      },
-      codeVisite: {
-        required
-      },
-      userDepartement:{
-        required
-      },
-      userService: {
-        required
-      },
-      photo:{required},
-      statut: {required},
-
-    },
-
-    mounted() {
-    this.show = true
-    this.token = useCookie('token')
-    const userStore = useUserStore()
-    this.user = userStore.user
-
-    this.test = this.user.visite.matricule
-    this.civilite = this.user.civilite
-    this.nom = this.user.nom
-    this.prenom = this.user.prenom
-    this.email = this.user.email
-    this.mobile1 = this.user.telephone1
-    this.mobile2 = this.user.telephone2
-    this.statut = this.user.statut
-    this.photo = this.user.image
-
-    // Info professionnelles
-    this.matricule = this.user.visite.matricule || ""
-    this.codeVisite = this.user.visite.code_visite || ""
-    this.userService = this.user.visite.service_id
-    this.userDepartement = this.user.visite.departement_id
-
-    // recuperer tous les departement
-    this.toutesCategories("DPT")
-    .then(departements => {
-      this.selectDepartements = departements;
-    })
-    .catch(error => {
-      console.error('Erreur lors de la récupération du departement:', error);
-    });
-
-    // recuperer tous les departement
-    this.toutesCategories("SRV")
-    .then(services => {
-      this.selectServices = services;
-    })
-    .catch(error => {
-      console.error('Erreur lors de la récupération du service:', error);
-    });
-
-
-
-    this.show = false
+    email: { required, email },
+    nom: { required },
+    prenom: { required },
+    civilite: { required },
+    mobile1: { required },
+    matricule: { required },
+    codeVisite: { required },
+    userDepartement: { required },
+    userService: { required },
+    photo: { required },
+    statut: { required }
   },
-  computed(){
-    const userStore = useUserStore()
-    this.user = userStore.user
+
+  async mounted() {
+    this.loading = true;
+    this.user = this.authStore.user;
+    this.token = this.authStore.token;
+
+    this.initializeUserInfo();
+    this.fetchCategories();
+
+    this.loading = false;
   },
 
   methods: {
-    updateUserInfo(user) {
-      this.civilite = user.civilite || "";  // Mise à jour de la civilité
-      this.nom = user.nom || "";  // Mise à jour du nom
-      this.prenom = user.prenom || "";  // Mise à jour du prénom
-      this.email = user.email || "";  // Mise à jour de l'email
-      this.mobile1 = user.telephone1 || "";  // Mise à jour du premier numéro de téléphone
-      this.mobile2 = user.telephone2 || "";  // Mise à jour du deuxième numéro de téléphone
-      this.statut = user.statut || "";  // Mise à jour du statut
+    async onDepartement(){
+      if(this.userDepartement){
+        try{
+          const response = await this.getById("categorie", departement.value )
+          if(!response.error){
+            this.selectServices = response.data.children
+          }
+        }catch(e){
 
-      // Informations professionnelles
-      this.matricule = user.visite ? user.visite.matricule : ""
-      this.codeVisite = user.visite ? user.visite.code_visite :  ""
-      this.userService = user.visite ? user.visite.service_id :  ""
-      this.userDepartement = user.visite? user.visite.departement_id :  ""
+        }
+      }
+    },
+    initializeUserInfo() {
+      
+      const user = this.authStore.user;
+      if (user) {
+        
+        this.civilite = user.civilite;
+        this.nom = user.nom;
+        this.prenom = user.prenom;
+        this.email = user.email;
+        this.mobile1 = user.telephone1;
+        this.mobile2 = user.telephone2;
+        this.statut = user.statut;
+        // this.photo = user.image;
+        this.matricule = user.visite ? user.visite.matricule : "";
+        this.codeVisite = user.visite ? user.visite.code_visite : "";
+        this.userService = user.visite ? user.visite.service_id : "";
+        this.userDepartement = user.visite ? user.visite.departement_id : "";
+      }
     },
 
-    toggleWizard(tab, value) {
-      this.activeTab = tab;
-      this.progressBarValue = value;
+    async fetchCategories() {
+      try {
+        const [departements, services] = await Promise.all([
+          this.toutesCategories("DPT"),
+          this.toutesCategories("SRV")
+        ]);
+        this.selectDepartements = departements;
+        this.selectServices = services;
+      } catch (error) {
+        console.error("Erreur lors de la récupération des catégories:", error);
+      }
     },
-
 
     async toutesCategories(slug) {
       try {
-        const response = await apiClient.get(`/categorie_by_slug/${slug}`, {},{
+        const response = await apiClient.get(`/categorie_by_slug/${slug}`, {
           headers: {
-            'Authorization': `Bearer ${this.token}`,
+            'Authorization': `Bearer ${this.token}`
           }
         });
-         if(!response.data.error){
-          return response.data.data
-         }
-
-      } catch (error) {
-        console.error('Error fetching Departement-----:', error);
-      }
-    },
-
-
-    async categorie(id) {
-      try {
-        console.log(`Requête API pour la catégorie avec l'ID : ${id}`);
-        console.log(`Token utilisé : ${this.token}`);
-
-        const response = await apiClient.get(`/categorie/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${this.token}`,
-          }
-        });
-
         if (!response.data.error) {
-          return response.data.data.libelle;
+          return response.data.data;
         }
       } catch (error) {
-        console.error('Erreur lors de la récupération du service :', error);
+        console.error(`Erreur lors de la récupération des catégories (${slug}):`, error);
       }
-    }
-,
-
-    // SweetAlert
-    // successmsg() {
-    //   this.$swal.fire("Succes!", "Modification reussie!", "success");
-    // },
-
-    successmsg() {
-      this.$swal.fire("Succes!", "Modification réussie!", "success")
-        .then(() => {
-          this.activeTabprofessionnelle = false
-          this.next = false
-          this.toggleWizard(1, 100)
-
-          // const userStore = useUserStore()
-          // this.user = userStore.user
-
-          // this.civilite = this.user.civilite
-          // this.nom = this.user.nom
-          // this.prenom = this.user.prenom
-          // this.email = this.user.email
-          // this.mobile1 = this.user.telephone1
-          // this.mobile2 = this.user.telephone2
-          // this.statut = this.user.statut
-          // this.photo = this.user.photo
-
-          // // Info professionnelles
-          // this.matricule = this.user.visite.matricule || ""
-          // this.codeVisite = this.user.code_visite || ""
-          // this.userDepartement = this.user.departement_id || ""
-          // this.userService = this.user.service_id || ""
-        });
-         if(!response.data.error){
-          return response.data.data
-         }
-
-      } catch (error) {
-        console.error('Error fetching Departement-----:', error);
-      }
-    },
-
-
-    async categorie(id) {
-      try {
-        console.log(`Requête API pour la catégorie avec l'ID : ${id}`);
-        console.log(`Token utilisé : ${this.token}`);
-
-        const response = await apiClient.get(`/categorie/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${this.token}`,
-          }
-        });
-
-        if (!response.data.error) {
-          return response.data.data.libelle;
-        }
-      } catch (error) {
-        console.error('Erreur lors de la récupération du service :', error);
-      }
-    }
-,
-
-    alertMessage(message, icon="error") {
-      this.$swal.fire({
-        position: "top",
-        icon: icon,
-        text: message,
-        showConfirmButton: false,
-        timer: 2000,
-        customClass: {
-      popup: 'custom-popup', // Classe personnalisée pour le popup
-      icon: 'custom-icon', // Classe personnalisée pour l'icône
-      title: 'custom-title', // Classe personnalisée pour le titre (si nécessaire)
-    }
-      });
-    },
-
-
-    toggleTabWizard(tab) {
-      this.activeTabArrow = tab;
-    },
-
-    handleFileUpload(event) {
-      // Récupérer le fichier sélectionné
-      this.photo = event.target.files[0];
     },
 
     onNext() {
       this.next = true
       this.v$.$touch();
-      if(
-        this.v$.email.$error ||
-        this.v$.nom.$error ||
-        this.v$.prenom.$error ||
-        this.v$.civilite.$error ||
-        this.v$.mobile1.$error){
-
+      if( 
+        this.v$.email.$error || 
+        this.v$.nom.$error || 
+        this.v$.prenom.$error || 
+        this.v$.civilite.$error || 
+        this.v$.mobile1.$error
+      ){
           this.activeTabprofessionnelle = false
       }else{
         this.activeTabprofessionnelle = true
@@ -294,112 +155,151 @@ export default {
       }
     },
 
-
-    async onSave(){
+    async onSave() {
       this.submitted = true;
       this.v$.$touch();
-      if(
+
+      // Vérification des erreurs de validation
+      if (
         this.v$.codeVisite.$error ||
         this.v$.userDepartement.$error ||
         this.v$.userService.$error ||
         this.v$.matricule.$error
-        ){
-          return
-      }else{
+      ) {
+        return;
+      } else {
         this.show = true;
-        try{
+        
+        try {
 
-          await apiClient.post(
-            `/user/${this.user.uuid}`,
-            {
-              nom: this.nom,
-              prenom: this.prenom,
-              email: this.email ,
-              image: this.photo,
-              telephone1: this.mobile1,
-              telephone2: this.mobile2,
-              civilite: this.civilite,
-              matricule: this.matricule,
-              departement_id: this.userDepartement,
-              service_id: this.userService,
-            },
-            {
+          const formData = new FormData();
 
-              headers: {
-                'Authorization': `Bearer ${this.token}`,
-              }
+          // Ajout des champs classiques
+          formData.append('nom', this.nom);
+          formData.append('prenom', this.prenom);
+          formData.append('email', this.email);
+          formData.append('telephone1', this.mobile1);
+          formData.append('telephone2', this.mobile2);
+          formData.append('civilite', this.civilite);
+          formData.append('matricule', this.matricule);
+          formData.append('matricule', this.matricule);
+          formData.append('departement_id', this.userDepartement);
+          formData.append('service_id', this.userService);
 
-            }).then(reponse =>{
-              if(!reponse.data.error){
+          // Ajout de l'image sous forme de fichier
+          if (this.photo) {
+            alert(1)
+            formData.append('image', this.photo); // Assurez-vous que `this.photo` est bien un fichier
+          }
 
-              apiClient.post('/auth/me', {}, {
+          const response = await apiClient.post(`/user/${this.user.uuid}`, formData, {
+            headers: { 'Authorization': `Bearer ${this.token}` }
+          });
+
+          // Si la réponse est réussie
+          if (!response.data.error) {
+            this.alertMessage(`ok`);
+            this.alertMessage(`${response.data.message}`, "success");
+
+            apiClient.post('/auth/me', {}, {
                 headers: { Authorization: `Bearer ${this.token}` },
               }).then(response=>{
+                this.authStore.setUser(response.data);
+              })
 
-
-            })
-
-        }catch{
-          alert("error")
-        }finally{
-          this.show = false
+         
+          } else {
+            // Si l'API retourne une erreur
+            this.alertMessage("Une erreur s'est produite lors de l'enregistrement du profil AAA", "error");
+          }
+        } catch (error) {
+          // Affichage d'un message d'erreur
+          this.alertMessage("Une erreur s'est produite lors de la sauvegarde du profil", "error");
+        } finally {
+          // Réinitialisation de l'état de l'interface
+          this.show = false;
+          this.submitted = false;
         }
-
-
-
-
-        this.successmsg()
-
-
-        this.civilite = ""
-        this.nom = ""
-        this.prenom = ""
-        this.email = ""
-        this.mobile1 = ""
-        this.mobile2 = ""
-        this.statut = ""
-        this.photo = ""
-
-        // Info professionnelles
-        this.matricule = ""
-        this.codeVisite = ""
-        this.userDepartement = ""
-        this.userService = ""
-
-        this.submitted = false;
       }
     },
-    async handleStatut(){
-      try {
-        const response = await apiClient.get(`/categorie_by_slug/${this.user.id}`, {
-          active : this.user.statut === 0 ? 1 : 0
-        },{
-          headers: {
-            'Authorization': `Bearer ${this.token}`,
-          }
-        });
-        if(!response.data.error){
-          console.log("-------------------------!"+response.data.data)
-        }
-      } catch (error) {
-        console.error('Error fetching Service:', error);
-      }
-    }
 
+    // async updateUserProfile() {
+    //   try {
+    //     const response = await apiClient.post('/auth/me', {}, {
+    //       headers: { Authorization: `Bearer ${this.token}` }
+    //     });
+
+    //     if (response.data) {
+    //       this.initializeUserInfo(); // Refresh user info after update
+    //     }
+    //   } catch (error) {
+    //     console.error("Error updating user profile:", error);
+    //   }
+    // },
+
+    successmsg() {
+      this.$swal.fire("Success!", "Modification réussie!", "success")
+        .then(() => {
+          this.resetForm();
+          this.toggleWizard(1, 100); // Reset wizard state
+        });
+    },
+
+    resetForm() {
+      this.nom = "";
+      this.prenom = "";
+      this.email = "";
+      this.mobile1 = "";
+      this.mobile2 = "";
+      this.statut = "";
+      this.photo = "";
+      this.matricule = "";
+      this.codeVisite = "";
+      this.userDepartement = "";
+      this.userService = "";
+      this.submitted = false;
+    },
+
+    toggleWizard(tab, value) {
+      this.activeTab = tab;
+      this.progressBarValue = value;
+    },
+
+    handleFileUpload(event) {
+      this.photo = event.target.files[0];
+    },
+
+    alertMessage(message, icon = "error") {
+      this.$swal.fire({
+        position: "top",
+        icon,
+        text: message,
+        showConfirmButton: false,
+        timer: 2000,
+        customClass: {
+          popup: 'custom-popup',
+          icon: 'custom-icon',
+          title: 'custom-title'
+        }
+      });
+    },
+
+    toggleTabWizard(tab) {
+      this.activeTabArrow = tab;
+    }
   }
 };
+
 </script>
 
 <template>
-  <div v-if="show" class="loading-overlay">
-    <div class="spinner"></div>
-  </div>
   <BRow class="wizard">
     <BCol>
       <BCard no-body>
         <BCardBody>
-          <!-- <BCardTitle class="mb-3">Basic Wizard</BCardTitle> -->
-          <BForm action="#">
+
+          <ScaleLoader v-if="loading" :loading="loading" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
+          <BForm v-if="!loading" action="#">
             <div id="custom-progress-bar" class="progress-nav mb-4">
               <div class="progress">
                 <div
@@ -668,6 +568,7 @@ export default {
                         v-model="matricule"
                         id="nom"
                         class="form-control border border-black rounded-2"
+                        :disabled="authStore.user.role_id != ADMIN"
                         type="text"
                         :class="{
                           'is-invalid': submitted && v$.matricule.$error,
@@ -694,6 +595,7 @@ export default {
                         v-model="codeVisite"
                         id="nom"
                         class="form-control border border-black rounded-2"
+                        :disabled="authStore.user.role_id != ADMIN"
                         type="text"
                         :class="{
                           'is-invalid': submitted && v$.codeVisite.$error,
@@ -721,6 +623,8 @@ export default {
                         id="departement"
                         class="form-select border border-black rounded-2"
                         aria-label="Default select example"
+                        :disabled="authStore.user.role_id != ADMIN"
+                        @change="onDepartement"
                         :class="{
                           'is-invalid': submitted && v$.userDepartement.$error,
                         }"
@@ -756,6 +660,7 @@ export default {
                         v-model="userService"
                         id="service"
                         class="form-select border border-black rounded-2"
+                        :disabled="authStore.user.role_id != ADMIN"
                         aria-label="Default select example"
                         :class="{
                           'is-invalid': submitted && v$.userService.$error,
@@ -783,8 +688,14 @@ export default {
                   </BCol>
 
                   <div class="d-flex justify-content-center mt-5 mb-4">
-                    <BButton variant="primary" class="ms-2" @click="onSave">
-                      <span class="px-md-5">Enregistrer</span>
+                    <BButton 
+                      variant="primary" 
+                      class="ms-2" 
+                      @click="onSave"
+                      :loading="show"
+                      :loading-text="'modification'"
+                    >
+                      <span class="px-md-5">Modifier</span>
                     </BButton>
                   </div>
                 </BRow>
@@ -872,35 +783,4 @@ export default {
 }
 </style>
 
-<style scoped>
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
 
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(255, 255, 255, 0.3);
-  border-top: 5px solid #fff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-</style>
