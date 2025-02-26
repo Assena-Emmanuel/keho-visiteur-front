@@ -4,17 +4,19 @@
         <BRow>
           <BCol md="">
             <vue-cal
-              small
-              :time-from="heureDebut * 60"
-              :time-to="heureFin * 60"
-              locale="fr"
-              hide-weekends
-              :disable-views="['years', 'year', 'month', 'week']"
-              :selected-date="selectedDate"
-              :events="events" 
-              :eventsCountOnYearView=true
-              class="vuecal--blue-theme calendrier-long"
-              @cell-focus="onCellFocus"
+                small
+                :time-from="heureDebut * 60"
+                :time-to="heureFin * 60"
+                locale="fr"
+                hide-weekends
+                :disable-views="['years', 'year', 'month', 'week']"
+                :selected-date="selectedDate"
+                :events="events" 
+                :eventsCountOnYearView=true
+                class="vuecal--blue-theme calendrier-long"
+                @cell-focus="onCellFocus"
+                :minDate="date"
+                :maxDate="date"
             />
           </BCol>
         </BRow>
@@ -33,6 +35,7 @@
     components: { VueCal },
     data() {
       return {
+        date: "2025-02-26",
         heureDebut: 8,
         heureFin: 17,
         selectedDate: null,
@@ -58,6 +61,13 @@
         editingIndex: null,
       };
     },
+    computed: {
+    dateToday() {
+      const today = new Date();
+      console.log("Date-------------: "+today.toISOString().split('T')[0])
+      return today.toISOString().split('T')[0]; // "2025-02-26"
+    },
+  },
     methods: {
       onCellFocus(date) {
         this.selectedDate = new Date(date);
