@@ -241,7 +241,6 @@ const onUpdateprofil = async () => {
   }
 };
 
-
 const filterOn = computed(() => props.fields.map(field => field.key));
 
 const filteredData = computed(() => {

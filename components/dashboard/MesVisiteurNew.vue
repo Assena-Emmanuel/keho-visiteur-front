@@ -134,7 +134,7 @@
           v-model:server-options="serverOptions"
           :server-items-length="serverItemsLength"
           :loading="loading"
-          :headers="headers"
+          :headers="filteredHeaders"
           :items="items"
           rows-of-page-separator-message="sur"
           buttons-pagination
@@ -185,9 +185,9 @@
                   <i class="uil uil-print font-size-15"></i>
                 </BButton>
 
-                <!-- Bouton de modification (edit) -->
+                <!-- Bouton d'Annulation -->
                 <BButton 
-                  v-if="permissions.some(perm => perm.edit)" 
+                  v-if="permissions.some(perm => perm.cancel)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
@@ -214,8 +214,9 @@
           </template>
 
           <template #item-heure_fin="item">
-              <div>
-                  <span>----</span>
+            <div>
+              <span v-if="!item.heure_fin">----</span>
+              <span v-else>{{ item.heure_fin }}</span>
               </div>
           </template>
 
@@ -258,7 +259,7 @@ const range = ref([5,10,15,20])
 const items = ref([]);
 const loading = ref(false);
 const serverItemsLength = ref(0);
-const searchField = ["visiteur", "entreprise", "numero_piece", "code_visite", "code_visiteur", "employe", "lib_visite"];
+const searchField = ["visiteur", "entreprise", "numero_piece",  "code_visiteur", "lib_visite"];
 const detailModal = ref(false)
 const data = ref([])
 const loadingDetail = ref(false)
@@ -288,6 +289,13 @@ function resetAction(){
   }
   
 }
+
+const filteredHeaders = computed(() => {
+  if (authStore.user.role_id !== 1) {
+    return headers.filter(header => header.value !== 'code_visiteur' && header.value !== 'employe')
+  }
+  return headers
+})
 
 // recherche coté server
 const recherche = async () => {
@@ -370,8 +378,17 @@ const loadFromServer = async () => {
     if (!response.data.error) {
       
       const data = response.data.data;
-      items.value = data?.data;
-      serverItemsLength.value = response.data.data.total;
+      const today = new Date()
+      items.value = data?.data.filter((visiteur) =>{
+        const visteDate = new Date(visiteur.created_at);
+        if( visteDate.getFullYear() == today.getFullYear() &&
+            visteDate.getMonth() == today.getMonth() &&
+            visteDate.getDate() === today.getDate()
+        ){
+          return visiteur
+        }
+      })
+      serverItemsLength.value = items.value.length;
 
     }
 
@@ -398,7 +415,6 @@ const loadFromServer = async () => {
 
   if(!response.data.error){
     permissions.value = response.data
-    console.log("permissionVisiteur----------------: "+JSON.stringify(permissions.value))
 
   }else{
     console.error("Menu error: "+response.message)

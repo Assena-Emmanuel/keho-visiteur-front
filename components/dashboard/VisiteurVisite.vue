@@ -119,11 +119,7 @@
                         HOTE
                     </div>
                     <div class="card-boby " style="background-color: #f6f6f6;">
-                        <!-- <div v-if="isLoadingUser" class="loading-ellipses">
-                          <span class="dot text-primary">.</span>
-                          <span class="dot text-success">.</span>
-                          <span class="dot text-danger">.</span>
-                        </div> -->
+
                         <ScaleLoader :loading="isLoadingUser" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
                         <div v-if="!isLoadingUser" class="">
                             <div class="row ">
@@ -355,7 +351,8 @@
 
         if (!response.data.error) {
           codeVisiteur.value = response.data.data.fvisite.code_fvisite
-          if (!response.data.data.fvisite.delegation) {
+          if (!response.data.error) {
+            console.log("Delegation--------------: "+JSON.stringify(response.data.data.fvisite))
             const data = response.data.data;
             // Remplissage des données dans la structure réactive `visiteurs`
             visiteurs.value = {
@@ -384,7 +381,7 @@
               visiteur: data.visiteurs
             };
           }else{
-            console.error("En delegation "+JSON.stringify(response.data.data))
+            console.error("En delegation "+JSON.stringify(response.data.message))
 
           }
 
@@ -412,6 +409,7 @@
     loadingImpression.value = true
     try{
       if(codeV){
+        // this.hide()
         window.open(`https://visitors.kehogroupe-ci.com/api/fvisites/print/${codeV}`, '_blank');
       }
     }catch(e){

@@ -1,30 +1,40 @@
-<script>
-export default {
-  components: {
-  },
-  data() {
-    return {
-      datas: [
-        {titre: "Total Visiteurs", valeur: 123},
-        {titre: "Total Visite Visites", valeur: 111},
-        // {titre: "Sur RDV", valeur: 0},
-        // {titre: "Inopinées", valeur: 0},
-        {titre: "Totals Visites Rejetées", valeur: 12},
-      ],
-      dataStatic: [
-        {imageUrl: '/images/stats/visiteurs.png', couleur: '#60F6FD'},
-        {imageUrl: '/images/stats/surRDV.png', couleur: '#3BF2CB'},
-        {imageUrl: '/images/stats/inopinees.png', couleur: '#EFC257'},
-        {imageUrl: '/images/stats/rejetes.png', couleur: '#F1947F'},
-      ],
+<script setup>
+import { computed, watch, ref } from 'vue';
+
+// Définir la prop stat
+const stat =  defineModel('stat')
+
+// Data
+const datas = ref([
+  { titre: "Total Visiteurs", valeur: stat.total },
+  { titre: "Total Visites Effectuées", valeur: stat.recu },
+  { titre: "Total Visites Rejetées", valeur: stat.rejeter },
+]);
+
+const dataStatic = [
+  { imageUrl: '/images/stats/visiteurs.png', couleur: '#60F6FD' },
+  { imageUrl: '/images/stats/surRDV.png', couleur: '#3BF2CB' },
+  { imageUrl: '/images/stats/inopinees.png', couleur: '#EFC257' },
+  { imageUrl: '/images/stats/rejetes.png', couleur: '#F1947F' },
+];
+
+// Watcher pour mettre à jour les datas lorsque props.stat change
+watch(
+  () => stat.value, // On surveille props.stat
+  (newStat) => {
+    if (newStat) {
+      datas.value = [
+        { titre: "Total Visiteurs", valeur: newStat.total },
+        { titre: "Total Visites Effectuées", valeur: newStat.recu },
+        { titre: "Total Visites Rejetées", valeur: newStat.rejeter },
+      ];
     }
   },
-  computed:{
-    getCol(){
-      return 12 / this.datas.length
-    }
-  }
-}
+  { immediate: true }
+);
+
+// Calculer la taille des colonnes
+const getCol = computed(() => 12 / datas.value.length);
 </script>
 
 <template>

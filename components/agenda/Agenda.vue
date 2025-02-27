@@ -29,12 +29,30 @@
             @cell-focus="onCellFocus"
             @cell-click="openEventModal($event)"
             @event-click="openEventModal($event)"
-          />
+          >
+
+          <!-- <template #event="{ event, view }">
+
+            <div class="vuecal__event-title" v-html="event.title" />
+
+            <div class="vuecal__event-title vuecal__event-title--edit"
+                contenteditable
+                @blur="event.title = $event.target.innerHTML"
+                v-html="event.title" />
+
+            <small class="vuecal__event-time">
+
+              <strong>H debut:</strong> <span>{{ event.start.getMinutes() }}</span><br/>
+              <strong>H fin:</strong> <span>{{ event.end.formatTime("h O'clock") }}</span>
+            </small>
+          </template> -->
+          </vue-cal>
+
         </BCol>
       </BRow>
 
       <!-- Modal pour ajouter ou modifier un événement -->
-      <!-- <BModal v-model="modalVisible" :title="isEditing ? 'Modifier l\'événement' : 'Ajouter un événement'" hide-footer>
+      <BModal v-model="modalVisible" :title="isEditing ? 'Modifier l\'événement' : 'Ajouter un événement'" hide-footer>
         <div>
           <BAlert variant="danger"v-model="error" dismissible>
             {{ errorMsg }}
@@ -67,7 +85,7 @@
 
           
         </BForm>
-      </BModal> -->
+      </BModal>
     
     </BCardBody>
   </BCard>
@@ -77,13 +95,21 @@
 import { title } from 'process';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
+import { useAuthStore } from "~/stores/auth.js";
+import apiClient from "../api/intercepteur";
 
 export default {
   components: { VueCal },
+  setup(){
+    return{
+      authStore:useAuthStore()
+    }
+  },
+
   data() {
     return {
       heureDebut: 8,
-      heureFin: 17,
+      heureFin: 24,
       selectedDate: null,
       modalVisible: false,
       eventTitle: '',
@@ -91,26 +117,53 @@ export default {
       eventEndTime: null,
       error: false,
       errorMsg: null,
-      colors: [
-      'event-1', 'event-2',
-      'event-3', 'event-4',
-      'event-5', 'event-6',
-      'event-7', 'event-8',
-      'event-9', 'event-10',
-      ],
+
       events: [
-        { title: 'Réunion', start: '2024-10-28 09:00', end: '2024-10-28 10:00', class: 'event-1' },
-        { title: 'Déjeuner', start: '2024-11-1 12:00', end: '2024-11-1 13:00', class: 'event-9' },
-        { title: 'Atelier', start: '2024-10-29 14:00', end: '2024-10-29 15:30', class: 'event-5' }
+        { title: 'Réunion', start: '2025-02-27 09:00', end: '2025-02-27 10:00', class: 'event-1' },
+        { title: 'Déjeuner', start: '2025-02-27 12:00', end: '2025-02-27 13:00', class: 'event-2' },
+        { title: 'Atelier', start: '2025-02-27 14:00', end: '2025-02-27 15:30', class: 'event-3' }
       ],
       isEditing: false,
       editingIndex: null,
     };
   },
+
+  async mounted() {
+    this.getEvents(this.authStore.user.visite?.code_visite)
+  },
+
   methods: {
+    async getEvents(code){
+      try{
+          const response = await apiClient.get("/fvisites/evenements", {
+            params: {
+            sort_type: 2,
+            code_employe: code
+          },
+          headers: {
+              Authorization: `Bearer ${this.authStore.token}`
+          }
+        });
+
+        if(!response.data.error){
+          console.log("Event: ------------------: "+JSON.stringify(response.data.data))
+          this.events = response.data.data 
+
+        }else{
+            console.log("Erreur: "+response.data.message)
+        }
+
+      }catch(e){
+        console.log("Erreur :"+e)
+      }finally{
+
+      }
+    },
+
     onCellFocus(date) {
       this.selectedDate = new Date(date);
     },
+
     openEventModal(event) {
       const eventFound = this.events.find(e => e.start === event.start && e.end === event.end);
       console.log(event.start)
@@ -178,29 +231,30 @@ export default {
         });
 
         this.resetForm();
-  }
-},
-
-
-    updateEvent() {
-      if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
-        const startDateTime = `${this.selectedDate.toISOString().split('T')[0]} ${this.eventStartTime}`;
-        const endDateTime = `${this.selectedDate.toISOString().split('T')[0]} ${this.eventEndTime}`;
-
-        this.events[this.editingIndex] = {
-          title: this.eventTitle,
-          start: startDateTime,
-          end: endDateTime,
-          class: this.getEventClass(this.eventTitle),
-        };
-
-        this.resetForm();
       }
     },
+
+    // updateEvent() {
+    //   if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
+    //     const startDateTime = `${this.selectedDate.toISOString().split('T')[0]} ${this.eventStartTime}`;
+    //     const endDateTime = `${this.selectedDate.toISOString().split('T')[0]} ${this.eventEndTime}`;
+
+    //     this.events[this.editingIndex] = {
+    //       title: this.eventTitle,
+    //       start: startDateTime,
+    //       end: endDateTime,
+    //       class: this.getEventClass(this.eventTitle),
+    //     };
+
+    //     this.resetForm();
+    //   }
+    // },
+
     deleteEvent() {
       this.events.splice(this.editingIndex, 1);
       this.resetForm();
     },
+
     resetForm() {
       this.eventTitle = '';
       this.eventStartTime = null;
@@ -211,6 +265,7 @@ export default {
       this.error = false
       this.errorMsg = null
     },
+
     onCellClick(event) {
 
     // Extraire l'heure de l'événement cliqué
@@ -236,35 +291,18 @@ export default {
 </script>
 
 <style>
-.event-1 {
-  background-color: rgba(232, 245, 233, 0.7) !important;
+
+
+.vuecal .event-1 {
+    background-color: rgba(240, 187, 65, 0.76) !important;
 }
-.event-2 {
-  background-color: rgba(226, 242, 253, 0.7) !important;
+
+.vuecal .event-2 {
+    background-color: rgba(239, 58, 58, 0.76) !important;
 }
-.event-3 {
-  background-color: rgba(255, 243, 224, 0.7) !important;
-}
-.event-4 {
-  background-color: rgba(255, 204, 204, 0.7) !important;
-}
-.event-5 {
-  background-color: rgba(204, 255, 204, 0.7) !important;
-}
-.event-6 {
-  background-color: rgba(204, 204, 255, 0.7) !important;
-}
-.event-7 {
-  background-color: rgba(255, 255, 204, 0.7) !important;
-}
-.event-8 {
-  background-color: rgba(255, 235, 238, 0.7) !important;
-}
-.event-9 {
-  background-color: rgba(255, 204, 255, 0.7) !important;
-}
-.event-10 {
-  background-color: rgba(204, 255, 255, 0.7) !important;
+
+.vuecal .event-3 {
+    background-color: rgba(65, 241, 68, 0.76) !important;
 }
 
 

@@ -65,7 +65,7 @@
     <div class="d-flex justify-content-end" v-if="data && data.visiteurs && data.visiteurs.length > 1 && !loadingDetail">
       <BPagination
       v-model="page"
-      :total-rows="data.length"
+      :total-rows="data.visiteurs.length"
       :per-page="itemsPerPage"
       aria-controls="modal-pagination"
     ></BPagination>
@@ -135,7 +135,7 @@
           v-model:server-options="serverOptions"
           :server-items-length="serverItemsLength"
           :loading="loading"
-          :headers="headers"
+          :headers="filteredHeaders"
           :items="items"
           rows-of-page-separator-message="sur"
           buttons-pagination
@@ -188,7 +188,7 @@
 
                 <!-- Bouton de modification (edit) -->
                 <BButton 
-                  v-if="permissions.some(perm => perm.edit)" 
+                  v-if="permissions.some(perm => perm.cancel)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
@@ -215,9 +215,10 @@
           </template>
 
           <template #item-heure_fin="item">
-              <div>
-                  <span>----</span>
-              </div>
+            <div>
+              <span v-if="!item.heure_fin">----</span>
+              <span v-else>{{ item.heure_fin }}</span>
+            </div>
           </template>
 
           <!-- Personnaliser le loading -->
@@ -246,7 +247,7 @@ const headers = [
   { text: "CNI", value: "numero_piece"},
   { text: "Société", value: "entreprise"},
   { text: "Code visiteur", value: "code_visiteur" },
-  { text: "Code visite", value: "code_fvisite" },
+  { text: "Code visite", value: "code_visite" },
   { text: "Employé", value: "employe" },
   { text: "Visite", value: "lib_visite" },
   { text: "H entrée", value: "heure_entree" },
@@ -267,12 +268,21 @@ const data = ref([])
 const loadingDetail = ref(false)
 const dateDebut = ref(null)
 const dateFin = ref(null)
+const stat = ref({recu:0, rejeter:0, total:0})
 const serverOptions = ref({
   page: 1,
   rowsPerPage: 5,
   sortBy: 1,
   code_employe: '',
 });
+
+const filteredHeaders = computed(() => {
+  if (authStore.user.role_id !== 1) {
+    // Masquer la colonne 'code_visiteur' pour les utilisateurs qui ne sont pas admin (role_id !== 1)
+    return headers.filter(header => header.value !== 'code_visiteur')
+  }
+  return headers
+})
 
 
 // reactualiser
@@ -328,7 +338,7 @@ const loadFromServer = async () => {
 // Appel initial pour charger les données
  onMounted( async () => {
   loadFromServer();
-  
+  getStat()
   const code = "visiteur"
   const response = await apiClient.get(`/permissions/menu_action/${authStore.user.role_id}/${code}`, 
   {
@@ -413,6 +423,56 @@ watch(serverOptions, (value) => {
   }, 
   { deep: true }
   );
+
+const getStat = async ()=>{
+  let params = {}
+
+    if(authStore.user.role_id == 1){
+        params = {
+            page: 1,
+            limit: 5,
+            sort_type: 1,
+        }
+    }else{
+        params = {
+            page: 1,
+            limit: 5,
+            sort_type: 2,
+            code_employe: authStore.user.visite?.code_visite,
+        }
+    }
+    
+    const response = await apiClient.get("/fvisites/lvisite", {
+      params: params,
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+
+    });
+
+
+    if(!response.data.error){
+        visites.value = response.data.data
+        let annuler = []
+        let recu = []
+        visites.value.data.forEach(element => {
+            if(element.statut == 3){
+                annuler.push(element)
+            }
+            if(element.statut == 4){
+                recu.push(element)
+            }
+        });
+
+        stat.value.recu = recu.length,
+        stat.value.rejeter = annuler.length
+        stat.value.total = visites.value.length
+
+    }else{
+        console.error("Menu error: "+response.message)
+
+    }
+}
 
 
 const formatDateTime = (dateTime) => {
