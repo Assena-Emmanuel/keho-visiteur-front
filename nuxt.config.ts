@@ -5,7 +5,6 @@ export default defineNuxtConfig({
     '~/plugins/qrcode-reader.js',
     '~/plugins/vue-cal.js',
     '~/plugins/vue-awesome-paginate.js',
-    '~/plugins/vue3-datatable.js',
     '~/plugins/vue-spinners.js',
     '~/plugins/vue3-easy-data-table.js',
     '~/plugins/vue3-form-wizard.js',
@@ -33,6 +32,10 @@ export default defineNuxtConfig({
         },
       ]
     }
+  },
+
+  build: {
+    transpile: ['@vuepic/vue-datepicker']
   },
 
   modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts", "nuxt-easy-lightbox",],

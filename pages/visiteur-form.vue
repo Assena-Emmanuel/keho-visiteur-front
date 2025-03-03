@@ -386,6 +386,9 @@
                         <ClientOnly>
                             <vue-web-cam v-model:rectoImage="rectoImage" v-model:versoImage="versoImage" />
                         </ClientOnly>
+
+                        <span>Recto: {{ rectoImage }}</span>
+                        <span>Verso: {{ versoImage }}</span>
                     </div>
                    <div class="alert alert-danger" v-if="submitted && (!rectoImage || !versoImage)"> Photo de la piece (recto et verso) obligatoire</div>
                 </BRow>
@@ -584,8 +587,6 @@
                             image_v: this.versoImage,
                         }
 
-                        
-                        console.log("Start--------------- : 1"+JSON.stringify(this.rectoImage)+" 2-- "+JSON.stringify(this.versoImage));
                         const response = await apiClient.post('/fvisites', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',

@@ -84,16 +84,28 @@
 
           <div class="row mb-3">
             <div class="col-2">
-              <BFormSelect v-model="selectEtat" :options="optionsTypeEtat" />
+              <CFormSelect aria-label="Default select example">
+                <option>Type de données</option>
+                <option value="1">Etat des visites effectuées</option>
+                <option value="1">Etat des visites rejetées</option>
+              </CFormSelect>
             </div>
             <div class="col-5">
-              <VueDatePicker v-model="dateDebut" range multi-calendars  placeholder="date Debut - date Fin" />
+              <CDateRangePicker v-model:end-date="dateFin" v-model:start-date="dateDebut" />
             </div>
             <div class="col-2">
-              <BFormInput v-model="searchValue" placeholder="Code employé" />
+              <CFormInput
+                type="email"
+                placeholder="Code employé"
+                v-model="searchValue"
+              />
             </div>
             <div class="col-2">
-              <BFormSelect v-model="selectPdf" :options="optionsPdf"  />
+              <CFormSelect aria-label="Default select example">
+              <option value="0">Fichier PDF</option>
+              <option value="1">Fichier EXCEL</option>
+              <option value="1">Fichier CSV</option>
+            </CFormSelect>
             </div>
             <div class="col-1">
               <button class="btn btn-primary">Generer</button>
@@ -281,9 +293,9 @@
   import apiClient from "../api/intercepteur";
   import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
   import Swal from 'sweetalert2';
-  import VueDatePicker from '@vuepic/vue-datepicker';
-  import '@vuepic/vue-datepicker/dist/main.css'
-
+  import '@coreui/coreui-pro/dist/css/coreui.min.css'
+  import { CDateRangePicker, CFormInput } from '@coreui/vue-pro';
+  import { CFormSelect } from '@coreui/vue';
   
   const authStore = useAuthStore();
   
@@ -324,23 +336,7 @@
     sortBy: 1,
     code_employe: '',
   });
-  const selectPdf = ref(null)
-  const selectEtat = ref(null)
-  const optionsPdf = ref([
-  {value: null, text: 'Type de Fichier'},
-  {value: "pdf", text: 'Fichier PDF'},
-  {value: "pdf", text: 'Fichier EXCEL'},
-  {value: "pdf", text: 'Fichier CSV'},
-  ])
-
-  const optionsTypeEtat = ref([
-    {value: null, text: 'Type de données'},
-    {value: null, text: 'Etat des visites effectuées'},
-    {value: null, text: 'Etat des visites rejetées'},
-    {value: null, text: 'Etat des visites'},
-  ])
-
-
+  
   
   // reactualiser
   function resetAction(){

@@ -31,21 +31,6 @@
             @event-click="openEventModal($event)"
           >
 
-          <!-- <template #event="{ event, view }">
-
-            <div class="vuecal__event-title" v-html="event.title" />
-
-            <div class="vuecal__event-title vuecal__event-title--edit"
-                contenteditable
-                @blur="event.title = $event.target.innerHTML"
-                v-html="event.title" />
-
-            <small class="vuecal__event-time">
-
-              <strong>H debut:</strong> <span>{{ event.start.getMinutes() }}</span><br/>
-              <strong>H fin:</strong> <span>{{ event.end.formatTime("h O'clock") }}</span>
-            </small>
-          </template> -->
           </vue-cal>
 
         </BCol>
@@ -77,10 +62,16 @@
           
           <div class="d-flex justify-content-between" v-if="isEditing">
             <BButton v-if="isEditing" class="mt-2" @click="deleteEvent" variant="danger">Supprimer</BButton>
-            <BButton class="mt-2" type="submit" variant="primary">Modifier</BButton>
+            <BButton class="mt-2" type="submit" variant="primary">
+              <span v-if="!loading">Modifier</span>
+              <ScaleLoader :loading="loading" :height="'20px'" :color="'#FFFFFF'" />
+            </BButton>
           </div>
           <div class="d-flex justify-content-end" v-if="!isEditing">
-            <BButton class="mt-2" type="submit" variant="primary">Ajouter</BButton>
+            <BButton class="mt-2" type="submit" variant="primary">
+              <span v-if="!loading">Ajouter</span>
+              <ScaleLoader :loading="loading" :height="'20px'" :color="'#FFFFFF'" />
+            </BButton>
           </div>
 
           
@@ -97,9 +88,10 @@ import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
 import { useAuthStore } from "~/stores/auth.js";
 import apiClient from "../api/intercepteur";
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 
 export default {
-  components: { VueCal },
+  components: { VueCal, ScaleLoader },
   setup(){
     return{
       authStore:useAuthStore()
@@ -117,12 +109,11 @@ export default {
       eventEndTime: null,
       error: false,
       errorMsg: null,
+      loading: false,
 
       events: [
-        { title: 'Réunion', start: '2025-02-27 09:00', end: '2025-02-27 10:00', class: 'event-1' },
-        { title: 'Déjeuner', start: '2025-02-27 12:00', end: '2025-02-27 13:00', class: 'event-2' },
-        { title: 'Atelier', start: '2025-02-27 14:00', end: '2025-02-27 15:30', class: 'event-3' }
       ],
+
       isEditing: false,
       editingIndex: null,
     };
@@ -146,8 +137,7 @@ export default {
         });
 
         if(!response.data.error){
-          console.log("Event: ------------------: "+JSON.stringify(response.data.data))
-          this.events = response.data.data 
+          this.events = response.data.data.particular_event
 
         }else{
             console.log("Erreur: "+response.data.message)
@@ -165,12 +155,19 @@ export default {
     },
 
     openEventModal(event) {
-      const eventFound = this.events.find(e => e.start === event.start && e.end === event.end);
-      console.log(event.start)
+      // console.log(Array.isArray(this.events));  // Vérifie si c'est un tableau
+      // console.log(this.events);
+      // const eventFound = this.events.find(e => e.start === event.start && e.end === event.end);
+      console.log("----------------eventttt"+JSON.stringify(event))
       if (event._eid) {
         this.eventTitle = event.title;
-        this.eventStartTime = event.start // Extraire l'heure
-        this.eventEndTime = event.end // Extraire l'heure
+        const startDate = new Date(event.start);
+        const endDate = new Date(event.end);
+        
+        // Extraire l'heure et les minutes au format HH:mm
+        this.eventStartTime = startDate.toISOString().slice(11, 16); // Extrait l'heure (HH:mm)
+        this.eventEndTime = endDate.toISOString().slice(11, 16); // Extrait l'heure (HH:mm)
+  
         this.isEditing = true;
         let obj = {
           title: this.eventTitle,
@@ -190,7 +187,7 @@ export default {
       this.modalVisible = true;
     },
     
-    addEvent() {
+    async addEvent() {
       if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
         if (!this.selectedDate) {
           alert("Veuillez sélectionner une date.");
@@ -211,7 +208,10 @@ export default {
         // Vérification que l'heure de début est avant l'heure de fin
         if (startDateTime >= endDateTime) {
           this.error= true
-          this.errorMsg = "L\'heure de début doit être avant l\'heure de fin."
+          this.errorMsg = "L'heure de début doit être antérieure à l'heure de fin."
+          setTimeout(() => {
+            this.error = false;
+          }, 2000);  // 5000 ms = 5 secondes
           return;
         }
 
@@ -219,36 +219,119 @@ export default {
         const startFormatted = `${startDateTime.toISOString().split('T')[0]} ${startDateTime.toTimeString().split(' ')[0]}`;
         const endFormatted = `${endDateTime.toISOString().split('T')[0]} ${endDateTime.toTimeString().split(' ')[0]}`;
 
-        console.log(`Start: ${startFormatted}, End: ${endFormatted}`);
+        // Enregistrement de l'evenement
+        try{
+          this.loading = true
+          const response = await apiClient.post("/event", {
+            titre: this.eventTitle,
+            debut: startFormatted,
+            fin: endFormatted
+          }, {
+            headers: {
+              Authorization: `Bearer ${this.authStore.token}`
+            }
+          });
 
-        // Choisir une couleur aléatoire et ajouter l'événement
-        const randomColor = this.colors[Math.floor(Math.random() * this.colors.length)];
-        this.events.push({
-          title: this.eventTitle,
-          start: startFormatted,
-          end: endFormatted,
-          class: randomColor,
-        });
+          if(!response.data.error){
+            console.log("--------------data : "+JSON.stringify(response.data))
 
-        this.resetForm();
+            if(response.data.data){
+              this.events.push(response.data.data)
+              this.resetForm();
+            }else{
+              this.error= true
+              this.errorMsg = response.data.message
+              setTimeout(() => {
+                this.error = false;
+              }, 2000);  // 5000 ms = 5 secondes
+            }
+            
+
+          }else{
+              console.log("Erreur: "+response.data.message)
+          }
+
+        }catch(e){
+          console.log("Erreur :"+e)
+        }finally{
+          this.loading = false
+        }
+
+        
       }
     },
 
-    // updateEvent() {
-    //   if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
-    //     const startDateTime = `${this.selectedDate.toISOString().split('T')[0]} ${this.eventStartTime}`;
-    //     const endDateTime = `${this.selectedDate.toISOString().split('T')[0]} ${this.eventEndTime}`;
+    async updateEvent() {
+      if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
 
-    //     this.events[this.editingIndex] = {
-    //       title: this.eventTitle,
-    //       start: startDateTime,
-    //       end: endDateTime,
-    //       class: this.getEventClass(this.eventTitle),
-    //     };
+        // Récupération des valeurs de l'heure
+        const [startHour, startMinute] = this.eventStartTime.split(':').map(Number);
+        const [endHour, endMinute] = this.eventEndTime.split(':').map(Number);
 
-    //     this.resetForm();
-    //   }
-    // },
+        // Création des objets Date en utilisant les valeurs de l'année, du mois, du jour, de l'heure et des minutes
+        const startDateTime = new Date(this.selectedDate);
+        startDateTime.setHours(startHour, startMinute, 0, 0); // Définir l'heure de début
+
+        const endDateTime = new Date(this.selectedDate);
+        endDateTime.setHours(endHour, endMinute, 0, 0); // Définir l'heure de fin
+
+        // Vérification que l'heure de début est avant l'heure de fin
+        if (startDateTime >= endDateTime) {
+          this.error= true
+          this.errorMsg = "L'heure de début doit être antérieure à l'heure de fin."
+          setTimeout(() => {
+            this.error = false;
+          }, 2000);  // 5000 ms = 5 secondes
+          return;
+        }
+
+        const startFormatted = `${startDateTime.toISOString().split('T')[0]} ${startDateTime.toTimeString().split(' ')[0]}`;
+        const endFormatted = `${endDateTime.toISOString().split('T')[0]} ${endDateTime.toTimeString().split(' ')[0]}`;
+
+        // Enregistrement de l'evenement
+        try{
+          this.loading = true
+          const response = await apiClient.post("/event", {
+            titre: this.eventTitle,
+            debut: startFormatted,
+            fin: endFormatted
+          }, {
+            headers: {
+              Authorization: `Bearer ${this.authStore.token}`
+            }
+          });
+
+          if(!response.data.error){
+            console.log("--------------data : "+JSON.stringify(response.data))
+
+            if(response.data.data){
+              this.events.push(response.data.data)
+              this.resetForm();
+            }else{
+              this.error= true
+              this.errorMsg = response.data.message
+              setTimeout(() => {
+                this.error = false;
+              }, 2000);  // 5000 ms = 5 secondes
+            }
+            
+
+          }else{
+              console.log("Erreur: "+response.data.message)
+          }
+
+        }catch(e){
+          console.log("Erreur :"+e)
+        }finally{
+          this.loading = false
+        }
+
+
+
+
+
+      }
+    },
 
     deleteEvent() {
       this.events.splice(this.editingIndex, 1);
@@ -277,14 +360,14 @@ export default {
     return this.eventStartTime
   },
 
-  // confirmDeleteEvent(event) {
-  //     if (confirm(`Voulez-vous vraiment supprimer "${event.title}" ?`)) {
-  //       this.deleteEvent(event.id); // Appelez la méthode de suppression
-  //     }
-  //   },
-  //   deleteEvent(eventId) {
-  //     this.events = this.events.filter(event => event.id !== eventId); // Supprimez l'événement
-  //   }
+  confirmDeleteEvent(event) {
+      if (confirm(`Voulez-vous vraiment supprimer "${event.title}" ?`)) {
+        this.deleteEvent(event.id); // Appelez la méthode de suppression
+      }
+    },
+    deleteEvent(eventId) {
+      this.events = this.events.filter(event => event.id !== eventId); // Supprimez l'événement
+    }
 
   }
 };
