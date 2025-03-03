@@ -3,16 +3,17 @@ import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import apiClient from "~/components/api/intercepteur";
 
-
 export default {
   setup() {
-    return { v$: useVuelidate() };
+    const authStore = useAuthStore();
+    return { v$: useVuelidate(), authStore };
   },
   data() {
     return {
       newpassword: "",
       confirmPassword: "",
       lastPassword: "",
+      loading: false,
       submitted: false,
       isSuccess: false,
       passwordVisible: false,
@@ -197,13 +198,12 @@ export default {
                 </BRow>
 
               <div class="mt-3 text-center">
-                <BButton variant="primary" 
+                <BButton 
+                  variant="primary" 
                   class="w-sm waves-effect waves-light" 
                   @click="onReset"
-                  loading-text="modification" 
-                  :loading="processing"
-
-                  :disabled="processing" 
+                  :loading="loading"
+                  loading-text="Modification" 
                 >
                   Enregistrer
                 </BButton>

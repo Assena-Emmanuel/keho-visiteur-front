@@ -2,12 +2,19 @@
 import apiClient from "../api/intercepteur";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email } from "@vuelidate/validators";
-import { useAuthStore } from '~/stores/auth'
+import { useNotifiedStore } from "~/stores/notified";
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue' 
+import axios from 'axios';
+
 
 export default {
+  components: {
+    ScaleLoader,
+
+  },
   setup() {
-    const authStore = useAuthStore()
-    return { v$: useVuelidate(), authStore };
+
+    return { v$: useVuelidate(), authStore: useAuthStore(), };
   },
   data() {
     return {
@@ -22,6 +29,10 @@ export default {
       passwordVisible: false,
       dismissCountDown: 10000,
       countdown: 0,
+      height: 25,        
+      width: 25,         
+      height: "20px",
+      color: "#FFFFFF"
     };
   },
   validations: {
@@ -67,70 +78,51 @@ export default {
       } else {
         this.errorMsg = "";
 
-        try {
+          this.processing = true;
 
-        this.processing = true;
+          await apiClient.post(
+            "/auth/login",
+            {
+              email: this.email,
+              password: this.password
+            }
+          ).then(response => {
+            
+            if(response.data.access_token){
+              const token = response.data.access_token;
 
-        const { data } = await apiClient.post("/auth/login", {
-          email: this.email,
-          password: this.password
-        });
+              apiClient.post('/auth/me', {}, {
+                headers: {
+                  Authorization: `Bearer ${token}`, // Utiliser le token dans l'en-tête Authorization
+                },
 
-        console.log("Réponse de l'API:", data); // Vérifie ce que retourne l'API
+              }).then(response => {
 
-        if (!data || !data.access_token) {
-          throw new Error("Échec de l'authentification"); // Déclenche une erreur si le token est absent
-        }
+                this.authStore.setToken(token)
+                this.authStore.setUser(response.data)
+                
+                this.$router.push('/dashboard');
+
+              })
+              .catch(error => {
+                  console.error('Error fetching user info:', error);
+                  return
+              });
+            
+            }else{
+              this.errorMsg = "E-mail ou Mot de passe incorrect "
+            }
+            
+  
+
+          }).catch(error => {
+                console.error('Error fetching token:', error);
+                return
+            });
+          
+
+          this.processing = false;
         
-        const token = data.access_token;
-        this.authStore.setToken(token);
-
-        console.log("pinia-------------------: "+authStore.token)
-
-        // const accessToken = useCookie('token', { maxAge: 86400, path: '/', sameSite: 'Lax' });
-        // accessToken.value = token;
-
-
-        // Vérifie l'utilisateur connecté
-        const response = await apiClient.post('/auth/me', {}, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        // console.log("Utilisateur récupéré:", response.data);
-        // const auth = useUserStore();
-        // auth.setUser(response.data);
-
-        this.authStore.setUser(response.data);
-
-        this.$router.push('/dashboard');
-
-      } catch (error) {
-        console.error("Erreur de connexion:", error);
-
-        if (!navigator.onLine) {
-          this.alertMessage("Vérifiez votre connexion Internet.");
-        } else if (error.response && error.response.status) {
-          if (error.response.status === 401) {
-            this.alertMessage("E-mail ou mot de passe incorrect");
-          } else {
-            this.alertMessage("Une erreur est survenue. Veuillez réessayer.");
-          }
-        } else if (error.message && error.message.includes("Network Error")) {
-          this.alertMessage("Impossible de se connecter au serveur. Vérifiez votre connexion.");
-        } else {
-          this.alertMessage("Une erreur inconnue est survenue.");
-        }
-
-
-      } finally {
-        this.processing = false;
-      }
-
-
-
-
-
-
       }
     }
   }
@@ -151,15 +143,6 @@ export default {
               <p class="">{{ errorMsg }}</p>
             </BAlert>
 
-            <!-- <BAlert
-              v-model="dismissCountDown"
-              dismissible
-              variant="danger"
-              @close-countdown="countdown = $event"
-            >
-              <p class="">{{ errorMsg }}</p>
-              <BProgress variant="warning" :max="dismissCountDown" :value="countdown" height="4px" />
-            </BAlert> -->
 
               <div class="mb-3">
                 <label for="email" class="font-size-12 text-light">E-mail <span class="text-danger"><strong>*</strong></span></label>
@@ -215,13 +198,16 @@ export default {
       <div class="mt-4 text-center">
         <BButton 
           variant="success"
-          :loading="processing" 
-          loading-text="Chargement" 
           :class="['btn-bg', processing ? 'btn-loading' : '']"  
           :disabled="processing" 
-          @click="onLogin">
-          Se connecter
+          @click="onLogin"
+        >
+          <span v-if="!processing">Se connecter</span>
+          
+          <!-- Affiche PulseLoader à la place de ScaleLoader si nécessaire -->
+          <ScaleLoader :loading="processing" :height="height" :color="color" />
         </BButton>
+        
       </div>
     </BForm>
 </template>

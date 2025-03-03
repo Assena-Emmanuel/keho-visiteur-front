@@ -1,451 +1,354 @@
 <template>
-    <DashboardCommonStat />
+  <DashboardCommonStat />
+  
+
+  <!-- Modal détail -->
+  <BModal v-model="detailModal" hide-footer title="Détails des Visites">
     
-
-    <!-- Modal détail -->
-    <BModal v-model="detailModal" hide-footer title="Détails des Visites">
-        <div class="d-flex justify-content-end">
-            <BButton variant="primary" size="sm" style="padding: 2px;">
-                <i class="uil uil-print font-size-15 annuler"></i> Imprimer
-            </BButton>
+    <div v-for="item in paginatedData" :key="item['Code visite']">
+      <div class="text-center"><h4>M. {{ item['Nom & Prénoms'] }}</h4>
+        <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">délégué</span>
+        <span class="border border-success rounded px-2 ms-2">Statut visite: <span class="text-success">Terminé</span></span>
+        <span class="border border-primary rounded px-2 ms-2 text-primary">Date: <span>{{ item.Date }}</span></span>
+      </div>
+      <hr class="text-secondary">
+      <div class="row">
+        <div class="col col-md-6">
+          <p><strong>Téléphone:</strong> {{ item.Telephone }}</p>
         </div>
-      <div v-for="item in paginatedData" :key="item['Code visite']">
-        <div class="text-center"><span class="h4">M. {{ item['Nom & Prénoms'] }}</span> <span v-if="item.Delegué" class="border border-primary rounded px-2 text-primary">Délégué</span>
-          <div class="bg-secondary text-center text-light mt-1">En délégation</div>
-        </div>
-        <hr class="text-secondary">
-        <div class="d-flex justify-content-between my-3">
-            <span class="border border-primary rounded px-2 ms-2 text-primary fw-bold"><span>{{ item.Date }}</span></span>
-            <span class="border border-success rounded px-2 ms-2 text-success">visite: <span class="fw-bold">Terminé</span></span>
-
-        </div>
-        <div class="row">
-            
-          <div class="col col-md-6">
-            <p><strong>Téléphone:</strong> {{ item.Telephone }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Société:</strong> {{ item.Société }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>E-mail:</strong> {{ item.Email }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Code visiteur:</strong> {{ item['Code visiteur'] }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>Type pièce:</strong> {{ item.TypePiece }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Num pièce:</strong> {{ item.CNI }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>Employé:</strong> {{ item.Employé }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Code:</strong> {{ item["Code visite"] }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>Heure d'entrée:</strong> {{ item['H entrée'] }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Heure de Sortie:</strong> {{ item["H Sortie"] }}</p>
-          </div>
+        <div class="col col-md-6">
+          <p><strong>Société:</strong> {{ item.Société }}</p>
         </div>
       </div>
-      <div class="d-flex justify-content-evenly mb-3">
-        <div class="piece" align="center" @click="showImg('rectoVisible')">
-          <div>Recto</div>
-          <img src="/images/pdf.png" alt="recto" width="90" />
+      <div class="row">
+        <div class="col col-md-6">
+          <p><strong>E-mail:</strong> {{ item.Email }}</p>
         </div>
-        <VueEasyLightbox
-              :visible="rectoVisible"
-              :imgs="['/images/pdf.png']"
-              @hide="onHide('rectoVisible')"
-          />
-        
-        <div>
-          <div class="piece" align="center" @click="showImg('versoVisible')">
-            <div>Verso</div>
-            <img  src="/images/pdf.png" width="90" alt="verso" />
-          </div>
-          <VueEasyLightbox
-              :visible="versoVisible"
-              imgs="/images/pdf.png"
-              @hide="onHide('versoVisible')"
-            />
+        <div class="col col-md-6">
+          <p><strong>Code visiteur:</strong> {{ item['Code visiteur'] }}</p>
         </div>
       </div>
-
-      <div class="d-flex justify-content-end">
-        <BPagination
-        v-model="page"
-        :total-rows="items.length"
-        :per-page="itemsPerPage"
-        aria-controls="modal-pagination"
-      ></BPagination>
+      <div class="row">
+        <div class="col col-md-6">
+          <p><strong>Type pièce:</strong> {{ item.TypePiece }}</p>
+        </div>
+        <div class="col col-md-6">
+          <p><strong>Num pièce:</strong> {{ item.CNI }}</p>
+        </div>
       </div>
-      
-    </BModal>
+      <div class="row">
+        <div class="col col-md-6">
+          <p><strong>Employé:</strong> {{ item.Employé }}</p>
+        </div>
+        <div class="col col-md-6">
+          <p><strong>Code:</strong> {{ item["Code visite"] }}</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-6">
+          <p><strong>Heure d'entrée:</strong> {{ item['H entrée'] }}</p>
+        </div>
+        <div class="col col-md-6">
+          <p><strong>Heure de Sortie:</strong> {{ item["H Sortie"] }}</p>
+        </div>
+      </div>
+      <div class="bg-secondary text-center text-light">En délégation</div>
+      <hr />
+    </div>
+    <div class="d-flex justify-content-end">
+      <BPagination
+      v-model="page"
+      :total-rows="data.length"
+      :per-page="itemsPerPage"
+      aria-controls="modal-pagination"
+    ></BPagination>
+    </div>
+    
+  </BModal>
 
 
 
-    <div class="mb-2"><span>Visites enregistrées</span></div>
-    <div>
-      <!-- Tableau des visiteurs -->
-      <BRow>
-        <BCol cols="12">
-          <BCard no-body>
-            <BCardBody>
-              <BRow class="mb-3">
-                <BCol sm="12" md="2">
-                  Debut
-                  <BFormInput type="datetime-local" v-model="dateDebut" class="border border-secondary":options="listVisiteur" size="sm" />
-                </BCol>
-                <BCol sm="12" md="2">
-                  Fin
-                  <BFormInput type="datetime-local" v-model="dateFin" class="border border-secondary":options="listVisiteur" size="sm" />
-                </BCol>
-                <BCol sm="12" md="5">
-                  <BFormSelect v-model="visiteurSelectionner" class="mt-4 border border-secondary":options="listVisiteur" size="sm" />
-                </BCol>
-                <BCol sm="12" md="3">
-                  <div class="input-group mt-4 border border-secondary rounded-1">
-                      <span class="input-group-text">
-                          <i class="fas fa-search font-size-10"></i>
-                      </span>
-                      <BFormInput v-model="filter" type="search" id="input-small" size="sm"  placeholder="Rechercher..." />
-                  </div>
-                </BCol>
-              </BRow>
-              <div class="table-responsive mb-0">
-                <BTable 
-                  :items="filteredData" 
-                  :fields="fields" 
-                  responsive="sm" 
-                  :per-page="perPage" 
-                  :current-page="currentPage" 
-                  v-model:sort-by.sync="sortBy" 
-                  v-model:sort-desc.sync="sortDesc" 
-                  @filtered="onFiltered" 
-                >
-                :
-                  <template #cell(Statut)="row">
-                    <span v-if="row.item.Statut" class="badge rounded-pill text-bg-success">activé</span>
-                    <span v-if="!row.item.Statut" class="badge rounded-pill text-bg-danger">Désactivé</span>
-                  </template>
-
-                  <template #cell(Actions)="row">
-                      <div class="d-flex gap-1">
-                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-warning d-flex justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'rejeter'">
+  <div class="mb-2"><span>Visites enregistrées</span></div>
+  <div>
+    <!-- Tableau des visiteurs -->
+    <BCard style="min-height: 5em;">
+      <!-- <scale-loader v-if="loading" :loading="loading" color="#FFF" :height="height" :width="width"></scale-loader> -->
+      <pulse-loader  v-if="!loading" :loading="loading" :color="color" :size="size" />
+      <BCardBody v-if="!loading">
+        <BRow class="mb-3">
+          <BCol sm="12" md="2">
+            Debut
+            <BFormInput type="datetime-local" v-model="dateDebut" class="border border-secondary":options="listVisiteur" size="sm" />
+          </BCol>
+          <BCol sm="12" md="2">
+            Fin
+            <BFormInput type="datetime-local" v-model="dateFin" class="border border-secondary":options="listVisiteur" size="sm" />
+          </BCol>
+          <BCol sm="12" md="5">
+            <BFormSelect v-model="visiteurSelectionner" class="mt-4 border border-secondary":options="listVisiteur" size="sm" />
+          </BCol>
+          <BCol sm="12" md="3">
+            <div class="input-group mt-4 border border-secondary rounded-1">
+                <span class="input-group-text">
+                    <i class="fas fa-search font-size-10"></i>
+                </span>
+                <BFormInput v-model="filter" type="search" id="input-small" size="sm"  placeholder="Rechercher..." />
+            </div>
+          </BCol>
+        </BRow>
+        <div class="table-responsive mb-0">
+          <vue3-datatable
+                :rows="rows"
+                :columns="cols"
+                :loading="loading"
+                :totalRows="total_rows"
+                :isServerMode="true"
+                :pageSize="params.limit"
+                :pageSizeOptions="arrayLine"
+                :showNumbersCount="3"
+                class="alt-pagination"
+                @change="changeServer"
+            >
+                <template #Actions="data">
+                    <div class="d-flex justify-content-center align-items-center gap-2">  <!-- Ajout de la classe d-flex flex-row -->
+                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="text-primary justify-content-center align-items-center" @click="showDetailsModal">
+                            <i class="fas fa-eye font-size-15"></i>
+                        </BButton>
+                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="mr-1 fw-bold text-warning justify-content-center align-items-center" @click="handleEdit(row.index, data)" v-b-tooltip.hover.bottom="'rejeter'">
                             <i class="uil uil-ban font-size-15 annuler"></i>
-                          </BButton>
-                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger d-flex justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
+                        </BButton>
+                        <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="px-2 text-danger justify-content-center align-items-center" @click="confirmDelete(row.item.Code)">
                             <i class="uil uil-trash-alt font-size-15"></i>
-                          </BButton>
-                          <BButton style="width: 15px; height: 15px;" variant="white" size="sm" class="d-flex text-primary justify-content-center align-items-center" @click="showDetailsModal">
-                            <i class="fas fa-eye"></i>
-                          </BButton>
-                      </div>
-                  </template>
-
-                </BTable>
-              </div>
-              <hr class="border-1 border-secondary">
-              <BRow>
-                <BCol>
-                  <div class="dataTables_paginate paging_simple_numbers d-flex justify-content-between">
-                    <div id="tickets-table_length" class="dataTables_length">
-                      <BCol sm="12" md="6" class="">
-                          <div id="tickets-table_length" class="dataTables_length">
-                              <label class="d-inline-flex align-items-center">
-                              Afficher&nbsp;
-                              <BFormSelect class="border border-secondary" v-model="perPage" size="sm" :options="pageOptions"></BFormSelect>éléments&nbsp;
-                              
-                              </label>
-                          </div>
-                      </BCol>
+                        </BButton>
                     </div>
-                    <ul class="pagination pagination-rounded mb-0">
-                      <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" />
-                    </ul>
-                  </div>
+                </template>
+            </vue3-datatable>
+        </div>
+        <hr class="border-1 border-secondary">
+        <BRow>
+          <BCol>
+            <div class="dataTables_paginate paging_simple_numbers d-flex justify-content-between">
+              <div id="tickets-table_length" class="dataTables_length">
+                <BCol sm="12" md="6" class="">
+                    <div id="tickets-table_length" class="dataTables_length">
+                        <label class="d-inline-flex align-items-center">
+                        Afficher&nbsp;
+                        <BFormSelect class="border border-secondary" v-model="perPage" size="sm" :options="pageOptions"></BFormSelect>éléments&nbsp;
+                        
+                        </label>
+                    </div>
                 </BCol>
-              </BRow>
-            </BCardBody>
-          </BCard>
-        </BCol>
-      </BRow>
-  </div>
+              </div>
+              <ul class="pagination pagination-rounded mb-0">
+                <!-- <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" /> -->
+                <BPagination
+                  v-model="currentPage"
+                  :total-rows="pagination.total"
+                  :per-page="pagination.perPage"
+                  :align="'fill'"
+                  size="sm"
+                  class="my-0"
+                />
+              </ul>
+            </div>
+          </BCol>
+        </BRow>
+      </BCardBody>
+    </BCard>
+</div>
 </template>
-<script>
 
-export default {
-    data() {
-        return {
-          rectoVisible : false,
-          versoVisible : false,
-          imgs : [
-            "/images/bg-qrcode.png",
-            "/images/pdf.png",
-            "/images/pdf.png",
-          ],
-          items: [ 
-          {
-              Date: "2024/10/20",
-              "Nom & Prénoms": "Dupont Jean",
-              Delegué: true,
-              TypePiece: "Carte Nationale d'Identité (CNI)",
-              Telephone: "0900020319",
-              Email: "dupond@gmail.com",
-              CNI: "C123456789",
-              Société: "Société A",
-              "Code visiteur": "VTR-xxx",
-              "Code visite": "017",
-              Employé: "KOUADIO Konan jean",
-              Visite: "RDV",
-              "H entrée": "08:30",
-              Statut: "Terminé",
-              "H Sortie": "12:30",
-          },
-          {
-              Date: "2024/10/10",
-              Delegué: false,
-              "Nom & Prénoms": "Aka André",
-              TypePiece: "Carte Nationale d'Identité (CNI)",
-              Telephone: "0700020310",
-              Email: "aka@gmail.com",
-              CNI: "C000956789",
-              Société: "Société B",
-              "Code visiteur": "VTR-xxx",
-              "Code visite": "006",
-              Employé: "Ouattara Khader",
-              Visite: "RDV",
-              "H entrée": "10:30",
-              Statut: "en cours",
-              "H Sortie": "11:38",
-          }
-           ],
-          page: 1,
-          itemsPerPage: 1,
 
-          detailModal: false,
-          isActive: 'Jour' ,
-          dateDebut: '',
-          dateFin: '',
-          visiteurSelectionner: null,
-          listVisiteur : [
-          {value: null, text: 'Liste Visiteurs'},
-          {value: '1', text: 'AKA ANDRE'},
-          ],
+<script setup>
+import { ref, computed, watch, nextTick, onMounted } from 'vue';
+import { useAuthStore } from '~/stores/auth.js';
+import apiClient from '../api/intercepteur';
+import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
 
-        totalRows: 1,
-        currentPage: 1,
-        perPage: 5,
-        pageOptions: [5, 10, 15, 20],
-        filter: "", 
-        sortBy: "age",
-        sortDesc: false,
-        
-        fields: [
-            {key: "Date"},
-            {key: "Nom & Prénoms"},
-            {key: "CNI"},
-            {key: "Société"},
-            {key: "Code visiteur"},
-            {key: "Code visite"},
-            {key: "Employé"},
-            {key: "Visite"},
-            {key: "H entrée"},
-            {key: "statut"},
-            {key: "H Sortie"},
-            {key: "Actions"},
-        ],
-        title: null,
-        data: [
-          {
-              Date: "2024/10/20",
-              "Nom & Prénoms": "Dupont Jean",
-              CNI: "C123456789",
-              Société: "Société A",
-              "Code visiteur": "VTR-xxx",
-              "Code visite": "017",
-              Employé: "KOUADIO Konan jean",
-              Visite: "RDV",
-              "H entrée": "08:30",
-              Statut: "Terminé",
-              "H Sortie": "12:30",
-          },
-          {
-              Date: "2024/10/10",
-              "Nom & Prénoms": "Aka André",
-             
-              CNI: "C000956789",
-              Société: "Société B",
-              "Code visiteur": "VTR-xxx",
-              "Code visite": "006",
-              Employé: "Ouattara Khader",
-              Visite: "RDV",
-              "H entrée": "10:30",
-              Statut: "en cours",
-              "H Sortie": "11:38",
-          }
-        ],
-    };
-  },
+// Déclaration des variables réactives
+const authStore = useAuthStore();
+const page = ref(1);
+const itemsPerPage = ref(1);
+const detailModal = ref(false);
+const isActive = ref('Jour');
+const dateDebut = ref('');
+const dateFin = ref('');
+const visiteurSelectionner = ref(null);
+const listVisiteur = ref([
+  { value: null, text: 'Liste Visiteurs' },
+  { value: '1', text: 'AKA ANDRE' }
+]);
+const size = ref(10);
+const totalRows = ref(1);
+const currentPage = ref(1);
+const perPage = ref(5);
+const pageOptions = ref([5, 10, 15, 20]);
+const filter = ref('');
+const sortBy = ref('age');
+const sortDesc = ref(false);
+const pagination = ref({
+  total: 0,
+  perPage: 5,
+  totalPages: 1
+});
+const fields = ref([
+  { key: 'created_at', label: 'Date' },
+  { key: 'visiteur', label: 'Nom & Prénoms' },
+  { key: 'numero_piece', label: 'CNI' },
+  { key: 'entreprise', label: 'Société' },
+  { key: 'code_visiteur', label: 'Code visiteur' },
+  { key: 'code_visite', label: 'Code visite' },
+  { key: 'employe', label: 'Employé' },
+  { key: 'lib_visite', label: 'Visite' },
+  { key: 'heure_entree', label: 'H entrée' },
+  { key: 'lib_statut', label: 'statut' },
+  { key: 'heure_fin', label: 'H Sortie' },
+  { key: 'Actions' }
+]);
+const data = ref([]);
+const loading = ref(false);
 
-    methods: {
-      showImg(type){
-        // this.indexRef = index;
-        this[type] = true;
-        console.log("show")
-      },
-      onHide(type){
-        this[type] = false;
-        console.log(`recto: ${this.rectoVisible} et verso: ${this.versoVisible}`)
-      },
-        onFiltered(filteredItems) {
-          // Update totalRows and reset to first page after filtering
-          this.totalRows = filteredItems.length;
-          this.currentPage = 1;
+// Computed properties
+const filteredData = computed(() => {
+  if (filter.value) {
+    return data.value.filter(item =>
+      Object.keys(item).some(key =>
+        String(item[key]).toLowerCase().includes(filter.value.toLowerCase())
+      )
+    );
+  }
+  return data.value;
+});
+
+// Fonction pour récupérer les données avec la pagination
+const fetchData = async (page) => {
+  if (authStore.user.visite && authStore.user.visite.code_visite) {
+    loading.value = true;
+    try {
+      const response = await apiClient.get('/fvisites/lvisite', {
+        params: {
+          page: page,
+          limit: pagination.value.perPage,
+          sort_type: 1,
+          code_employe: authStore.user.visite.code_visite
         },
+        headers: {
+          'Authorization': `Bearer ${authStore.token}`
+        }
+      });
 
-        handleEdit(index, data) {
-          this.$swal.fire({
-          text: "Voulez-vous rejeter?",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Oui',
-          cancelButtonText: 'Non',
-          reverseButtons: true // Inverser l'ordre des boutons
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Logique pour supprimer l'élément ici
-            this.deleteItem(code);
+      if (!response.data.error) {
+        const dataResponse = response.data.data;
+        data.value = [...dataResponse.data];
 
-            this.$swal.fire(
-              'Rejeter!',
-              'Visite rejetée',
-              'success'
-            );
-          }
-        });
-        },
-
-        showDetailsModal(){
-          this.detailModal = !this.detailModal
-        },
-
-        confirmDelete(code) {
-        this.$swal.fire({
-          title: 'Êtes-vous sûr?',
-          text: "Cette action est irréversible!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Oui',
-          cancelButtonText: 'Non',
-          reverseButtons: true // Inverser l'ordre des boutons
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // Logique pour supprimer l'élément ici
-            this.deleteItem(code);
-
-            this.$swal.fire(
-              'Supprimé!',
-              'Votre élément a été supprimé.',
-              'success'
-            );
-          }
-        });
-      },
-
-    },
-    computed: {
-    /**
-     * Dynamically generate filterOn based on fields
-     */
-    filterOn() {
-      // Return an array of keys from fields
-      return this.fields.map(field => field.key);
-    },
-
-    /**
-     * Total no. of records
-     */
-    rows() {
-      return this.filteredData.length;
-    },
-
-    /**
-     * Filtered data based on search input
-     */
-    filteredData() {
-      if (this.filter) {
-        return this.data.filter(item =>
-          this.filterOn.some(key =>
-            String(item[key]).toLowerCase().includes(this.filter.toLowerCase())
-          )
-        );
+        pagination.value = {
+          total: dataResponse.total,
+          perPage: dataResponse.per_page,
+          totalPages: dataResponse.last_page
+        };
+      } else {
+        console.error('Erreur lors de l\'extraction des visiteurs:', JSON.stringify(response.data));
       }
-      return this.data;
-    },
-    paginatedData() {
-      const start = (this.page - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.items.slice(start, end);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des données:', error);
+    } finally {
+      loading.value = false;
     }
-  },
-  mounted() {
-    this.totalRows = this.data.length;
-  },
-}
+  } else {
+    console.error('Pas de code visite');
+  }
+};
+
+// Fonction qui est appelée à chaque changement de page
+const handlePageChange = (newPage) => {
+  currentPage.value = newPage;
+  fetchData(newPage); // Charger les données pour la nouvelle page
+};
+
+// Fonction pour afficher/modifier les détails d'un visiteur
+const showDetailsModal = () => {
+  detailModal.value = !detailModal.value;
+};
+
+// Confirmer la suppression d'un visiteur
+const confirmDelete = (code) => {
+  // Logique de confirmation de suppression
+};
+
+// Filter dynamically based on the field keys
+const filterOn = computed(() => fields.value.map(field => field.key));
+
+
+
+// Computed property for total number of records
+const rows = computed(() => data.value.length);
+
+// Watch for changes in currentPage
+watch(currentPage, (newPage) => {
+  console.log('----------------- page: ' + newPage);
+  fetchData(newPage).then(() => {
+    // Après que fetchData a mis à jour les données, calculer filteredData
+    nextTick(() => {
+      console.log('data après changement de page:', JSON.stringify(filteredData.value));
+    });
+  });
+});
+
+// Load data initially
+onMounted(() => {
+  fetchData(currentPage.value);
+});
 </script>
+
 
 <style>
 .activeVisiteur {
-    background-color: #007bff; 
-    color: white;
+  background-color: #007bff; 
+  color: white;
 }
 .largeur{
-    width: 90px;
-    padding: 0;
+  width: 90px;
+  padding: 0;
 }
 .btn-inactive {
-    border: 1px solid gray; /* Bordure grise */
-    background-color: white; /* Fond blanc */
-    color: gray; /* Couleur du texte */
-}
-</style>
-<style scoped>
-.image-container {
-  display: flex;           /* Utilisation de Flexbox */
-  flex-wrap: wrap;          /* Permet aux images de se replier si nécessaire */
-  justify-content: center;  /* Aligne les images à gauche */
+  border: 1px solid gray; /* Bordure grise */
+  background-color: white; /* Fond blanc */
+  color: gray; /* Couleur du texte */
 }
 
-.pic {
-  margin-right: 10px; /* Espacement entre les images */
-  margin-bottom: 10px; /* Espacement vertical entre les images */
+/* spinner */
+.loading-ellipses {
+  font-size: 40px; /* Taille augmentée */
+  text-align: center;
+  font-weight: bold;
 }
 
-img {
-  max-width: 100%; /* S'assure que les images ne débordent pas */
-  height: auto;
+.dot {
+  animation: blink 1s infinite;
+  margin: 0 5px; /* Espacement entre les points */
 }
 
-.piece:hover {
-  cursor: pointer;
+.dot:nth-child(1) {
+  animation-delay: 0s;
 }
+
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes blink {
+  0%, 20% {
+    opacity: 0;
+  }
+  50%, 100% {
+    opacity: 1;
+  }
+}
+/* end spinner */
+
+
 </style>

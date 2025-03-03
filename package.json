@@ -20,6 +20,7 @@
   "dependencies": {
     "@amcharts/amcharts5": "^5.4.2",
     "@amcharts/amcharts5-geodata": "^5.1.1",
+    "@bhplugin/vue3-datatable": "^2.0.1",
     "@ckeditor/ckeditor5-build-classic": "^39.0.1",
     "@fullcalendar/bootstrap": "^6.1.8",
     "@fullcalendar/core": "^6.1.8",
@@ -36,6 +37,7 @@
     "@vuelidate/core": "^2.0.3",
     "@vuelidate/validators": "^2.0.4",
     "@vuepic/vue-datepicker": "^6.0.1",
+    "@vueuse/core": "^12.7.0",
     "apexcharts": "^3.41.1",
     "axios": "^1.4.0",
     "bootstrap": "^5.3.2",
@@ -47,6 +49,10 @@
     "metismenujs": "^1.4.0",
     "nuxt-storage": "^1.2.2",
     "nuxt-sweetalert2": "^1.0.0",
+<<<<<<< HEAD
+=======
+    "pinia": "^2.2.2",
+>>>>>>> dev-ib
     "pinia-plugin-persistedstate": "^4.2.0",
     "pusher-js": "^8.4.0-rc2",
     "sass": "^1.66.1",
@@ -65,10 +71,15 @@
     "vue-flatpickr-component": "^11.0.3",
     "vue-i18n": "^9.2.2",
     "vue-multiselect": "^3.1.0",
+    "vue-notification": "^1.3.20",
     "vue-qrcode-reader": "^5.5.11",
+    "vue-spinner": "^1.0.4",
+    "vue-toastification": "^1.7.14",
     "vue-web-cam": "^1.9.0",
     "vue3-apexcharts": "^1.4.4",
     "vue3-carousel": "^0.3.1",
+    "vue3-easy-data-table": "^1.5.47",
+    "vue3-form-wizard": "^0.2.4",
     "vue3-google-map": "^0.15.0"
   }
 }

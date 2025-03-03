@@ -27,5 +27,5 @@ export default {
   <SiteHeader :title="title" />
   <PageHeader :title="title" :items="items" />
   
-  <DashboardMesVisiteur />
+  <DashboardMesVisiteurNew />
 </template>

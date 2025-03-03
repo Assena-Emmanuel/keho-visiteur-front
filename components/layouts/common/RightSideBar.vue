@@ -2,7 +2,9 @@
 import { useLayoutStore } from "~/stores/layout";
 import apiClient from "~/components/api/intercepteur";
 import RadioGroup from "~/components/common/RadioGroup.vue";
-import { useAuthStore } from '~/stores/auth'
+import { useAuthStore } from '~/stores/auth';
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
+
 
 
 import {
@@ -12,9 +14,12 @@ import {
   topBarOptions,
   layoutModeOptions
 } from "~/components/layouts/utils/rightSideBar.js";
-// import { NuxtLink } from "#build/components";
 
 export default {
+  setup(){
+    return {authStore: useAuthStore()}
+
+  },
   data() {
     return {
       layoutOptions,
@@ -22,12 +27,16 @@ export default {
       sideBarTypeOptions,
       topBarOptions,
       layoutModeOptions,
-      user: authStore.user,
-      token: authStore.token,
+      user: "",
+      token: "",
+      isLoading: false,
+      color: "#FFFFFF",
+      height: "18px"
     };
   },
   components: {
-    RadioGroup
+    RadioGroup,
+    ScaleLoader
   },
 
   setup() {
@@ -93,26 +102,26 @@ export default {
 
   
   mounted() {
+    this.user = this.authStore.user,
+    this.token = this.authStore.token,
     this.addEventListener();
-    // const authStore = useAuthStore();
-    // this.user = authStore.user
-    // this.token = authStore.token
-
   },
 
 
   methods: {
     async deconnexion(){
       try {
-          const authStore = useAuthStore();
+          this.isLoading = true
+          // const token = useCookie("token")
           await  apiClient.post('/auth/logout', {}, {
               headers: {
-                Authorization: `Bearer ${token}`, // Utiliser le token dans l'en-tête Authorization
+                Authorization: `Bearer ${this.token}`, // Utiliser le token dans l'en-tête Authorization
               },
             }).then(response => {
-              authStore.logout()
- 
-              // Rediriger vers la page enregistrée ou vers /dashboard par défaut
+              this.authStore.logout()
+              this.hide() // fermer le rightSideBar
+              
+
               this.$router.push('/login');
 
             })
@@ -120,9 +129,13 @@ export default {
                 console.error('Error fetching user info:', error);
             });
 
+        
       } catch (error) {
         console.error('Erreur lors de la déconnexion:', error);
         throw error;
+
+      }finally{
+        this.isLoading = true
       }
       
   },
@@ -165,7 +178,10 @@ export default {
         </div>
         <div class="p-3">
           <div class="text-center">
-            <img class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
+            <img v-if="user.image" class="rounded-circle header-profile-user" style="width: 100px; height: 100px;" :src="`data:${user.imageType};base64,${user.image}`" alt="Header Avatar" />
+            <img v-else-if="!user.image && user.civilite == 'M.' " class="rounded-circle header-profile-user" src="/public/images/office-man.png" alt="Header Avatar" />
+            <img v-else-if="!user.image && user.civilite != 'M.' " class="rounded-circle header-profile-user" src="/public/images/woman.png" alt="Header Avatar" />
+            
             <div class="ms-1 fw-medium font-size-12">{{ user.nom +' '+ user.prenom}}</div>
             <div class="ms-1 fw-medium font-size-12 text-primary">{{user.email}}</div>
             <div><BBadge variant="secondary">{{ user.role.libelle }}</BBadge></div>
@@ -195,9 +211,12 @@ export default {
             </button>
           </div>
           <div class="text-center mt-5">
-            <BButton variant="outline-danger" @click="deconnexion">
-              <i class="uil uil-sign-out-alt font-size-18 align-middle me-1"></i>
-              <span class="align-middle">Déconnexion</span>
+            <BButton variant="outline-danger" @click="deconnexion" style="min-width: 120px">
+              <span class="d-flex" v-if="!isLoading">
+                <i  class="uil uil-sign-out-alt font-size-18 align-middle me-1"></i>
+                <span class="align-middle">Déconnexion</span>
+              </span>
+              <ScaleLoader :loading="isLoading" :height="height" :color="color" />
             </BButton>
           </div>
         

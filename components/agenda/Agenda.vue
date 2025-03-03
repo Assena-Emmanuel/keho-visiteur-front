@@ -68,6 +68,7 @@
           
         </BForm>
       </BModal> -->
+    
     </BCardBody>
   </BCard>
 </template>
@@ -135,6 +136,7 @@ export default {
       }
       this.modalVisible = true;
     },
+    
     addEvent() {
       if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
         if (!this.selectedDate) {

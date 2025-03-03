@@ -72,12 +72,10 @@
       async onLogin() {
       this.submitted = true;
       this.v$.$touch();
-      alert(`v$.civilite.$error: ${v$.civilite.$error}`)
       if (this.v$.$invalid) {
         return;
       } else {
         this.errorMsg = "";
-        alert(`nom: ${this.nom}, nom: ${this.prenom}, nom: ${this.civilite}, nom: ${this.email}, nom: ${this.mobile1}, nom: ${this.mobile2}`)
         this.nom = ""
         this.prenom = ""
         this.civilite = ""

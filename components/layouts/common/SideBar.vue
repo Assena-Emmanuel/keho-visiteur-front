@@ -1,11 +1,23 @@
 <script>
-import { menuItems } from "~/components/layouts/utils/menu.js";
 import MetisMenu from "metismenujs";
+import { useAuthStore } from "~/stores/auth.js";
+import { useApi } from '~/components/api/useApi';
+import apiClient from "~/components/api/intercepteur";
+
 
 export default {
+  setup(){
+    const authStore = useAuthStore()
+    const { getAll, createResource } = useApi(authStore.token);
+
+    return{
+      authStore,getAll, createResource
+    }
+
+  },
   data() {
     return {
-      menuItems
+      menus: []
     };
   },
   props: {
@@ -18,6 +30,12 @@ export default {
       required: true
     }
   },
+  computed: {
+    filteredMenus() {
+      return this.menus.filter(item => item.type === 'SIDE');
+    }
+  },
+
   watch: {
     type: {
       immediate: true,
@@ -79,7 +97,7 @@ export default {
       }
     }
   },
-  mounted() {
+  async mounted() {
     const element = document.getElementById("side-menu");
     if (element) {
       new MetisMenu("#side-menu");
@@ -89,6 +107,23 @@ export default {
         this._activateMenuDropdown();
       });
     }
+
+    
+    // Recuperation des menus en fonction du role connecté
+    const response = await apiClient.get(`/menu_by_role/${this.authStore.user.role_id}`, 
+      {
+      headers: {
+          'Authorization': `Bearer ${this.authStore.token}`,  // Utilisation du token d'authentification
+        },
+      })
+
+    if(!response.data.error){
+      this.menus = response.data
+
+    }else{
+      console.error("Menu error: "+response.message)
+    }
+
   },
   methods: {
     toggleMenu() {
@@ -134,9 +169,11 @@ export default {
          * TODO: This is hard coded way of expading/activating parent menu dropdown and working till level 3.
          * We should come up with non hard coded approach
          */
+
         if (parent) {
           parent.classList.add("mm-active");
           const parent2 = parent.parentElement.closest("ul");
+
           if (parent2 && parent2.id !== "side-menu") {
             parent2.classList.add("mm-show");
 
@@ -145,18 +182,23 @@ export default {
               parent3.classList.add("mm-active");
               var childAnchor = parent3.querySelector(".has-arrow");
               var childDropdown = parent3.querySelector(".has-dropdown");
+
               if (childAnchor) childAnchor.classList.add("mm-active");
+
               if (childDropdown) childDropdown.classList.add("mm-active");
 
               const parent4 = parent3.parentElement;
               if (parent4 && parent4.id !== "side-menu") {
                 parent4.classList.add("mm-show");
                 const parent5 = parent4.parentElement;
+
                 if (parent5 && parent5.id !== "side-menu") {
                   parent5.classList.add("mm-active");
                   const childanchor = parent5.querySelector(".is-parent");
+
                   if (childanchor && parent5.id !== "side-menu") {
                     childanchor.classList.add("mm-active");
+
                   }
                 }
               }
@@ -164,6 +206,7 @@ export default {
           }
         }
       }
+      
     }
   }
 };
@@ -189,10 +232,10 @@ export default {
     <div data-simplebar class="sidebar-menu-scroll">
       <div id="sidebar-menu">
         <ul class="metismenu list-unstyled" id="side-menu">
-          <template v-for="item in menuItems">
-            <li class="menu-title" v-if="item.isTitle" :key="item.id">
+          <template v-for="item in filteredMenus" :key="item.id">
+            <!-- <li class="menu-title" v-if="item.label" :key="item.id">
               {{ $t(item.label) }}
-            </li>
+            </li> -->
             <li v-if="!item.isTitle && !item.isLayout" :key="item.id">
               <a v-if="hasItems(item)" href="javascript:void(0);" class="is-parent" :class="{
                 'has-arrow': !item.badge,
@@ -203,36 +246,19 @@ export default {
                 <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ $t(item.badge.text) }}</span>
               </a>
 
-              <!-- <nuxt-link :to="item.link" v-if="!hasItems(item)" class="side-nav-link-ref">
-                <i :class="`${item.icon}`" v-if="item.icon"></i>
-                <img src="/images/sideBarIcon/dashboard.png" width="30px" class="me-2" alt="">
-                <img src="/images/sideBarIcon/dashboard-des.png" width="30px" class="me-2" alt="">
-                <span>{{ $t(item.label) }}</span>
-                <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ $t(item.badge.text) }}</span>
-              </nuxt-link> -->
 
               <nuxt-link :to="item.link" v-if="!hasItems(item)" class="side-nav-link-ref">
                   <img 
                     v-if="item.icon" 
-                    :src="$route.path === item.link ? item.icon.active : item.icon.desactive" 
+                    :src="$route.path === item.link ? item.icon+'.png' : item.icon+'-desactive.png'" 
                     width="25px" class="me-2" alt=""
                   >
                   <!-- <img v-else :src="`${item.icon.desactive}`" width="30px" class="me-2" alt=""> -->
-                  <span :style="{color : $route.path === item.link ? '#378DEA':'#878787' }">{{ $t(item.label) }}</span>
-                  <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ $t(item.badge.text) }}</span>
+                  <span :style="{color : $route.path === item.link ? '#378DEA':'#878787' }">{{ item.label }}</span>
+                  <span :class="`badge rounded-pill bg-${item.badge.variant} float-end`" v-if="item.badge">{{ item.badge.text }}</span>
               </nuxt-link>
 
-              <!-- <ul v-if="hasItems(item)" class="sub-menu" aria-expanded="false">
-                <li v-for="(subitem, index) of item.subItems" :key="index">
-                  <nuxt-link :to="subitem.link" v-if="!hasItems(subitem)" class="side-nav-link-ref">{{ $t(subitem.label) }}</nuxt-link>
-                  <a v-if="hasItems(subitem)" class="side-nav-link-a-ref has-arrow" href="javascript:void(0);">{{ $t(subitem.label) }}</a>
-                  <ul v-if="hasItems(subitem)" class="sub-menu mm-collapse" aria-expanded="false">
-                    <li v-for="(subSubitem, index) of subitem.subItems" :key="index">
-                      <nuxt-link :to="subSubitem.link" class="side-nav-link-ref">{{ $t(subSubitem.label) }}</nuxt-link> 
-                    </li>
-                  </ul>
-                </li>
-              </ul> -->
+
             </li>
           </template>
         </ul>
