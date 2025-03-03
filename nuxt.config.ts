@@ -1,12 +1,16 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+//@ts-check
 export default defineNuxtConfig({
   plugins: [
     '~/plugins/sweetalert.ts',
     '~/plugins/qrcode-reader.js',
     '~/plugins/vue-cal.js',
     '~/plugins/vue-awesome-paginate.js',
-    'pinia-plugin-persistedstate/nuxt',
+    '~/plugins/vue3-datatable.js',
+    '~/plugins/vue-spinners.js',
+    '~/plugins/vue3-easy-data-table.js',
+    '~/plugins/vue3-form-wizard.js',
   ],
+  
   app: {
     head: {
       htmlAttrs: { dir: "ltr", lang: "fr" },
@@ -31,7 +35,11 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts", "nuxt-easy-lightbox", "pinia-plugin-persistedstate/nuxt",],
+  modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts", "nuxt-easy-lightbox",],
+
+  pinia: {
+    autoImports: ["defineStore", ["defineStore", "definePiniaStore"]]
+  },
 
   css: [
     "bootstrap-vue-next/dist/bootstrap-vue-next.css",
