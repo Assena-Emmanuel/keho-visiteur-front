@@ -2,12 +2,6 @@
 {
   "compilerOptions": {
     "paths": {
-      "nitropack/types": [
-        "../node_modules/nitropack/types"
-      ],
-      "nitropack/runtime": [
-        "../node_modules/nitropack/runtime"
-      ],
       "nitropack": [
         "../node_modules/nitropack"
       ],
@@ -47,9 +41,6 @@
       "nuxt": [
         "../node_modules/nuxt"
       ],
-      "vite/client": [
-        "../node_modules/vite/client"
-      ],
       "~": [
         ".."
       ],
@@ -73,9 +64,6 @@
       ],
       "@@/*": [
         "../*"
-      ],
-      "#shared": [
-        "../shared"
       ],
       "assets": [
         "../../../../../../../..//assets"
@@ -111,16 +99,16 @@
         "./imports"
       ],
       "#app-manifest": [
-        "./manifest/meta/8db9602b-f009-4b4a-acd3-2fb747a65882"
-      ],
-      "#components": [
-        "./components"
+        "./manifest/meta/dev"
       ],
       "#build": [
         "."
       ],
       "#build/*": [
         "./*"
+      ],
+      "#components": [
+        "./components"
       ]
     },
     "esModuleInterop": true,
@@ -135,7 +123,7 @@
     "noUncheckedIndexedAccess": false,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
-    "module": "preserve",
+    "module": "ESNext",
     "noEmit": true,
     "lib": [
       "ESNext",
@@ -177,13 +165,6 @@
     "../dist",
     "../node_modules",
     "../node_modules/nuxt/node_modules",
-    "../node_modules/@nuxtjs/mdc/node_modules",
-    "../node_modules/@nuxt/content/node_modules",
-    "../node_modules/@pinia/nuxt/node_modules",
-    "../node_modules/@nuxtjs/google-fonts/node_modules",
-    "../node_modules/nuxt-easy-lightbox/node_modules",
-    "../node_modules/@nuxt/devtools/node_modules",
-    "../node_modules/@nuxt/telemetry/node_modules",
     "../node_modules/@nuxtjs/mdc/runtime/server",
     "../node_modules/@nuxtjs/mdc/dist/runtime/server",
     "../node_modules/@nuxt/content/runtime/server",
