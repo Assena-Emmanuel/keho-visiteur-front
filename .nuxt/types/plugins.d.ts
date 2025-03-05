@@ -3,44 +3,38 @@ import type { Plugin } from '#app'
 
 type Decorate<T extends Record<string, any>> = { [K in keyof T as K extends string ? `$${K}` : never]: T[K] }
 
-type IsAny<T> = 0 extends 1 & T ? true : false
-type InjectionType<A extends Plugin> = IsAny<A> extends true ? unknown : A extends Plugin<infer T> ? Decorate<T> : unknown
+type InjectionType<A extends Plugin> = A extends {default: Plugin<infer T>} ? Decorate<T> : unknown
 
 type NuxtAppInjections = 
-  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/revive-payload.client.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt/dist/head/runtime/plugins/unhead.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt/dist/pages/runtime/plugins/router.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/navigation-repaint.client.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/check-outdated-build.client.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/revive-payload.server.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/chunk-reload.client.js").default> &
-  InjectionType<typeof import("../../node_modules/@pinia/nuxt/dist/runtime/plugin.vue3.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt/dist/pages/runtime/plugins/prefetch.client.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt/dist/pages/runtime/plugins/check-if-page-unused.js").default> &
-  InjectionType<typeof import("../../node_modules/@nuxt/devtools/dist/runtime/plugins/devtools.server.js").default> &
-  InjectionType<typeof import("../../node_modules/@nuxt/devtools/dist/runtime/plugins/devtools.client.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt-easy-lightbox/dist/runtime/plugin.js").default> &
-  InjectionType<typeof import("../../node_modules/@nuxt/content/dist/runtime/plugins/ws.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/dev-server-logs.js").default> &
-  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/check-if-layout-used.js").default> &
-  InjectionType<typeof import("../../plugins/sweetalert").default> &
-  InjectionType<typeof import("../../plugins/qrcode-reader.js").default> &
-  InjectionType<typeof import("../../plugins/vue-cal.js").default> &
-  InjectionType<typeof import("../../plugins/vue-awesome-paginate.js").default> &
-  InjectionType<typeof import("../../plugins/vue3-datatable.js").default> &
-  InjectionType<typeof import("../../plugins/vue-spinners.js").default> &
-  InjectionType<typeof import("../../plugins/vue3-easy-data-table.js").default> &
-  InjectionType<typeof import("../../plugins/vue3-form-wizard.js").default> &
-  InjectionType<typeof import("../../plugins/i18n.client.js").default> &
-  InjectionType<typeof import("../../plugins/piniaPersistedState.js").default> &
-  InjectionType<typeof import("../../plugins/pusher.js").default> &
-  InjectionType<typeof import("../../plugins/vueBootstrap.client.js").default>
+  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/revive-payload.client.js")> &
+  InjectionType<typeof import("../../node_modules/nuxt/dist/head/runtime/plugins/unhead.js")> &
+  InjectionType<typeof import("../../node_modules/nuxt/dist/pages/runtime/plugins/router.js")> &
+  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/payload.client.js")> &
+  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/navigation-repaint.client.js")> &
+  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/check-outdated-build.client.js")> &
+  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/revive-payload.server.js")> &
+  InjectionType<typeof import("../../node_modules/nuxt/dist/app/plugins/chunk-reload.client.js")> &
+  InjectionType<typeof import("../../node_modules/@pinia/nuxt/dist/runtime/plugin.vue3.js")> &
+  InjectionType<typeof import("../../node_modules/nuxt/dist/pages/runtime/plugins/prefetch.client.js")> &
+  InjectionType<typeof import("../../node_modules/nuxt-easy-lightbox/dist/runtime/plugin.js")> &
+  InjectionType<typeof import("../../plugins/sweetalert")> &
+  InjectionType<typeof import("../../plugins/qrcode-reader.js")> &
+  InjectionType<typeof import("../../plugins/vue-cal.js")> &
+  InjectionType<typeof import("../../plugins/vue-awesome-paginate.js")> &
+  InjectionType<typeof import("../../plugins/vue3-datatable.js")> &
+  InjectionType<typeof import("../../plugins/vue-spinners.js")> &
+  InjectionType<typeof import("../../plugins/vue3-easy-data-table.js")> &
+  InjectionType<typeof import("../../plugins/vue3-form-wizard.js")> &
+  InjectionType<typeof import("../../plugins/i18n.client.js")> &
+  InjectionType<typeof import("../../plugins/piniaPersistedState.js")> &
+  InjectionType<typeof import("../../plugins/pusher.js")> &
+  InjectionType<typeof import("../../plugins/vueBootstrap.client.js")>
 
 declare module '#app' {
   interface NuxtApp extends NuxtAppInjections { }
 
   interface NuxtAppLiterals {
-    pluginName: 'nuxt:revive-payload:client' | 'nuxt:head' | 'nuxt:router' | 'nuxt:revive-payload:server' | 'nuxt:chunk-reload' | 'pinia' | 'nuxt:global-components' | 'nuxt:prefetch' | 'nuxt:checkIfPageUnused' | 'nuxt:checkIfLayoutUsed'
+    pluginName: 'nuxt:revive-payload:client' | 'nuxt:head' | 'nuxt:router' | 'nuxt:payload' | 'nuxt:revive-payload:server' | 'nuxt:chunk-reload' | 'pinia' | 'nuxt:global-components' | 'nuxt:prefetch'
   }
 }
 
