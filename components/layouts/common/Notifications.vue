@@ -75,7 +75,7 @@ const modal = ref(false)
 
 // Définir une propriété calculée pour obtenir les notifications
 const myNotifs = computed(() => notifiedStore.mynotifs);
-
+   
 // Utilisateur connecté
 const userId = parseInt(authUser.user.id, 10);
 

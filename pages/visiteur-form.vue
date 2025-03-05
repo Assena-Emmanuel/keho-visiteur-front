@@ -393,6 +393,11 @@
                    <div class="alert alert-danger" v-if="submitted && (!rectoImage || !versoImage)"> Photo de la piece (recto et verso) obligatoire</div>
                 </BRow>
 
+
+                <!-- Debugging log -->
+                <p>Recto Image: {{ rectoImage ? rectoImage.name : 'Aucune image' }}</p>
+                <p>Verso Image: {{ versoImage ? versoImage.name : 'Aucune image' }}</p>
+
                 <div class="mt-4 d-flex justify-content-center">
 
                 <BButton :loading="loading" loading-text="Enregistrement ..." @click="onSaveVisiteur" variant="primary" class="w-sm waves-effect waves-light btn btn-lg" >

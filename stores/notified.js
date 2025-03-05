@@ -29,16 +29,13 @@ export const useNotifiedStore = defineStore("notified", {
        let notifs = JSON.parse(JSON.stringify(response.data));
 
        if(parseInt(notifs.code)===1){
-
         this.notifications.push(...notifs.data);
-       
         this.mynotifs = this.notifications.map(notification => notification.data);
      
        }
     
       } else {
         console.error("Error fetching notifications: " + response.status);
-
       }
 
      

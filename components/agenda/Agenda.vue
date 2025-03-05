@@ -61,10 +61,13 @@
           </BRow>
           
           <div class="d-flex justify-content-between" v-if="isEditing">
-            <BButton v-if="isEditing" class="mt-2" @click="deleteEvent" variant="danger">Supprimer</BButton>
-            <BButton class="mt-2" type="submit" variant="primary">
+            <BButton v-if="isEditing" class="mt-2" @click="deleteEvent" variant="danger">
+              <span v-if="!loadingDel">Supprimer</span>
+              <ScaleLoader v-if="loadingDel" :loading="loadingDel" :height="'20px'" :color="'#FFFFFF'" />
+            </BButton>
+            <BButton class="mt-2" type="submit" variant="primary" @click="updateEvent">
               <span v-if="!loading">Modifier</span>
-              <ScaleLoader :loading="loading" :height="'20px'" :color="'#FFFFFF'" />
+              <ScaleLoader v-if="loading" :loading="loading" :height="'20px'" :color="'#FFFFFF'" />
             </BButton>
           </div>
           <div class="d-flex justify-content-end" v-if="!isEditing">
@@ -86,22 +89,21 @@
 import { title } from 'process';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
+import apiClient from '~/components/api/intercepteur';
 import { useAuthStore } from "~/stores/auth.js";
-import apiClient from "../api/intercepteur";
-import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue' 
 
 export default {
   components: { VueCal, ScaleLoader },
   setup(){
-    return{
-      authStore:useAuthStore()
-    }
-  },
-
+      return {
+        authStore: useAuthStore()
+      }
+    },
   data() {
     return {
       heureDebut: 8,
-      heureFin: 24,
+      heureFin: 20,
       selectedDate: null,
       modalVisible: false,
       eventTitle: '',
@@ -109,8 +111,9 @@ export default {
       eventEndTime: null,
       error: false,
       errorMsg: null,
-      loading: false,
-
+      loading:false,
+      loadingDel:false,
+      uuid : null,
       events: [
       ],
 
@@ -119,55 +122,49 @@ export default {
     };
   },
 
-  async mounted() {
-    this.getEvents(this.authStore.user.visite?.code_visite)
+  mounted() {
+      this.getEven()
   },
 
   methods: {
-    async getEvents(code){
+    async getEven(){
       try{
-          const response = await apiClient.get("/fvisites/evenements", {
-            params: {
+        const response = await apiClient.get("/fvisites/evenements", {
+          params: {
             sort_type: 2,
-            code_employe: code
+            code_employe: this.authStore.user.visite?.code_visite
           },
           headers: {
-              Authorization: `Bearer ${this.authStore.token}`
+            Authorization: `Bearer ${this.authStore.token}` // Utiliser "headers" et non "Autorization"
           }
         });
 
         if(!response.data.error){
           this.events = response.data.data.particular_event
-
         }else{
-            console.log("Erreur: "+response.data.message)
+          console.error(response.data.message)
         }
 
       }catch(e){
-        console.log("Erreur :"+e)
+        console.error(e)
       }finally{
 
       }
     },
-
     onCellFocus(date) {
       this.selectedDate = new Date(date);
     },
-
+    formatTime(datetime) {
+      const date = new Date(datetime);
+      const hours = String(date.getHours()).padStart(2, '0'); // Assurez-vous d'avoir 2 chiffres
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    },
     openEventModal(event) {
-      // console.log(Array.isArray(this.events));  // Vérifie si c'est un tableau
-      // console.log(this.events);
-      // const eventFound = this.events.find(e => e.start === event.start && e.end === event.end);
-      console.log("----------------eventttt"+JSON.stringify(event))
       if (event._eid) {
         this.eventTitle = event.title;
-        const startDate = new Date(event.start);
-        const endDate = new Date(event.end);
-        
-        // Extraire l'heure et les minutes au format HH:mm
-        this.eventStartTime = startDate.toISOString().slice(11, 16); // Extrait l'heure (HH:mm)
-        this.eventEndTime = endDate.toISOString().slice(11, 16); // Extrait l'heure (HH:mm)
-  
+        this.eventStartTime = this.formatTime(event.start) // Extraire l'heure
+        this.eventEndTime = this.formatTime(event.end) // Extraire l'heure
         this.isEditing = true;
         let obj = {
           title: this.eventTitle,
@@ -175,7 +172,9 @@ export default {
           end: this.eventEndTime,
           class: event.class
         }
+        this.uuid = event.uuid
         this.editingIndex = this.events.indexOf(obj);
+        
       } else {
         const eventStartTime = new Date(event.start).toTimeString().slice(0, 5); // Extract HH:mm
         this.eventTitle = '';
@@ -185,6 +184,7 @@ export default {
         this.editingIndex = null;
       }
       this.modalVisible = true;
+      
     },
     
     async addEvent() {
@@ -208,10 +208,12 @@ export default {
         // Vérification que l'heure de début est avant l'heure de fin
         if (startDateTime >= endDateTime) {
           this.error= true
-          this.errorMsg = "L'heure de début doit être antérieure à l'heure de fin."
+          this.errorMsg = "L'heure de début doit être antérieure à l'heure de fin. Merci de vérifier les horaires."
+
           setTimeout(() => {
             this.error = false;
-          }, 2000);  // 5000 ms = 5 secondes
+          }, 2000); // 2000 ms = 2 secondes
+
           return;
         }
 
@@ -219,50 +221,46 @@ export default {
         const startFormatted = `${startDateTime.toISOString().split('T')[0]} ${startDateTime.toTimeString().split(' ')[0]}`;
         const endFormatted = `${endDateTime.toISOString().split('T')[0]} ${endDateTime.toTimeString().split(' ')[0]}`;
 
-        // Enregistrement de l'evenement
+       
+        this.loading = true
         try{
-          this.loading = true
-          const response = await apiClient.post("/event", {
-            titre: this.eventTitle,
+          const response = await apiClient.post("/event",{
+            titre:this.eventTitle,
             debut: startFormatted,
             fin: endFormatted
           }, {
             headers: {
-              Authorization: `Bearer ${this.authStore.token}`
+              Authorization: `Bearer ${this.authStore.token}` // Utiliser "headers" et non "Autorization"
             }
           });
 
           if(!response.data.error){
-            console.log("--------------data : "+JSON.stringify(response.data))
-
-            if(response.data.data){
-              this.events.push(response.data.data)
-              this.resetForm();
-            }else{
-              this.error= true
-              this.errorMsg = response.data.message
-              setTimeout(() => {
-                this.error = false;
-              }, 2000);  // 5000 ms = 5 secondes
-            }
-            
-
+            this.getEven()
+            this.loading = false
+            this.resetForm();
           }else{
-              console.log("Erreur: "+response.data.message)
+            console.error(response.data.message)
           }
-
         }catch(e){
-          console.log("Erreur :"+e)
+          console.error("error lors de l'enregistrement de l'venement: "+e)
         }finally{
           this.loading = false
         }
 
         
-      }
-    },
+  }
+},
+
+          // }else{
+          //     console.log("Erreur: "+response.data.message)
+          // }
 
     async updateEvent() {
       if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
+        if (!this.selectedDate) {
+          alert("Veuillez sélectionner une date.");
+          return;
+        }
 
         // Récupération des valeurs de l'heure
         const [startHour, startMinute] = this.eventStartTime.split(':').map(Number);
@@ -278,65 +276,100 @@ export default {
         // Vérification que l'heure de début est avant l'heure de fin
         if (startDateTime >= endDateTime) {
           this.error= true
-          this.errorMsg = "L'heure de début doit être antérieure à l'heure de fin."
+          this.errorMsg = "L'heure de début doit être antérieure à l'heure de fin. Merci de vérifier les horaires."
+
           setTimeout(() => {
             this.error = false;
-          }, 2000);  // 5000 ms = 5 secondes
+          }, 2000); // 2000 ms = 2 secondes
+
           return;
         }
 
+        // Formatage des dates au format souhaité
         const startFormatted = `${startDateTime.toISOString().split('T')[0]} ${startDateTime.toTimeString().split(' ')[0]}`;
         const endFormatted = `${endDateTime.toISOString().split('T')[0]} ${endDateTime.toTimeString().split(' ')[0]}`;
 
-        // Enregistrement de l'evenement
-        try{
-          this.loading = true
-          const response = await apiClient.post("/event", {
-            titre: this.eventTitle,
-            debut: startFormatted,
-            fin: endFormatted
-          }, {
-            headers: {
-              Authorization: `Bearer ${this.authStore.token}`
-            }
-          });
+        console.log(`Start: ${startFormatted}, End: ${endFormatted}`);
 
-          if(!response.data.error){
-            console.log("--------------data : "+JSON.stringify(response.data))
+        this.loading = true
+        if(this.uuid){
+          try{
+            const response = await apiClient.put(`/event/${this.uuid}`,{
+              titre:this.eventTitle,
+              debut: startFormatted,
+              fin: endFormatted
+            }, {
+              headers: {
+                Authorization: `Bearer ${this.authStore.token}` // Utiliser "headers" et non "Autorization"
+              }
+            });
 
-            if(response.data.data){
-              this.events.push(response.data.data)
+            if(!response.data.error){
+              this.getEven()
+              this.loading = false
               this.resetForm();
             }else{
+              console.error(response.data.message)
               this.error= true
               this.errorMsg = response.data.message
+
               setTimeout(() => {
                 this.error = false;
-              }, 2000);  // 5000 ms = 5 secondes
-            }
-            
+              }, 2000); // 2000 ms = 2 secondes
 
-          }else{
-              console.log("Erreur: "+response.data.message)
+            }
+          }catch(e){
+            console.error("error lors de la modification de l'venement: "+e)
+          }finally{
+            this.loading = false
           }
 
-        }catch(e){
-          console.log("Erreur :"+e)
-        }finally{
-          this.loading = false
+        }else{
+          console.error("error uuid obligatoire: ")
         }
-
-
 
 
 
       }
     },
 
-    deleteEvent() {
-      this.events.splice(this.editingIndex, 1);
-      this.resetForm();
+    async deleteEvent() {
+      alert()
+      this.loadingDel = true
+        if(this.uuid){
+          alert(this.uuid)
+          try{
+            const response = await apiClient.delete(`/event/${this.uuid}`,{
+              headers: {
+                Authorization: `Bearer ${this.authStore.token}` // Utiliser "headers" et non "Autorization"
+              }
+            });
+
+            if(!response.data.error){
+              this.getEven()
+              this.loadingDel = false
+              this.resetForm();
+            }else{
+              this.error= true
+              this.errorMsg = response.data.message
+
+              setTimeout(() => {
+                this.error = false;
+              }, 2000); // 2000 ms = 2 secondes
+
+            }
+          }catch(e){
+            console.error("error lors de la modification de l'venement: "+e)
+          }finally{
+            this.loadingDel = false
+          }
+
+        }else{
+          console.error("error uuid obligatoire: ")
+        }
+      
     },
+
 
     resetForm() {
       this.eventTitle = '';
