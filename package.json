@@ -20,7 +20,7 @@
   "dependencies": {
     "@amcharts/amcharts5": "^5.4.2",
     "@amcharts/amcharts5-geodata": "^5.1.1",
-    "@bhplugin/vue3-datatable": "^2.0.1",
+    "@bhplugin/vue3-datatable": "^2.0.2",
     "@ckeditor/ckeditor5-build-classic": "^39.0.1",
     "@fullcalendar/bootstrap": "^6.1.8",
     "@fullcalendar/core": "^6.1.8",
@@ -76,7 +76,7 @@
     "vue3-easy-data-table": "^1.5.47",
     "vue3-form-wizard": "^0.2.4",
     "vue3-google-map": "^0.15.0"
-  }, 
+  },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.6.1"
   }
