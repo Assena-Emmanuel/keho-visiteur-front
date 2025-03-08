@@ -229,8 +229,8 @@ const fetchData = async (page) => {
         params: {
           page: page,
           limit: pagination.value.perPage,
-          sort_type: 1,
-          code_employe: authStore.user.visite.code_visite
+          sort_type: authStore.user.role.code == 'SUPADM' ? 1 : 2,
+          code_employe: authStore.user.role.code == 'SUPADM' ? null : authStore.user.visite.code_visite
         },
         headers: {
           'Authorization': `Bearer ${authStore.token}`

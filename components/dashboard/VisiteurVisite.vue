@@ -24,10 +24,10 @@
                 </div>
               </BCol>
             </BRow> -->
-            <div class="row g-3">
+            <div class="row gap-1">
               <!-- Info visiteur -->
 
-                <div class="card rounded-0 col-sm-6 col-md-6 p-0" style="box-shadow: none;">
+                <div class="card rounded-0 col-12 col-sm-6 col-md-6 p-0" style="box-shadow: none;">
                     <div class="card-header rounded-0 text-light fw-bold" style="background-color: #265FFB;">
                         VISITEUR
                     </div>
@@ -114,7 +114,7 @@
                 </div>
 
                 <!-- Visité -->
-                <div class="card rounded-0 border-0 col-sm-6 col-md-6 p-0 visite" style="box-shadow: none; margin-left: 5px;">
+                <div class="card rounded-0 border-0 col-12 col-sm-6 col-md-6 p-0 visite" style="box-shadow: none;">
                     <div class="card-header rounded-0 text-light fw-bold" style="background-color: #FAD400;">
                         HOTE
                     </div>
@@ -589,7 +589,7 @@
     width: 200px;
   }
   .visite{
-    width: 590px
+    width: 472px
   }
 
 }
@@ -627,11 +627,18 @@
   }
 
   .visite{
-    width: 360px
+    width: 374px
   }
   
 }
 
+@media (min-width: 1559px) {
+
+  .visite{
+    width: 620px
+  }
+
+}
 
 
 </style>

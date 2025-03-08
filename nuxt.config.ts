@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '~/plugins/vue-spinners.js',
     '~/plugins/vue3-easy-data-table.js',
     '~/plugins/vue3-form-wizard.js',
+    '~/plugins/mosha-toastify.js',
   ],
   
   app: {
@@ -34,6 +35,7 @@ export default defineNuxtConfig({
       ]
     }
   },
+  
 
   modules: ["@nuxt/content", "@pinia/nuxt", "@nuxtjs/google-fonts", "nuxt-easy-lightbox",],
 

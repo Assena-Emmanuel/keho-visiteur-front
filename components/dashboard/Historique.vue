@@ -1,108 +1,91 @@
 <template>
   <DashboardCommonStat />
-  <!-- <div class="mb-2 d-flex justify-content-end gap-3">
-
-    <BButton size="sm" class="export">CSV</BButton>
-    <BButton size="sm" class="export">EXCEL</BButton>
-    <BButton size="sm" class="export">PDF</BButton>
-  </div> -->
 
     <!-- Modal détail -->
-    <BModal v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur" >
+    <BModal v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur">
     <ScaleLoader :loading="loadingDetail" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
-    <div v-if="data && data.visiteurs && !loadingDetail"  v-for="item in data.visiteurs" :key="item['Code visite']">
-      <div class="text-center"><h3>{{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</h3>
-        <span v-if="item.delegation && item.chef_equipe " class="badge bg-danger rounded">délégué</span>
-      </div>
-      <div class="d-flex justify-content-between">
-        <div>
-          <span v-if="data.fvisite.statut==2" class="text-succes px-2 ms-2">statut: <span class="">terminé</span></span>
-          <span v-if="data.fvisite.statut==1" class="text-warning px-2 ms-2">statut: <span class="">Notifié</span></span>
-          <span v-if="data.fvisite.statut==0" class="text-warning px-2 ms-2">statut: <span class="">En cours</span></span>
-          <span v-if="data.fvisite.statut==3" class="text-danger px-2 ms-2">statut: <span class="">Rejeté</span></span>
-          <span v-if="data.fvisite.statut==4" class="text-info px-2 ms-2">statut: <span class="">Confirmé</span></span>
-          <span v-if="data.fvisite.statut==5" class="text-succes px-2 ms-2">statut: <span class="">Clôturé</span></span>
+
+    <div v-if="data && data.visiteurs && !loadingDetail">
+      <!-- Affichage des visiteurs selon la pagination -->
+      <div v-for="(item, index) in data.visiteurs" :key="item['Code visite']">
+        <div class="text-center">
+          <h3>{{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</h3>
+          <span v-if="item.delegation && item.chef_equipe " class="badge bg-danger rounded">délégué</span>
         </div>
-        <div><small class=" px-2 ms-2 "><i class="fa fa-clock"></i> <small>{{ formatDateTime(data.fvisite.created_at)  }}</small></small></div>
-      </div>
-      <hr class="text-secondary">
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>Téléphone:</strong> {{ item.visiteur.users.telephone2 }}</p>
+        <div class="d-flex justify-content-between">
+          <div>
+            <span v-if="data.fvisite.statut==2" class="text-succes px-2 ms-2">statut: <span class="">terminé</span></span>
+            <span v-if="data.fvisite.statut==1" class="text-warning px-2 ms-2">statut: <span class="">Notifié</span></span>
+            <span v-if="data.fvisite.statut==0" class="text-warning px-2 ms-2">statut: <span class="">En cours</span></span>
+            <span v-if="data.fvisite.statut==3" class="text-danger px-2 ms-2">statut: <span class="">Rejeté</span></span>
+            <span v-if="data.fvisite.statut==4" class="text-info px-2 ms-2">statut: <span class="">Confirmé</span></span>
+            <span v-if="data.fvisite.statut==5" class="text-succes px-2 ms-2">statut: <span class="">Clôturé</span></span>
+          </div>
+          <div><small class=" px-2 ms-2 "><i class="fa fa-clock"></i> <small>{{ formatDateTime(data.fvisite.created_at)  }}</small></small></div>
         </div>
-        <div class="col col-md-6">
-          <p><strong>Société:</strong> {{ item.visiteur.entreprise.libelle }}</p>
+        <hr class="text-secondary">
+        <div class="row">
+          <div class="col col-md-6">
+            <p><strong>Téléphone:</strong> {{ item.visiteur.users.telephone2 }}</p>
+          </div>
+          <div class="col col-md-6">
+            <p><strong>Société:</strong> {{ item.visiteur.entreprise.libelle }}</p>
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>E-mail:</strong> {{ item.visiteur.users.email }}</p>
+        <div class="row">
+          <div class="col col-md-6">
+            <p><strong>E-mail:</strong> {{ item.visiteur.users.email }}</p>
+          </div>
+          <div class="col col-md-6">
+            <p><strong>Code visiteur:</strong> {{ data.fvisite.code_fvisite }}</p>
+          </div>
         </div>
-        <div class="col col-md-6">
-          <p><strong>Code visiteur:</strong> {{ data.fvisite.code_fvisite }}</p>
+        <div class="row">
+          <div class="col col-md-6">
+            <p><strong>Type pièce:</strong> {{ item.visiteur.type_piece.code == 'CNI' ? item.visiteur.type_piece.code :  item.visiteur.libelle }}</p>
+          </div>
+          <div class="col col-md-6">
+            <p><strong>Num pièce:</strong> {{ item.visiteur.numero_piece }}</p>
+          </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>Type pièce:</strong> {{ item.visiteur.type_piece.code == 'CNI' ? item.visiteur.type_piece.code :  item.visiteur.libelle }}</p>
+
+        <div class="row">
+          <div class="col col-md-6">
+            <p><strong>Heure d'entrée:</strong> {{ data.fvisite.heure_entree }}</p>
+          </div>
+          <div class="col col-md-6">
+            <p><strong>Heure de Sortie:</strong> {{ !data.fvisite.heure_fin ? "---------" : data.fvisite.heure_fin }}</p>
+          </div>
         </div>
-        <div class="col col-md-6">
-          <p><strong>Num pièce:</strong> {{ item.visiteur.numero_piece }}</p>
-        </div>
+        <div class="bg-danger text-center text-light" v-if="item.delegation">En délégation</div>
+        <hr />
       </div>
 
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>Heure d'entrée:</strong> {{ data.fvisite.heure_entree }}</p>
-        </div>
-        <div class="col col-md-6">
-          <p><strong>Heure de Sortie:</strong> {{ !data.fvisite.heure_fin ? "---------" : data.fvisite.heure_fin }}</p>
-        </div>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-end" v-if="data && data.visiteurs && data.visiteurs.length > 1 && !loadingDetail">
+        <BPagination
+          v-model="page"
+          :total-rows="data.visiteurs.length"
+          :per-page="itemsPerPage"
+          aria-controls="modal-pagination"
+        ></BPagination>
       </div>
-      <div class="bg-danger text-center text-light" v-if="item.delegation">En délégation</div>
-      <hr />
     </div>
-    <div class="d-flex justify-content-end" v-if="data && data.visiteurs && data.visiteurs.length > 1 && !loadingDetail">
-      <BPagination
-      v-model="page"
-      :total-rows="data.visiteurs.length"
-      :per-page="itemsPerPage"
-      aria-controls="modal-pagination"
-    ></BPagination>
-    </div>
-    
-  </BModal>  
+  </BModal>
+ 
 
-  <BCard style="min-height: 10em;">
-    <BCardBody>
+  <BCard style="min-height: 10em; margin: 0;">
+    <BCardBody style="margin: 0;">
       <div>
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-3xl">Historique des Visites</h3>
+          <h4 class="text-3xl">Historique des Visites</h4>
         </div>
 
           <BRow class="mb-3">
-              <!-- <BCol sm="12" md="3">
-              Debut
-              <BFormInput
-                  type="datetime-local"
-                  v-model="dateDebut"
-                  class="border border-secondary"
-                  size="sm"
-              />
-              </BCol>
-              <BCol sm="12" md="3">
-              Fin
-              <BFormInput
-                  type="datetime-local"
-                  v-model="dateFin"
-                  class="border border-secondary"
-                  size="sm"
-              />
-              </BCol> -->
               <BCol sm="12" md="6">
-                <VueDatePicker v-model="dateselect" range multi-calendars @update:model-value="handleDate"  placeholder="Date Debut - Date Fin" />
+                <VueDatePicker v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" />
               </BCol> 
-              <BCol sm="12" md="5">
+              <BCol sm="12" md="4" v-if="authStore.user.role.code == 'SUPADM'">
                 <div>
                   <div class="input-group border border-secondary rounded-1">
                   <span class="input-group-text">
@@ -118,8 +101,8 @@
                   </div>
                 </div>
               </BCol>
-              <BCol sm="12" md="1">
-                  <BButton  @click="recherche">Rechercher</BButton>
+              <BCol sm="12" md="2">
+                  <BButton style="width: 100%;"  @click="recherche">Rechercher</BButton>
               </BCol>
             
           </BRow>
@@ -191,7 +174,7 @@
 
                 <!-- Bouton de modification (edit) -->
                 <BButton 
-                  v-if="permissions.some(perm => perm.edit)" 
+                  v-if="permissions.some(perm => perm.cancel)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
@@ -245,7 +228,6 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 
 const authStore = useAuthStore();
-
 const headers = [
   { text: "Date", value: "created_at", sortable: true },
   { text: "Nom & Prénoms", value: "visiteur" },
@@ -260,6 +242,7 @@ const headers = [
   { text: "H Sortie", value: "heure_fin" },
   { text: "Actions", value: "Actions" },
 ];
+
 const loadingReset = ref(false)
 const permissions = ref([])
 const range = ref([5,10,15,20])
@@ -274,11 +257,12 @@ const loadingDetail = ref(false)
 const dateDebut = ref(null)
 const dateFin = ref(null)
 const dateselect = ref(null)
+const itemsPerPage = ref(1)
 const serverOptions = ref({
   page: 1,
   rowsPerPage: 5,
-  sortBy: 1,
-  code_employe: '',
+  sortBy: authStore.user.role.code == 'SUPADM' ? 1 : 2,
+  code_employe: authStore.user.role.code == 'SUPADM' ? '' : authStore.user.visite.code_visite,
 });
 
 
@@ -317,7 +301,6 @@ const loadFromServer = async () => {
     if (!response.data.error) {
       
       const data = response.data.data;
-      console.log("Data--------------------------: "+JSON.stringify(data?.data))
       items.value = data?.data;
       serverItemsLength.value = response.data.data.total;
 
@@ -336,7 +319,7 @@ const loadFromServer = async () => {
  onMounted( async () => {
   loadFromServer();
   
-  const code = "visiteur"
+  const code = "historique"
   const response = await apiClient.get(`/permissions/menu_action/${authStore.user.role_id}/${code}`, 
   {
   headers: {
@@ -346,6 +329,7 @@ const loadFromServer = async () => {
 
   if(!response.data.error){
     permissions.value = response.data
+    console.log("-------------------:per "+JSON.stringify(permissions.value))
 
   }else{
     console.error("Menu error: "+response.message)
@@ -357,6 +341,29 @@ const loadFromServer = async () => {
 // recherche coté server
 const recherche = async () => {
   loading.value = true;
+  if (Array.isArray(dateselect.value) && dateselect.value.length === 2) {
+    
+    const startDate = new Date(dateselect.value[0]);
+    let endDate = null
+    if(dateselect.value[1]){
+       endDate = new Date(dateselect.value[1]);
+    }
+
+
+    // Formater les dates au format 'YYYY-MM-DD HH:mm:ss'
+    let formattedEndDate = null
+    const formattedStartDate = startDate.toISOString().slice(0, 19).replace("T", " ");
+    if(dateselect.value[1]){
+      formattedEndDate = endDate.toISOString().slice(0, 19).replace("T", " ");
+    }
+    
+    // Mettre à jour la valeur de dateselect pour chaque date
+    
+    // Vous pouvez faire d'autres opérations avec ces dates
+    const date = { start: formattedStartDate, end: formattedEndDate };
+    let code = authStore.user.role.code == 'SUPADM' ?  searchValue.value : authStore.user.visite.code_visite
+    
+  
   try {
     const param = {
       page: 1,
@@ -366,35 +373,42 @@ const recherche = async () => {
       date_debut: null,
       date_fin: null
     }
+    
+    if(authStore.user.role.code == 'SUPADM'){
+      // Vérification si dateDebut et dateFin sont définis
+      if (date.start != null && code == null) {
+        param.sort_type = 3;
+        param.date_debut = date.start;
+        param.date_fin = dateselect.value[1] != null ? date.end : date.start;
+        alert(4); // Retirer si plus nécessaire pour le débogage
+      } 
+      // Vérification si searchValue est défini et pas dateDebut et dateFin
+      else if (date.start == null && dateselect.value[1] == null && code != null) {
+        alert(2); // Retirer si plus nécessaire pour le débogage
+        param.sort_type = 2;
+        param.code_employe = code;
+      } 
+      // Tous les critères sont définis
+      else if (date.start && date.end && code) {
+        param.sort_type = 4;
+        param.date_debut = date.start;
+        param.date_fin = param.date_fin = dateselect.value[1] != null ? date.end : date.start;
+        param.code_employe = code;
+        alert(4); // Retirer si plus nécessaire pour le débogage
+      }
+      else if (date.start == null && date.end == null && code==null) {
+        resetAction()
+        return
+      }
 
-    // Vérification si dateDebut et dateFin sont définis
-    if (dateselect.value[0] != null && dateselect.value[1] != null && searchValue.value == null) {
-      param.sort_type = 3;
-      param.date_debut = dateselect.value[0]
-      param.date_fin = dateselect.value[1]
-      // alert(4); // Retirer si plus nécessaire pour le débogage
-    } 
-    // Vérification si searchValue est défini et pas dateDebut et dateFin
-    else if (dateselect.value[0] == null && dateselect.value[1] == null && searchValue.value != null) {
-      // alert(2); // Retirer si plus nécessaire pour le débogage
-      param.sort_type = 2;
-      param.code_employe = searchValue.value;
-    } 
-    // Tous les critères sont définis
-    else if (dateselect.value[0] && dateselect.value[1] && searchValue.value) {
+    }else{
       param.sort_type = 4;
-      param.date_debut = dateDebut.value;
-      param.date_fin = dateFin.value;
-      param.code_employe = searchValue.value;
-      // alert(4); // Retirer si plus nécessaire pour le débogage
+      param.date_debut = date.start;
+      param.date_fin = dateselect.value[1] != null ? date.end : date.start;
+      param.code_employe = code;
     }
-    else if (dateselect.value[0] != null && dateselect.value[1] == null && searchValue.value) {
-      param.sort_type = 4;
-      param.date_debut = dateDebut.value;
-      param.date_fin = dateFin.value;
-      param.code_employe = searchValue.value;
-      // alert(4); // Retirer si plus nécessaire pour le débogage
-    }
+    
+    
 
     // Envoi de la requête à l'API
     const response = await apiClient.get("/fvisites/lvisite", {
@@ -419,6 +433,8 @@ const recherche = async () => {
   } finally {
     loading.value = false;
   }
+}
+
 }
 
 // Utilisation de debounce pour éviter des appels rapides au serveur
@@ -473,12 +489,29 @@ const showDetailsModal = async (uuid) => {
 
 
 const handleDate = (modelData) => {
-  dateselect.value = modelData;
-  console.log("------------------------date range: "+JSON.stringify(dateselect.value))
-  // do something else with the data
-}
+  // Vérifier si modelData est un tableau avec 2 dates
+  if (Array.isArray(modelData) && modelData.length === 2) {
+    const startDate = new Date(modelData[0]);
+    const endDate = new Date(modelData[1]);
 
+    // Vérifier si les deux dates sont valides
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      console.error("Invalid date values:", modelData);
+      return;
+    }
 
+    // Formater les dates au format 'YYYY-MM-DD HH:mm:ss'
+    const formattedStartDate = startDate.toISOString().slice(0, 19).replace("T", " ");
+    const formattedEndDate = endDate.toISOString().slice(0, 19).replace("T", " ");
+
+    // Mettre à jour la valeur de dateselect pour chaque date
+    dateselect.value = { start: formattedStartDate, end: formattedEndDate };
+
+    // Vous pouvez faire d'autres opérations avec ces dates
+  } else {
+    console.error("modelData should be an array with two dates.");
+  }
+};
 
 const confirmDelete = async (uuid) => {
   if (uuid) {
@@ -535,8 +568,6 @@ const confirmDelete = async (uuid) => {
     });
   }
 };
-
-
 
 const rejet = async (uuid) => {
   if (uuid) {
@@ -600,16 +631,11 @@ const rejet = async (uuid) => {
   }
 };
 
-
 const showTicket = async (uuid) =>{
   if(uuid){
     return navigateTo(`/visiteur/visiteurVisite/${uuid}`)
   }
 }
-
-
-
-
 
 const hideModal = () => {
   detailModal.value = false
@@ -619,9 +645,9 @@ const hideModal = () => {
 
 <style>
   .customize-table{
-      --easy-table-header-font-size: 14px;
-      --easy-table-body-row-height: 30px;
-      --easy-table-body-row-font-size: 14px;
+      --easy-table-header-font-size: 12px;
+      --easy-table-body-row-height: 26px;
+      --easy-table-body-row-font-size: 12px;
 
       --easy-table-header-item-padding: 10px 15px;
 
