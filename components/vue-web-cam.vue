@@ -41,7 +41,7 @@
 
       <div class="row align-items-end">
           <div  class="col-lg-5 "> <!-- Ajout de position-relative ici -->
-            <video class="" id="video" ref="video" autoplay style="display: none;"></video>
+            <video id="video" ref="video" autoplay style="display: none; " ></video>
             <div class="button-container d-flex gap-3 px-3"  style="position: absolute; bottom: 10px; left: 10px; right: 10px;"> <!-- Positionnement absolu -->
                 <button class="btn btn-primary" @click="takeSnapshot('canvas', 'rectoFichiercache')" id="click-photo" :style="{ display: !appareilRecto ? 'none' : 'block' }"> 
                     <i class="fas fa-camera-retro"></i> <span class="d-md-block d-none">Capturer Recto</span><span class="d-md-none d-block">Recto</span>
@@ -120,6 +120,11 @@ export default {
   },
 
   methods: {
+    generateRandomFileName(extension = '.jpg') {
+      const randomString = Math.random().toString(36).substring(2, 15); // Crée une chaîne aléatoire
+      return randomString + extension; // Ajoute l'extension du fichier (par défaut '.jpg')
+    },
+
     handleFileChange(event, typeFile) {
       
       if (!event.target.files.length) return;
@@ -150,6 +155,8 @@ export default {
       }
       this.afficheCamera=!this.afficheCamera
     },
+
+
     isMobileDevice() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     },
@@ -199,53 +206,46 @@ export default {
     
 
     takeSnapshot(canvas, hiddenInput) {
-        if (this[canvas] && this.video) {
+      if (this[canvas] && this.video) {
+    const ctx = this[canvas].getContext('2d');
+    // Ajuster la taille du canvas à la vidéo
+    this[canvas].width = this.video.videoWidth;
+    this[canvas].height = this.video.videoHeight;
+    // Dessiner la vidéo sur le canvas
+    ctx.drawImage(this.video, 0, 0);
+    // Obtenir l'image sous forme de data URL (Base64)
+    const imageDataUrl = this[canvas].toDataURL('image/jpeg');
+    // Affecter la valeur à l'input hidden correspondant
+    this[hiddenInput] = imageDataUrl;
 
-            const ctx = this[canvas].getContext('2d');
-            // Ajuster la taille du canvas à la vidéo
-            this[canvas].width = this.video.videoWidth;
-            this[canvas].height = this.video.videoHeight;
-            // Dessiner la vidéo sur le canvas
-            ctx.drawImage(this.video, 0, 0);
-            // Obtenir l'image sous forme de data URL (Base64)
-            const imageDataUrl = this[canvas].toDataURL('image/jpeg');
-            // Affecter la valeur à l'input hidden correspondant
-            this[hiddenInput] = imageDataUrl;
+    // Afficher le canvas
+    this[canvas].style.display = 'block';
 
-            console.log("Image -------------------- : "+JSON.stringify(this[canvas]))
-            // Afficher le canvas
-            this[canvas].style.display = 'block';
+    // Convertir le data URL en Blob
+    const byteString = atob(imageDataUrl.split(',')[1]);
+    const mimeString = imageDataUrl.split(',')[0].split(':')[1].split(';')[0];
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const uint8Array = new Uint8Array(arrayBuffer);
 
+    for (let i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+    }
 
-            // Convertir le data URL en Blob
-            const byteString = atob(imageDataUrl.split(',')[1]);
-            const mimeString = imageDataUrl.split(',')[0].split(':')[1].split(';')[0];
-            const arrayBuffer = new ArrayBuffer(byteString.length);
-            const uint8Array = new Uint8Array(arrayBuffer);
+    // Créer le Blob à partir de l'ArrayBuffer
+    const blob = new Blob([uint8Array], { type: mimeString });
 
-            for (let i = 0; i < byteString.length; i++) {
-              uint8Array[i] = byteString.charCodeAt(i);
-            }
+    // Créer un fichier à partir du Blob
+    const file = new File([blob], this.generateRandomFileName(), { type: mimeString });
 
-            // Créer le Blob à partir de l'ArrayBuffer
-            const blob = new Blob([uint8Array], { type: mimeString });
+    // Emission de l'image au parent (sans indexation)
+    if (canvas === 'canvas') {
+        console.log("----------------fichier: ", file);  // Affiche directement l'objet File
+        this.$emit('update:rectoImage', file);  // Passe l'objet File complet
+    } else {
+        this.$emit('update:versoImage', file);  // Passe l'objet File complet
+    }
+}
 
-            // Créer un fichier à partir du Blob
-            const file = new File([blob], 'image.jpg', { type: mimeString });
-
-
-
-            // emission de l'image au parent
-            if (canvas === 'canvas') {
-              alert(1)
-              this.$emit('update:rectoImage', file);
-
-            } else {
-              alert(2)
-              this.$emit('update:versoImage', file);
-
-            }
-          }
        
     },
 
@@ -289,7 +289,11 @@ export default {
 button {
   width: 100%;
 }
-video, canvas {
+video {
+  width: 100%; 
+  border-radius: 5px; /* Optional: add some rounded corners */
+}
+canvas {
   width: 100%; /* Ensure both video and canvas take full width */
   border-radius: 5px; /* Optional: add some rounded corners */
 }
