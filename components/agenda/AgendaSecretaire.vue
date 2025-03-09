@@ -74,6 +74,18 @@
         ] 
       };
     },
+
+    props:{
+      code: String
+    },
+
+    watch:{
+      code(newValue, oldValue) {
+        console.log('Code visite modifié de', oldValue, 'à', newValue);
+        this.getEven(newValue)
+      }
+
+    },
     computed: {
       dateToday() {
         const today = new Date();
@@ -152,6 +164,8 @@
   
     }
   };
+
+
   </script>
   <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
   <style>

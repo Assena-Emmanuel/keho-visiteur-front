@@ -1,12 +1,7 @@
 <template>
   <DashboardCommonStat />
     <!-- Modal détail -->
-    <BModal  v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur" >
-      <!-- <template v-slot:header>
-        <div class="d-flex justify-content-start w-100" style="position: relative;">
-          <img src="/images/total-removebg.png" alt="" width="50">
-        </div>
-      </template> -->
+    <BModal v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur" >
     <ScaleLoader :loading="loadingDetail" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
     <div v-if="data && data.visiteurs && !loadingDetail"  v-for="item in paginatedData" :key="item['Code visite']">
       <div class="text-center"><h3>{{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</h3>
@@ -61,19 +56,12 @@
       <hr />
     </div>
     <div class="d-flex justify-content-end" v-if="data && data.visiteurs && data.visiteurs.length > 1 && !loadingDetail">
-      <!-- <BPagination
+      <BPagination
       v-model="currentPage"
-      :total-rows="visiteurs.length"
+      :total-rows="data.visiteurs.length"
       :per-page="itemsPerPage"
       aria-controls="modal-pagination"
-    ></BPagination> -->
-
-    <vue-awesome-paginate
-      :total-items="data.visiteurs.length"
-      :items-per-page="1"
-      :max-pages-shown="data.visiteurs.length>= 18 ? 2 : 5"
-      v-model="currentPage"
-    />
+    ></BPagination>
     </div>
     
   </BModal>  
@@ -84,15 +72,7 @@
         <div class="flex items-center justify-between mb-3">
           <h3 class="text-3xl">Visites enregistrées</h3>
         </div>
-        <div class="d-flex justify-content-end mb-3" style="margin-top: -20px;">
-            <button 
-              @click="resetAction" 
-              :disabled="loadingReset"
-              class="btn btn-outline-primary">
-              <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
-              <i v-else class="fas fa-spinner fa-spin"></i> 
-            </button>
-          </div>
+
         <BRow class="mb-3">
               <BCol sm="12" md="6">
                 <VueDatePicker v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
@@ -118,31 +98,46 @@
               </BCol>
             
           </BRow>
-          
+          <div class="d-flex justify-content-end mb-3" style="margin-top: -5px;">
+            <button 
+              @click="resetAction" 
+              :disabled="loadingReset"
+              class="btn btn-outline-primary">
+              <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
+              <i v-else class="fas fa-spinner fa-spin"></i> 
+            </button>
+          </div>
 
-          <vue3-datatable
-            :rows="items"
-            :columns="headers"
-            :loading="loading"
-            :totalRows="serverItemsLength"
-            :isServerMode="true"
-            :pageSize="params.pagesize"
-            :showNumbersCount="3"
-            class="alt-pagination"
-            @change="changeServer"
-        >
+        <!-- Table avec pagination -->
+        <EasyDataTable
+          v-model:server-options="serverOptions"
+          :server-items-length="serverItemsLength"
+          :loading="loading"
+          :headers="headers"
+          :items="items"
+          rows-of-page-separator-message="sur"
+          buttons-pagination
+          table-class-name="customize-table"
+          header-text-direction="center"
+          body-text-direction="center"
+          :rows-items="range"
+          :rows-per-page="range[0]"
+          empty-message="Aucune donnée disponible"
+          rows-per-page-message="Ligne par page"
+          :search-field="searchField"
+          >
 
-        <template #lib_statut="data">
-          <strong>{{ data.value.email }}</strong>
-          <span v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
-        </template>
 
-        <template #actions="data">
+          <template #item-lib_statut="item">
+            <span v-if="item.statut == 0" class="text-warning">{{ item.lib_statut }}</span>
+            <span v-if="item.statut == 1" class="text-info">{{ item.lib_statut }}</span>
+            <span v-if="item.statut == 2" class="text-success">{{ item.lib_statut }}</span>
+            <span v-if="item.statut == 3" class="text-danger">{{ item.lib_statut }}</span>
+            <span v-if="item.statut == 4" class="text-success">{{ item.lib_statut }}</span>
+            <span v-if="item.statut == 5" class="text-dark">{{ item.lib_statut }}</span>
+          </template>
+
+          <template #item-actions="item">
               <div class="d-flex gap-1">
                 <BButton 
                   v-if="permissions.some(perm => perm.show)" 
@@ -150,60 +145,64 @@
                   variant="white" 
                   size="sm" 
                   class="d-flex text-primary justify-content-center align-items-center" 
-                  @click="showDetailsModal(data.value.uuid)"
+                  @click="showDetailsModal(item.uuid)"
                 >
                   <i class="fas fa-eye"></i>
                 </BButton>
 
-                 
+                 <!-- Bouton d'impression (prt) -->
                 <BButton 
                   v-if="permissions.some(perm => perm.prt)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
                   class="d-flex text-primary justify-content-center align-items-center" 
-                  @click="showTicket(data.value.uuid)"
+                  @click="showTicket(item.uuid)"
                 >
                   <i class="uil uil-print font-size-15"></i>
                 </BButton>
 
-                
+                <!-- Bouton de modification (edit) -->
                 <BButton 
                   v-if="permissions.some(perm => perm.edit)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
                   class="mr-1 fw-bold text-warning d-flex justify-content-center align-items-center" 
-                  @click="rejet(data.value.uuid)" 
+                  @click="rejet(item.uuid)" 
                   v-b-tooltip.hover.bottom="'rejeter'"
                 >
                   <i class="uil uil-ban font-size-15 annuler"></i>
                 </BButton>
 
-                
+                <!-- Bouton de suppression (del) -->
                 <BButton 
                   v-if="permissions.some(perm => perm.del)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
                   class="px-2 text-danger d-flex justify-content-center align-items-center" 
-                  @click="confirmDelete(data.value.uuid)"
+                  @click="confirmDelete(item.uuid)"
                 >
                   <i class="uil uil-trash-alt font-size-15"></i>
                 </BButton>
                       
               </div>
           </template>
-          <template #heure_fin="data">
+
+          <template #item-heure_fin="item">
               <div>
                   <span>----</span>
               </div>
           </template>
 
+          <!-- Personnaliser le loading -->
+          <template #loading>
+              <ScaleLoader :loading="loading" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
+          </template>
+          
 
-        </vue3-datatable>
-
-        
+          </EasyDataTable>
       </div>
     </BCardBody>
   </BCard>
@@ -216,34 +215,31 @@ import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import Swal from 'sweetalert2';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
-import Vue3Datatable from '@bhplugin/vue3-datatable'
-import '@bhplugin/vue3-datatable/dist/style.css'
 
 
 const authStore = useAuthStore();
 
-const headers = ref([
-  { title: "Date", field: "created_at", width: "40px", sortable: true },
-  { title: "Nom & Prénoms",width: "40px", field: "visiteur" },
-  { title: "CNI",width: "40px", field: "numero_piece"},
-  { title: "Société",width: "40px", field: "entreprise"},
-  { title: "Code visiteur",width: "40px", field: "code_visiteur" },
-  { title: "Code visite",width: "40px", field: "code_visite" },
-  { title: "Employé",width: "40px", field: "employe" },
-  { title: "Visite",width: "40px", field: "lib_visite" },
-  { title: "H entrée",width: "40px", field: "heure_entree" },
-  { title: "Statut",width: "40px", field: "lib_statut" },
-  { title: "H Sortie",width: "40px", field: "heure_fin" },
-  { title: "Actions",width: "40px", field: "actions" },
-]);
-
-
+const headers = [
+  { text: "Date", value: "created_at", sortable: true },
+  { text: "Nom & Prénoms", value: "visiteur" },
+  { text: "CNI", value: "numero_piece"},
+  { text: "Société", value: "entreprise"},
+  { text: "Code visiteur", value: "code_visiteur" },
+  { text: "Code visite", value: "code_visite" },
+  { text: "Employé", value: "employe" },
+  { text: "Visite", value: "lib_visite" },
+  { text: "H entrée", value: "heure_entree" },
+  { text: "Statut", value: "lib_statut" },
+  { text: "H Sortie", value: "heure_fin" },
+  { text: "Actions", value: "Actions" },
+];
 const loadingReset = ref(false)
 const permissions = ref([])
 const range = ref([5,10,15,20])
 const items = ref([]);
 const loading = ref(false);
 const serverItemsLength = ref(0);
+const searchField = ["visiteur", "entreprise", "numero_piece", "code_visite", "code_visiteur", "employe", "lib_visite"];
 const searchValue = ref("");
 const detailModal = ref(false)
 const data = ref([])
@@ -252,10 +248,9 @@ const dateDebut = ref(null)
 const dateFin = ref(null)
 const dateselect = ref(null)
 const currentPage = ref(1)
-const params = reactive({ current_page: 1, pagesize: 5 });
 const serverOptions = ref({
-  page: params.current_page,
-  rowsPerPage: params.pagesize,
+  page: 1,
+  rowsPerPage: 5,
   sortBy: 1,
   code_employe: '',
 });
@@ -283,8 +278,8 @@ const loadFromServer = async () => {
   try {
       const response = await apiClient.get("/fvisites/lvisite", {
       params: {
-        page: params.current_page,
-        limit: params.pagesize,
+        page: serverOptions.value.page,
+        limit: serverOptions.value.rowsPerPage,
         sort_type: serverOptions.value.sortBy,
         code_employe: serverOptions.value.code_employe,
       },
@@ -309,13 +304,6 @@ const loadFromServer = async () => {
     loading.value = false;
 
   }
-};
-
-const changeServer = (data) => {
-    params.current_page = data.current_page;
-    params.pagesize = data.pagesize;
-
-    loadFromServer();
 };
 
 // Appel initial pour charger les données
@@ -390,7 +378,7 @@ const recherche = async () => {
       param.sort_type = 3;
       param.date_debut = date.start;
       param.date_fin = dateselect.value[1] != null ? date.end : date.start;
-
+      console.log("-------------data: ",param.date_debut)
     } 
     // Vérification si searchValue est défini et pas dateDebut et dateFin
     else if (date.start == null && dateselect.value[1] == null && searchValue.value != "") {
@@ -404,7 +392,7 @@ const recherche = async () => {
       param.date_debut = date.start;
       param.date_fin = dateFin.value;
       param.code_employe = searchValue.value;
-
+      alert(4); // Retirer si plus nécessaire pour le débogage
     }
     
 
@@ -476,7 +464,7 @@ const showDetailsModal = async (uuid) => {
 
     if(!response.data.error){
       data.value = response.data.data
-      console.log('Detail-------------: '+JSON.stringify( data.value.visiteurs.length))
+
     }else{
       console.error(response.data)
     }
@@ -528,6 +516,8 @@ const confirmDelete = async (uuid) => {
           });
 
           if (!response.data.error) {
+            
+            console.log("Sup-----------: " + JSON.stringify(response.data));
             loadFromServer();
             // Fermer l'alerte de chargement et afficher une alerte de succès
             swalLoading.close();
@@ -639,44 +629,5 @@ const hideModal = () => {
       --easy-table-body-item-padding: 12px 5px;
 
       
-  }
-</style>
-<style>
-  .pagination-container {
-    display: flex;
-
-    column-gap: 10px;
-  }
-
-  .paginate-buttons {
-    height: 40px;
-
-    width: 40px;
-
-    border-radius: 20px;
-
-    cursor: pointer;
-
-    background-color: rgb(242, 242, 242);
-
-    border: 1px solid rgb(217, 217, 217);
-
-    color: black;
-  }
-
-  .paginate-buttons:hover {
-    background-color: #d8d8d8;
-  }
-
-  .active-page {
-    background-color: #3498db;
-
-    border: 1px solid #3498db;
-
-    color: white;
-  }
-
-  .active-page:hover {
-    background-color: #2988c8;
   }
 </style>

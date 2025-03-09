@@ -83,7 +83,7 @@
 
           <BRow class="mb-3">
               <BCol sm="12" md="6">
-                <VueDatePicker v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" />
+                <VueDatePicker cancel-text="Annuler" select-text="Selectionner" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" />
               </BCol> 
               <BCol sm="12" md="4" v-if="authStore.user.role.code == 'SUPADM'">
                 <div>
@@ -411,7 +411,7 @@ const recherche = async () => {
     
 
     // Envoi de la requête à l'API
-    const response = await apiClient.get("/fvisites/lvisite", {
+    const response = await apiClient.get("/fvisites/hvisite", {
       params: param,
       headers: {
         Authorization: `Bearer ${authStore.token}`,

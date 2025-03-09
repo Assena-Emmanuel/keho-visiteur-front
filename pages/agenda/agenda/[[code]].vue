@@ -4,6 +4,12 @@ export default {
   components: {
     AgendaS
   },
+  setup() {
+    const route = useRoute();
+    const code = route.params.code; // Récupérer le paramètre uuid
+
+    return { code: code}
+  },
   data() {
     return {
       title: "Agenda",
@@ -24,5 +30,5 @@ export default {
 <template>
   <SiteHeader :title="title" />
   <PageHeader :title="title" :items="items" />
-  <AgendaS />
+  <AgendaS :code="this.code" />
 </template>

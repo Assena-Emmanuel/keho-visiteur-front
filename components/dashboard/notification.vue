@@ -18,7 +18,7 @@
           <div>
             <div class="d-flex justify-content-between line font-size-12 line">
               <span >Nom & Prénom</span>
-              <span>{{visiteur.nom}}</span>
+              <span style="font-weight: bold;">{{visiteur.nom}}</span>
             </div>
 
             <div class="d-flex justify-content-between line font-size-12 line">

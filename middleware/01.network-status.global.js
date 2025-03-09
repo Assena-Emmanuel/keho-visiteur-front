@@ -25,6 +25,9 @@ export default defineNuxtRouteMiddleware((to, from) => {
             hideProgressBar: true,
             showIcon: true,
           })
+
+           // Rafraîchir la page une fois la connexion rétablie
+          location.reload();
         })
 
         window.addEventListener('offline', () => {
@@ -39,7 +42,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
               // Si l'utilisateur est de nouveau en ligne, arrêter l'intervalle
               clearInterval(offlineNotificationTimeout)
             }
-          }, 7000)  // 2 minutes = 120000 ms
+          }, 10000)  // 2 minutes = 120000 ms
         })
     }
 })

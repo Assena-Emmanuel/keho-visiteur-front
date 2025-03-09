@@ -570,8 +570,6 @@
                             return; // Empêche l'envoi si le fichier verso est manquant
                         }
 
-                        console.log("type----------------------------: "+typeof this.rectoImage)
-
                         const formData = {
                             nom: this.nom,
                             prenom: this.prenom,
@@ -618,7 +616,7 @@
 
                         
                     }catch(error){
-                        console.error("Error a l'enregistrement -------------------"+error);
+                        console.error("Error a l'enregistrement"+error);
                     }finally{
                         this.loading = false
                         

@@ -193,7 +193,7 @@ export default {
           <span v-if="!processing">Se connecter</span>
           
           <!-- Affiche PulseLoader à la place de ScaleLoader si nécessaire -->
-          <ScaleLoader :loading="processing" :height="height" :color="color" />
+          <ScaleLoader :loading="processing" :height="'10px'" :color="color" />
         </BButton>
         
       </div>

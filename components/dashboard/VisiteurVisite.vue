@@ -17,7 +17,7 @@
                         <div v-if="!isLoading" class="">
                             <div class="row">
                                 <div style="height: 100%;" class="col-sm-6 col-md-6 containerimgVisiteur">
-                                    <img src="/images/personne.png" width="100%" class="pt-2 pb-2 ps-2 imgVisiteur" height="260" alt="Image personne">
+                                    <img  src="/images/personne.png" width="100%" class="pt-2 pb-2 ps-2 imgVisiteur" height="260" alt="Image personne">
                                 </div>
                                 
                                  <div class="col-sm-6 col-md-6 pt-4 containerInfoVisiteur">
@@ -77,14 +77,24 @@
                         </div>
                         
                         <div v-if="!isLoading" class="row carte mt-5 mb-4">
-                            <div class="col-6 d-flex justify-content-center">
-                                <img  :src="`data:${visiteurs.cni.mime_type_p};base64,${visiteurs.cni.image_p}`" height="100" class="cni" alt="CNI recto">
-                                <!-- <img src="/images/cni.png" height="100" class="cni" alt="CNI recto"> -->
-                            </div>
-                            <div class="col-6 d-flex justify-content-center">
-                              <img :src="`data:${visiteurs.cni.mime_type_v};base64,${visiteurs.cni.image_v}`" height="100" class="cni" alt="CNI recto">
-                            </div>
+                          <div class="col-6 d-flex justify-content-center">
+                            <img @click="imgViewer('image-recto')" 
+                                id="image-recto"  
+                                :src="`data:${visiteurs.cni.mime_type_p};base64,${visiteurs.cni.image_p}`" 
+                                height="100" 
+                                class="cni" 
+                                alt="CNI recto">
+                          </div>
+                          <div class="col-6 d-flex justify-content-center">
+                            <img @click="imgViewer('image-verso')" 
+                                id="image-verso" 
+                                :src="`data:${visiteurs.cni.mime_type_v};base64,${visiteurs.cni.image_v}`" 
+                                height="100" 
+                                class="cni" 
+                                alt="CNI verso">
+                          </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -94,44 +104,42 @@
                         HOTE
                     </div>
                     <div class="card-boby " style="background-color: #f6f6f6;">
-                        <!-- <div v-if="isLoadingUser" class="loading-ellipses">
-                          <span class="dot text-primary">.</span>
-                          <span class="dot text-success">.</span>
-                          <span class="dot text-danger">.</span>
-                        </div> -->
-                        <ScaleLoader :loading="isLoadingUser" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
-                        <div v-if="!isLoadingUser" class="">
+
+                        <ScaleLoader :loading="isLoading" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
+                        <div v-if="!isLoading" class="">
                             <div class="row ">
                                 <div style="height: 100%;" class="col-sm-6 col-md-6 containerimgVisiteur">
-                                    <img :src="`data:${employe.mime_type};base64,${employe.image}`" width="100%" class="pt-2 pb-2 ps-2 imgVisiteur" height="260" alt="Image personne">
+                                    <img :src="`data:${employe.users?.mime_type};base64,${employe.users?.image}`" width="100" class="pt-2 pb-2 ps-2 imgVisiteur" height="200" alt="Image personne">
                                 </div>
                                 
                                 <div class="col-sm-6 col-md-6 pt-4 containerInfoVisiteur">
                                     <div class="d-flex justify-content-between  font-size-12 line">
-                                        <span  class="texte">Code visite</span>
-                                        <span  class="texte">{{ employe.codeVisite }}</span>
+                                        <span  class="texte" style="font-size: 12px;">Code visite</span>
+                                        <span  class="texte">{{ employe.code_visite }}</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between  font-size-12 line">
-                                        <span class="texte">{{ (employe.nomPrenom).toUpperCase() }} </span>
+                                        <span class="texte">{{ employe.users?.civilite }} {{ (employe.users?.nom)?.toUpperCase() }} {{ (employe.users?.prenom)?.toUpperCase() }} </span>
                                     </div>
 
                                     <div class="d-flex justify-content-between font-size-12 line">
-                                        <span  class="texte">Site</span>
+                                        <span  class="texte" style="font-size: 12px;">Site</span>
                                         <span  class="texte">Abidjan-sud</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between  font-size-12 line">
-                                        <span class="texte">{{ employe.departement }}</span>
+                                      <span  class="texte" style="font-size: 12px;">Dept</span>
+                                        <span class="texte">{{ employe.departement?.libelle }}</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between  font-size-12 line">
-                                        <span class="texte">{{ employe.service }}</span>
+                                      <span  class="texte" style="font-size: 12px;">Serv</span>
+                                        <span class="texte">{{ employe.service?.libelle }}</span>
                                     </div>
 
                                     <div class="d-flex justify-content-between  font-size-12 line">
-                                        <span  class="texte">Fixe</span>
-                                        <span  class="texte">22 22 33 33 44</span>
+                                        <span  class="texte" style="font-size: 12px;">Tel. </span>
+                                        <span  class="texte">{{ employe.users?.telephone1 }}</span>
                                     </div>
 
                                 </div>
@@ -142,7 +150,7 @@
                                 <span>---/--/---</span>
                             </div>
                             <div class="mx-5 mb-3 mt-3 planning">
-                                <button class="btn btn-outline-dark fw-bold w-100 rounded-0">
+                                <button class="btn btn-outline-dark fw-bold w-100 rounded-0" @click="showPlanning(employe.code_visite)">
                                     <div class="row">
                                         <div class="col-5 text-start"><i class="uil uil-schedule"></i></div>
                                     <div class="col-7 text-start">Planning</div>
@@ -151,7 +159,7 @@
                             </div>
                             <div class="d-flex align-items-center justify-content-evenly mb-3 impression mx-4">
                                 <div class="">
-                                    <button class="btn btn-success w-100 fw-bold" style="background-color: #6BFA88;" @click="showTicket"><i class="uil uil-print"></i>IMPRIMER LE TICKET</button>
+                                    <button class="btn btn-success w-100 fw-bold" style="background-color: #6BFA88;" @click="showTicket(employe.code_visite)"><i class="uil uil-print"></i>IMPRIMER LE TICKET</button>
                                 </div>
                                 <div class="">
                                     <span class="border border-secondary" style="padding: 9px;"><strong style="color: red;">{{ visiteurs.visiteur.length }}</strong></span>
@@ -226,15 +234,40 @@
   import { ref, onMounted } from 'vue';
   import apiClient from '../api/intercepteur';
   import { useAuthStore } from '~/stores/auth.js';
-  
+  import Viewer from 'viewerjs'
   import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
+  import 'viewerjs/dist/viewer.css';
 
+  // Fonction pour visualiser la pièce d'identité (clic sur l'image)
+  const imgViewer = (id) => {
+    // Sélectionne l'image cliquée par son id
+    const imageElement = document.getElementById(id);
+
+    if (imageElement) {
+      // Crée un nouvel objet Viewer pour cette image
+      const viewer = new Viewer(imageElement, {
+        inline: false,
+        viewed() {
+          viewer.zoomTo(1);  // Ajuste le zoom dès que l'image est vue
+        },
+        
+
+      });
+
+      // Affiche la vue modale de l'image cliquée
+      viewer.show();
+    } else {
+      console.error('Image non trouvée');
+    }
+  }
+    
   // Props
   const props = defineProps({
     uuid: String,
   });
 
   const codeVisiteur = ref("")
+  const codeVisite = ref(null)
 
   // Variables réactives
   const isOpen = ref(false);
@@ -255,18 +288,9 @@
   const loadingImpression = ref(false)
 
 
-  const employe = ref({
-    nomPrenom:"",
-    codeVisite: "",
-    departement:"",
-    service:"",
-    telephone: "",
-    image:"",
-    mime_type:""
-  })
+  const employe = ref({})
 
   const isLoading = ref(false);
-  const isLoadingUser = ref(false);
 
   // Store
   const authStore = useAuthStore();
@@ -285,37 +309,15 @@
     isOpen.value = true;
   };
 
-
-  const userData = async () => {
-    try {
-      isLoadingUser.value = true;
-        const response = await apiClient.get(`/user/${authStore.user.uuid}`, {
-          headers: {
-            'Authorization': `Bearer ${authStore.token}`,
-          },
-        });
-
-        if(!response.data.error){
-          const data = response.data.data
-          console.log('---------------data employe: '+JSON.stringify(data.value))
-          employe.value.nomPrenom = data.nom+" "+data.prenom
-          employe.value.departement =data.visite.departement.libelle
-          employe.value.service = data.visite.service.libelle
-          employe.value.telephone = data.telephone1
-          employe.value.codeVisite = data.visitecode_visite
-          employe.value.image = data.image
-          employe.value.mime_type = data.mime_type
-
-        }
-
-      }catch (error) {
-        console.error('Erreur lors de la recuperation des infos: ', error);
-
-      }finally{
-        isLoadingUser.value = false
-
-      }
+  // Afficher le planning du jour de l'employe
+  const showPlanning = (code) =>{
+    if(code){
+      return navigateTo(`/agenda/agenda/${code}`)
+    }
+    console.error("code visite n'est pas definit")
   }
+
+  
 
   const fetchVisitorData = async () => {
     if (props.uuid) {
@@ -358,9 +360,12 @@
               heure_entree: data.fvisite.heure_entree,
               visiteur: data.visiteurs
             };
-            console.log("En delegation 1-----------------------------: "+JSON.stringify(visiteurs.value.visiteur.length))
+
+            // Recuperer les infos du visité
+            employe.value = data.visiteurs[0].visite
+
           }else{
-            console.log("En delegation 2-----------------------------: "+JSON.stringify(response.data.data))
+            
             const data = response.data.data;
             // Remplissage des données dans la structure réactive `visiteurs`
             visiteurs.value = {
@@ -408,7 +413,6 @@
   // Appeler la fonction au moment du montage du composant
   onMounted(() => {
     fetchVisitorData();
-    userData()
   });
 
   const imprimerTicket = async (codeV) => {
