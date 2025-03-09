@@ -2,42 +2,17 @@
     <BRow>
       <BCol cols="12">
         <BCard no-body>
-          <BCardBody>
-            <!-- <BRow class="mb-3">
-              <BCol sm="12" md="2">
-                Debut
-                <BFormInput type="datetime-local" v-model="dateDebut" class="border border-secondary":options="listVisiteur" size="sm" />
-              </BCol>
-              <BCol sm="12" md="2">
-                Fin
-                <BFormInput type="datetime-local" v-model="dateFin" class="border border-secondary":options="listVisiteur" size="sm" />
-              </BCol>
-              <BCol sm="12" md="5">
-                <BFormSelect v-model="visiteurSelectionner" class="mt-4 border border-secondary":options="listVisiteur" size="sm" />
-              </BCol>
-              <BCol sm="12" md="3">
-                <div class="input-group mt-4 border border-secondary rounded-1">
-                    <span class="input-group-text">
-                        <i class="fas fa-search font-size-10"></i>
-                    </span>
-                    <BFormInput v-model="filter" type="search" id="input-small" size="sm"  placeholder="Rechercher..." />
-                </div>
-              </BCol>
-            </BRow> -->
-            <div class="row g-3">
+
+          <BCardBody>            
+            <div class="row gap-1">
               <!-- Info visiteur -->
 
-                <div class="card rounded-0 col-sm-6 col-md-6 p-0" style="box-shadow: none;">
+                <div class="card rounded-0 col-12 col-sm-6 col-md-6 p-0" style="box-shadow: none;">
                     <div class="card-header rounded-0 text-light fw-bold" style="background-color: #265FFB;">
                         VISITEUR
                     </div>
                     <div class="card-boby " style="background-color: #f6f6f6;">
-                      <!-- <PulseLoader v-if="isLoading" :loading="isLoading" size="40px" color="#4fa94d" /> -->
-                        <!-- <div v-if="isLoading" class="loading-ellipses">
-                          <span class="dot text-primary">.</span>
-                          <span class="dot text-success">.</span>
-                          <span class="dot text-danger">.</span>
-                        </div> -->
+
                         <ScaleLoader :loading="isLoading" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
                         <div v-if="!isLoading" class="">
                             <div class="row">
@@ -114,7 +89,7 @@
                 </div>
 
                 <!-- Visité -->
-                <div class="card rounded-0 border-0 col-sm-6 col-md-6 p-0 visite" style="box-shadow: none; margin-left: 5px;">
+                <div class="card rounded-0 border-0 col-12 col-sm-6 col-md-6 p-0 visite" style="box-shadow: none;">
                     <div class="card-header rounded-0 text-light fw-bold" style="background-color: #FAD400;">
                         HOTE
                     </div>
@@ -189,8 +164,8 @@
 
                 </div>
             </div>
-        
-        </BCardBody>
+          </BCardBody>
+
         </BCard>
       </BCol>
     </BRow>
@@ -263,6 +238,8 @@
 
   // Variables réactives
   const isOpen = ref(false);
+  // const visiteurs = ref({});
+
   const visiteurs = ref({
     users: {},
     telephone: "",
@@ -274,6 +251,7 @@
     visiteur:[]
 
   });
+
   const loadingImpression = ref(false)
 
 
@@ -319,6 +297,7 @@
 
         if(!response.data.error){
           const data = response.data.data
+          console.log('---------------data employe: '+JSON.stringify(data.value))
           employe.value.nomPrenom = data.nom+" "+data.prenom
           employe.value.departement =data.visite.departement.libelle
           employe.value.service = data.visite.service.libelle
@@ -379,9 +358,36 @@
               heure_entree: data.fvisite.heure_entree,
               visiteur: data.visiteurs
             };
-            console.log("En delegation-----------------------------: "+JSON.stringify(visiteurs.value.visiteur.length))
+            console.log("En delegation 1-----------------------------: "+JSON.stringify(visiteurs.value.visiteur.length))
           }else{
-            console.log("En delegation-----------------------------: "+JSON.stringify(response.data.data))
+            console.log("En delegation 2-----------------------------: "+JSON.stringify(response.data.data))
+            const data = response.data.data;
+            // Remplissage des données dans la structure réactive `visiteurs`
+            visiteurs.value = {
+              visite: data.fvisite.code_fvisite,
+              users: {
+                id: data.visiteurs[0].visiteur.users.id,
+                nom: data.visiteurs[0].visiteur.users.nom,
+                prenom: data.visiteurs[0].visiteur.users.prenom,
+                email: data.visiteurs[0].visiteur.users.email,
+              },
+              telephone: data.visiteurs[0].visiteur.users.telephone2,
+              numCni: data.visiteurs[0].visiteur.numero_piece,
+              cni: {
+                image_p: data.visiteurs[0].visiteur.image_p,
+                image_v: data.visiteurs[0].visiteur.image_v,
+                mime_type_p: data.visiteurs[0].visiteur.mime_type_p,
+                mime_type_v: data.visiteurs[0].visiteur.mime_type_v,
+                libelle: data.visiteurs[0].visiteur.type_piece.libelle, 
+              },
+              entreprise: {
+                id: data.visiteurs[0].visiteur.entreprise.id,
+                libelle: data.visiteurs[0].visiteur.entreprise.libelle,
+                code: data.visiteurs[0].visiteur.entreprise.code,
+              },
+              heure_entree: data.fvisite.heure_entree,
+              visiteur: data.visiteurs
+            };
 
           }
 
@@ -589,7 +595,7 @@
     width: 200px;
   }
   .visite{
-    width: 590px
+    width: 472px
   }
 
 }
@@ -627,11 +633,18 @@
   }
 
   .visite{
-    width: 360px
+    width: 374px
   }
   
 }
 
+@media (min-width: 1559px) {
+
+  .visite{
+    width: 620px
+  }
+
+}
 
 
 </style>

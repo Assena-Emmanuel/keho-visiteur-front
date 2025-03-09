@@ -106,6 +106,7 @@
                             </div>
                         </div>
                     </BCol>
+
                     <BCol md="4">
                         <div class="mb-3">
                             <label for="email" class="fw-bold text-black" style="font-size: 12px;">E-mail <strong class="text-danger">*</strong></label>
@@ -157,6 +158,8 @@
                             
                         </div>
                     </BCol>
+
+                
                     <BCol md="4">
                         <div class="mb-3">
                             <label for="numPiece" class="fw-bold text-black" style="font-size: 12px;">N° Pièce <strong class="text-danger">*</strong></label>
@@ -535,10 +538,10 @@
             },
 
             async onSaveVisiteur(){
+                console.log("Start--------------- : 1"+JSON.stringify(this.rectoImage)+" 2-- "+JSON.stringify(this.versoImage));
                 this.submitted = true;
                 this.v$.$touch();
-                
-                console.log("verso --------- "+JSON.stringify(this.versoImage)+"(---------) recto--------"+this.rectoImage.name)
+
                 if (this.v$.nom.$error || 
                     this.v$.prenom.$error || 
                     this.v$.typePiece.$error ||
@@ -590,7 +593,7 @@
                         }
 
                         
-                        console.log("Start--------------- : 1"+JSON.stringify(this.rectoImage)+" 2-- "+JSON.stringify(this.versoImage));
+                        
                         const response = await apiClient.post('/fvisites', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',

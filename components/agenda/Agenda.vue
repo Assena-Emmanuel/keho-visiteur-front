@@ -34,7 +34,7 @@
       </BRow>
 
       <!-- Modal pour ajouter ou modifier un événement -->
-      <!-- <BModal v-model="modalVisible" :title="isEditing ? 'Modifier l\'événement' : 'Ajouter un événement'" hide-footer>
+      <BModal v-model="modalVisible" :title="isEditing ? 'Modifier l\'événement' : 'Ajouter un événement'" hide-footer>
         <div>
           <BAlert variant="danger"v-model="error" dismissible>
             {{ errorMsg }}
@@ -58,16 +58,25 @@
           </BRow>
           
           <div class="d-flex justify-content-between" v-if="isEditing">
-            <BButton v-if="isEditing" class="mt-2" @click="deleteEvent" variant="danger">Supprimer</BButton>
-            <BButton class="mt-2" type="submit" variant="primary">Modifier</BButton>
+            <BButton v-if="isEditing" class="mt-2" @click="deleteEvent" variant="danger">
+              <span v-if="!loading">Supprimer</span>
+              <ScaleLoader v-if="loadingDelete" :loading="processing" height="20px" color="#FFFFFF" />
+            </BButton>
+            <BButton class="mt-2" type="submit" variant="primary" @click="updateEvent">
+              <span v-if="!loading">Modifier</span>
+              <ScaleLoader v-if="loading" :loading="processing" height="20px" color="#FFFFFF" />
+            </BButton>
           </div>
           <div class="d-flex justify-content-end" v-if="!isEditing">
-            <BButton class="mt-2" type="submit" variant="primary">Ajouter</BButton>
+            <BButton class="mt-2" type="submit" variant="primary">
+              <span v-if="!loading">Ajouter</span>
+              <ScaleLoader v-if="loading" :loading="processing" height="20px" color="#FFFFFF" />
+            </BButton>
           </div>
 
           
         </BForm>
-      </BModal> -->
+      </BModal>
     
     </BCardBody>
   </BCard>
@@ -77,13 +86,21 @@
 import { title } from 'process';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
+import apiClient from '~/components/api/intercepteur';
+import { useAuthStore } from "~/stores/auth.js";
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue' 
 
 export default {
-  components: { VueCal },
+  components: { VueCal, ScaleLoader },
+  setup(){
+      return {
+        authStore: useAuthStore()
+      }
+    },
   data() {
     return {
       heureDebut: 8,
-      heureFin: 17,
+      heureFin: 20,
       selectedDate: null,
       modalVisible: false,
       eventTitle: '',
@@ -91,13 +108,8 @@ export default {
       eventEndTime: null,
       error: false,
       errorMsg: null,
-      colors: [
-      'event-1', 'event-2',
-      'event-3', 'event-4',
-      'event-5', 'event-6',
-      'event-7', 'event-8',
-      'event-9', 'event-10',
-      ],
+      loading:false,
+      uuid : null,
       events: [
         { title: 'Réunion', start: '2024-10-28 09:00', end: '2024-10-28 10:00', class: 'event-1' },
         { title: 'Déjeuner', start: '2024-11-1 12:00', end: '2024-11-1 13:00', class: 'event-9' },
@@ -107,17 +119,50 @@ export default {
       editingIndex: null,
     };
   },
+
+  mounted() {
+      this.getEven()
+  },
+
   methods: {
+    async getEven(){
+      try{
+        const response = await apiClient.get("/fvisites/evenements", {
+          params: {
+            sort_type: 2,
+            code_employe: this.authStore.user.visite?.code_visite
+          },
+          headers: {
+            Authorization: `Bearer ${this.authStore.token}` // Utiliser "headers" et non "Autorization"
+          }
+        });
+
+        if(!response.data.error){
+          this.events = response.data.data.particular_event
+        }else{
+          console.error(response.data.message)
+        }
+
+      }catch(e){
+        console.error(e)
+      }finally{
+
+      }
+    },
     onCellFocus(date) {
       this.selectedDate = new Date(date);
     },
+    formatTime(datetime) {
+      const date = new Date(datetime);
+      const hours = String(date.getHours()).padStart(2, '0'); // Assurez-vous d'avoir 2 chiffres
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    },
     openEventModal(event) {
-      const eventFound = this.events.find(e => e.start === event.start && e.end === event.end);
-      console.log(event.start)
       if (event._eid) {
         this.eventTitle = event.title;
-        this.eventStartTime = event.start // Extraire l'heure
-        this.eventEndTime = event.end // Extraire l'heure
+        this.eventStartTime = this.formatTime(event.start) // Extraire l'heure
+        this.eventEndTime = this.formatTime(event.end) // Extraire l'heure
         this.isEditing = true;
         let obj = {
           title: this.eventTitle,
@@ -125,7 +170,9 @@ export default {
           end: this.eventEndTime,
           class: event.class
         }
+        this.uuid = event.uuid
         this.editingIndex = this.events.indexOf(obj);
+        
       } else {
         const eventStartTime = new Date(event.start).toTimeString().slice(0, 5); // Extract HH:mm
         this.eventTitle = '';
@@ -135,9 +182,10 @@ export default {
         this.editingIndex = null;
       }
       this.modalVisible = true;
+      
     },
     
-    addEvent() {
+    async addEvent() {
       if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
         if (!this.selectedDate) {
           alert("Veuillez sélectionner une date.");
@@ -158,7 +206,12 @@ export default {
         // Vérification que l'heure de début est avant l'heure de fin
         if (startDateTime >= endDateTime) {
           this.error= true
-          this.errorMsg = "L\'heure de début doit être avant l\'heure de fin."
+          this.errorMsg = "L'heure de début doit être antérieure à l'heure de fin. Merci de vérifier les horaires."
+
+          setTimeout(() => {
+            this.error = false;
+          }, 2000); // 2000 ms = 2 secondes
+
           return;
         }
 
@@ -168,39 +221,150 @@ export default {
 
         console.log(`Start: ${startFormatted}, End: ${endFormatted}`);
 
-        // Choisir une couleur aléatoire et ajouter l'événement
-        const randomColor = this.colors[Math.floor(Math.random() * this.colors.length)];
-        this.events.push({
-          title: this.eventTitle,
-          start: startFormatted,
-          end: endFormatted,
-          class: randomColor,
-        });
+        this.loading = true
+        try{
+          const response = await apiClient.post("/event",{
+            titre:this.eventTitle,
+            debut: startFormatted,
+            fin: endFormatted
+          }, {
+            headers: {
+              Authorization: `Bearer ${this.authStore.token}` // Utiliser "headers" et non "Autorization"
+            }
+          });
 
-        this.resetForm();
+          if(!response.data.error){
+            this.getEven()
+            this.loading = false
+            this.resetForm();
+          }else{
+            console.error(response.data.message)
+          }
+        }catch(e){
+          console.error("error lors de l'enregistrement de l'venement: "+e)
+        }finally{
+          this.loading = false
+        }
+
+        
   }
 },
 
 
-    updateEvent() {
+    async updateEvent() {
       if (this.eventTitle && this.eventStartTime && this.eventEndTime) {
-        const startDateTime = `${this.selectedDate.toISOString().split('T')[0]} ${this.eventStartTime}`;
-        const endDateTime = `${this.selectedDate.toISOString().split('T')[0]} ${this.eventEndTime}`;
+        if (!this.selectedDate) {
+          alert("Veuillez sélectionner une date.");
+          return;
+        }
 
-        this.events[this.editingIndex] = {
-          title: this.eventTitle,
-          start: startDateTime,
-          end: endDateTime,
-          class: this.getEventClass(this.eventTitle),
-        };
+        // Récupération des valeurs de l'heure
+        const [startHour, startMinute] = this.eventStartTime.split(':').map(Number);
+        const [endHour, endMinute] = this.eventEndTime.split(':').map(Number);
 
-        this.resetForm();
+        // Création des objets Date en utilisant les valeurs de l'année, du mois, du jour, de l'heure et des minutes
+        const startDateTime = new Date(this.selectedDate);
+        startDateTime.setHours(startHour, startMinute, 0, 0); // Définir l'heure de début
+
+        const endDateTime = new Date(this.selectedDate);
+        endDateTime.setHours(endHour, endMinute, 0, 0); // Définir l'heure de fin
+
+        // Vérification que l'heure de début est avant l'heure de fin
+        if (startDateTime >= endDateTime) {
+          this.error= true
+          this.errorMsg = "L'heure de début doit être antérieure à l'heure de fin. Merci de vérifier les horaires."
+
+          setTimeout(() => {
+            this.error = false;
+          }, 2000); // 2000 ms = 2 secondes
+
+          return;
+        }
+
+        // Formatage des dates au format souhaité
+        const startFormatted = `${startDateTime.toISOString().split('T')[0]} ${startDateTime.toTimeString().split(' ')[0]}`;
+        const endFormatted = `${endDateTime.toISOString().split('T')[0]} ${endDateTime.toTimeString().split(' ')[0]}`;
+
+        console.log(`Start: ${startFormatted}, End: ${endFormatted}`);
+
+        this.loading = true
+        if(this.uuid){
+          try{
+            const response = await apiClient.put(`/event/${this.uuid}`,{
+              titre:this.eventTitle,
+              debut: startFormatted,
+              fin: endFormatted
+            }, {
+              headers: {
+                Authorization: `Bearer ${this.authStore.token}` // Utiliser "headers" et non "Autorization"
+              }
+            });
+
+            if(!response.data.error){
+              this.getEven()
+              this.loading = false
+              this.resetForm();
+            }else{
+              console.error(response.data.message)
+              this.error= true
+              this.errorMsg = response.data.message
+
+              setTimeout(() => {
+                this.error = false;
+              }, 2000); // 2000 ms = 2 secondes
+
+            }
+          }catch(e){
+            console.error("error lors de la modification de l'venement: "+e)
+          }finally{
+            this.loading = false
+          }
+
+        }else{
+          console.error("error uuid obligatoire: ")
+        }
+
+
+
       }
     },
-    deleteEvent() {
-      this.events.splice(this.editingIndex, 1);
-      this.resetForm();
+
+    async deleteEvent() {
+      this.loading = true
+        if(this.uuid){
+          try{
+            const response = await apiClient.delete(`/event/${this.uuid}`,{
+              headers: {
+                Authorization: `Bearer ${this.authStore.token}` // Utiliser "headers" et non "Autorization"
+              }
+            });
+
+            if(!response.data.error){
+              this.getEven()
+              this.loading = false
+              this.resetForm();
+            }else{
+              this.error= true
+              this.errorMsg = response.data.message
+
+              setTimeout(() => {
+                this.error = false;
+              }, 2000); // 2000 ms = 2 secondes
+
+            }
+          }catch(e){
+            console.error("error lors de la modification de l'venement: "+e)
+          }finally{
+            this.loading = false
+          }
+
+        }else{
+          console.error("error uuid obligatoire: ")
+        }
+      
     },
+
+
     resetForm() {
       this.eventTitle = '';
       this.eventStartTime = null;

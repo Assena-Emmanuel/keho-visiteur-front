@@ -83,9 +83,9 @@ const onSaveprofil = async () => {
     };
 
       const data = await createResource(`role`, formData);
-      console.log("Error:------------"+JSON.stringify(data))
+      alert(1)
       if(!data.data.error){
-
+        alert(2)
         const data = await getAll("role");
         console.log("data save:------------"+JSON.stringify(data.data))
         gestionStore.setProfils(data.data)
@@ -128,20 +128,15 @@ watch(
   () => id.value,  
   async (newid) => {  
     if (newid) {
-      
       loading.value = true
       isOpen.value = false
       // recuperation du profil
       try{
           isOpen.value = true
           isEditMode.value = true
-          
-          
          
           const profil = await getById("role", newid);
           
-          
-          // const actions = await getAll("action")
         
         if(!profil.data.error){
 
@@ -170,13 +165,10 @@ watch(
            
               menus.value.map((menu) => {
                 menu.permissions.map((perm) => {
-                  formData.value[`${menu.resourceId}-${perm.action_id}`] =
-                    perm.habilitation;
+                  formData.value[`${menu.resourceId}-${perm.action_id}`] = perm.habilitation;
                 });
               });
-            console.log("fields-------------: "+JSON.stringify(fields.value))
-
-            
+       
           }else{
             alert()
           }
@@ -211,7 +203,6 @@ const onUpdateprofil = async () => {
   }
 
   loadingEdit.value = true;
-  console.log(formData.value);
 
   try {
     const response = await apiClient.post("/permissions", {
@@ -227,6 +218,7 @@ const onUpdateprofil = async () => {
       isOpen.value = false
       isEditMode.value = false
       id.value = null
+      alertMessage(response.data.message, 'success')
       resetForm();
     } else {
       alert("Une erreur est survenue : " + response.statusText);

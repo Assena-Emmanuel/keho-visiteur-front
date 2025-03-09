@@ -187,7 +187,7 @@
 
                 <!-- Bouton de modification (edit) -->
                 <BButton 
-                  v-if="permissions.some(perm => perm.edit)" 
+                  v-if="permissions.some(perm => perm.cancel)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
@@ -268,9 +268,12 @@ const searchValue = ref(null)
 const serverOptions = ref({
   page: 1,
   rowsPerPage: 5,
-  sortBy: 2,
-  code_employe: authStore.user.visite?.code_visite,
+  sortBy: authStore.user.role.code == 'SUPADM' ? 1 : 2,
+  code_employe: authStore.user.role.code == 'SUPADM' ? null : authStore.user.visite.code_visite,
 });
+
+// sort_type: authStore.user.role.code == 'SUPADM' ? 1 : 2,
+//   code_employe: authStore.user.role.code == 'SUPADM' ? null : authStore.user.visite.code_visite
 
 const loadingReset = ref(false)
 // reactualiser

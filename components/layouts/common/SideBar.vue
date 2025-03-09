@@ -3,9 +3,14 @@ import MetisMenu from "metismenujs";
 import { useAuthStore } from "~/stores/auth.js";
 import { useApi } from '~/components/api/useApi';
 import apiClient from "~/components/api/intercepteur";
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
+import { createToast } from 'mosha-vue-toastify'
 
 
 export default {
+  components:{
+    ScaleLoader
+  },
   setup(){
     const authStore = useAuthStore()
     const { getAll, createResource } = useApi(authStore.token);
@@ -17,7 +22,8 @@ export default {
   },
   data() {
     return {
-      menus: []
+      menus: [],
+      loading: false
     };
   },
   props: {
@@ -97,7 +103,9 @@ export default {
       }
     }
   },
+
   async mounted() {
+    this.loading = true
     const element = document.getElementById("side-menu");
     if (element) {
       new MetisMenu("#side-menu");
@@ -110,6 +118,7 @@ export default {
 
     
     // Recuperation des menus en fonction du role connecté
+
     const response = await apiClient.get(`/menu_by_role/${this.authStore.user.role_id}`, 
       {
       headers: {
@@ -123,8 +132,10 @@ export default {
     }else{
       console.error("Menu error: "+response.message)
     }
+    this.loading = false
 
   },
+
   methods: {
     toggleMenu() {
       this.$parent.toggleMenu();
@@ -261,6 +272,9 @@ export default {
 
             </li>
           </template>
+          <div v-if="loading" style="height: 400px; display: flex; justify-content: center; align-items: center;">
+            <ScaleLoader :loading="loading" :height="'20px'" :color="'#FE0201'" />
+          </div>
         </ul>
       </div>
     </div>
