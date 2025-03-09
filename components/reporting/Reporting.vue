@@ -281,8 +281,11 @@
   import apiClient from "../api/intercepteur";
   import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
   import Swal from 'sweetalert2';
-  import VueDatePicker from '@vuepic/vue-datepicker';
   import '@vuepic/vue-datepicker/dist/main.css'
+import Vue3Datatable from '@bhplugin/vue3-datatable'
+import '@bhplugin/vue3-datatable/dist/style.css'
+import Viewer from 'viewerjs'
+ import 'viewerjs/dist/viewer.css';
 
   
   const authStore = useAuthStore();
@@ -291,35 +294,40 @@
   startDate: '2022/08/03', // Initialisation avec une date de départ par défaut
   endDate: '2022/08/17',   // Initialisation avec une date de fin par défaut
     });
-  const headers = [
-    { text: "Date", value: "created_at", sortable: true },
-    { text: "Nom & Prénoms", value: "visiteur" },
-    { text: "CNI", value: "numero_piece"},
-    { text: "Société", value: "entreprise"},
-    { text: "Code visiteur", value: "code_visiteur" },
-    { text: "Code visite", value: "code_visite" },
-    { text: "Employé", value: "employe" },
-    { text: "Visite", value: "lib_visite" },
-    { text: "H entrée", value: "heure_entree" },
-    { text: "Statut", value: "lib_statut" },
-    { text: "H Sortie", value: "heure_fin" },
-    { text: "Actions", value: "Actions" },
-  ];
+
+
+  const headers = ref([
+    { title: "Date", field: "created_at", width: "40px", sortable: true },
+    { title: "Nom & Prénoms",width: "40px", field: "visiteur" },
+    { title: "CNI",width: "40px", field: "numero_piece"},
+    { title: "Société",width: "40px", field: "entreprise"},
+    { title: "Code visiteur",width: "40px", field: "code_visiteur" },
+    { title: "Code visite",width: "40px", field: "code_visite" },
+    { title: "Employé",width: "40px", field: "employe" },
+    { title: "Visite",width: "40px", field: "lib_visite" },
+    { title: "H entrée",width: "40px", field: "heure_entree" },
+    { title: "Statut",width: "40px", field: "lib_statut" },
+    { title: "H Sortie",width: "40px", field: "heure_fin" },
+    { title: "Actions",width: "40px", field: "actions" },
+  ]);
+
+
   const loadingReset = ref(false)
   const permissions = ref([])
   const range = ref([5,10,15,20])
   const items = ref([]);
   const loading = ref(false);
   const serverItemsLength = ref(0);
-  const searchField = ["visiteur", "entreprise", "numero_piece", "code_visite", "code_visiteur", "employe", "lib_visite"];
   const searchValue = ref("");
   const detailModal = ref(false)
   const data = ref([])
   const loadingDetail = ref(false)
   const dateDebut = ref(null)
   const dateFin = ref(null)
+  const currentPage = ref(1)
+  const params = reactive({ current_page: 1, pagesize: 5 });
   const serverOptions = ref({
-    page: 1,
+    page: params.current_page,
     rowsPerPage: 5,
     sortBy: 1,
     code_employe: '',

@@ -1,77 +1,99 @@
 <template>
   <DashboardCommonStat />
 
-    <!-- Modal détail -->
-    <BModal v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur">
+  <!-- Modal détail -->
+  <BModal  v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur" >
+      <!-- <template v-slot:header>
+        <div class="d-flex justify-content-start w-100" style="position: relative;">
+          <img src="/images/total-removebg.png" alt="" width="50">
+        </div>
+      </template> -->
     <ScaleLoader :loading="loadingDetail" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
-
-    <div v-if="data && data.visiteurs && !loadingDetail">
-      <!-- Affichage des visiteurs selon la pagination -->
-      <div v-for="(item, index) in data.visiteurs" :key="item['Code visite']">
-        <div class="text-center">
-          <h3>{{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</h3>
-          <span v-if="item.delegation && item.chef_equipe " class="badge bg-danger rounded">délégué</span>
+    <div v-if="data && data.visiteurs && !loadingDetail"  v-for="item in paginatedData" :key="item['Code visite']">
+      <div class="text-center"><h3>{{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</h3>
+        <span v-if="item.delegation && item.chef_equipe " class="badge bg-danger rounded">délégué</span>
+      </div>
+      <div class="d-flex justify-content-between">
+        <div>
+          <span v-if="data.fvisite.statut==2" class="text-succes px-2 ms-2">statut: <span class="">terminé</span></span>
+          <span v-if="data.fvisite.statut==1" class="text-warning px-2 ms-2">statut: <span class="">Notifié</span></span>
+          <span v-if="data.fvisite.statut==0" class="text-warning px-2 ms-2">statut: <span class="">En cours</span></span>
+          <span v-if="data.fvisite.statut==3" class="text-danger px-2 ms-2">statut: <span class="">Rejeté</span></span>
+          <span v-if="data.fvisite.statut==4" class="text-info px-2 ms-2">statut: <span class="">Confirmé</span></span>
+          <span v-if="data.fvisite.statut==5" class="text-succes px-2 ms-2">statut: <span class="">Clôturé</span></span>
         </div>
-        <div class="d-flex justify-content-between">
-          <div>
-            <span v-if="data.fvisite.statut==2" class="text-succes px-2 ms-2">statut: <span class="">terminé</span></span>
-            <span v-if="data.fvisite.statut==1" class="text-warning px-2 ms-2">statut: <span class="">Notifié</span></span>
-            <span v-if="data.fvisite.statut==0" class="text-warning px-2 ms-2">statut: <span class="">En cours</span></span>
-            <span v-if="data.fvisite.statut==3" class="text-danger px-2 ms-2">statut: <span class="">Rejeté</span></span>
-            <span v-if="data.fvisite.statut==4" class="text-info px-2 ms-2">statut: <span class="">Confirmé</span></span>
-            <span v-if="data.fvisite.statut==5" class="text-succes px-2 ms-2">statut: <span class="">Clôturé</span></span>
-          </div>
-          <div><small class=" px-2 ms-2 "><i class="fa fa-clock"></i> <small>{{ formatDateTime(data.fvisite.created_at)  }}</small></small></div>
+        <div><small class=" px-2 ms-2 "><i class="fa fa-clock"></i> <small>{{ formatDateTime(data.fvisite.created_at)  }}</small></small></div>
+      </div>
+      <hr class="text-secondary">
+      <div class="row">
+        <div class="col col-md-6">
+          <p><strong>Téléphone:</strong> {{ item.visiteur.users.telephone2 }}</p>
         </div>
-        <hr class="text-secondary">
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>Téléphone:</strong> {{ item.visiteur.users.telephone2 }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Société:</strong> {{ item.visiteur.entreprise.libelle }}</p>
-          </div>
+        <div class="col col-md-6">
+          <p><strong>Société:</strong> {{ item.visiteur.entreprise.libelle }}</p>
         </div>
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>E-mail:</strong> {{ item.visiteur.users.email }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Code visiteur:</strong> {{ data.fvisite.code_fvisite }}</p>
-          </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-6">
+          <p><strong>E-mail:</strong> {{ item.visiteur.users.email }}</p>
         </div>
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>Type pièce:</strong> {{ item.visiteur.type_piece.code == 'CNI' ? item.visiteur.type_piece.code :  item.visiteur.libelle }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Num pièce:</strong> {{ item.visiteur.numero_piece }}</p>
-          </div>
+        <div class="col col-md-6">
+          <p><strong>Code visiteur:</strong> {{ data.fvisite.code_fvisite }}</p>
         </div>
-
-        <div class="row">
-          <div class="col col-md-6">
-            <p><strong>Heure d'entrée:</strong> {{ data.fvisite.heure_entree }}</p>
-          </div>
-          <div class="col col-md-6">
-            <p><strong>Heure de Sortie:</strong> {{ !data.fvisite.heure_fin ? "---------" : data.fvisite.heure_fin }}</p>
-          </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-6">
+          <p><strong>Type pièce:</strong> {{ item.visiteur.type_piece.code == 'CNI' ? item.visiteur.type_piece.code :  item.visiteur.libelle }}</p>
         </div>
-        <div class="bg-danger text-center text-light" v-if="item.delegation">En délégation</div>
-        <hr />
+        <div class="col col-md-6">
+          <p><strong>Num pièce:</strong> {{ item.visiteur.numero_piece }}</p>
+        </div>
+      </div>
+     
+      <div class="row">
+        <div class="col col-md-6">
+          <p><strong>Heure d'entrée:</strong> {{ data.fvisite.heure_entree }}</p>
+        </div>
+        <div class="col col-md-6">
+          <p><strong>Heure de Sortie:</strong> {{ !data.fvisite.heure_fin ? "---------" : data.fvisite.heure_fin }}</p>
+        </div>
       </div>
 
-      <!-- Pagination -->
-      <div class="d-flex justify-content-end" v-if="data && data.visiteurs && data.visiteurs.length > 1 && !loadingDetail">
-        <BPagination
-          v-model="page"
-          :total-rows="data.visiteurs.length"
-          :per-page="itemsPerPage"
-          aria-controls="modal-pagination"
-        ></BPagination>
+      <div class="row carte mt-2 mb-2">
+        <div class="col-6 d-flex justify-content-center">
+          <img @click="imgViewer('image-recto')" 
+              id="image-recto"  
+              :src="`data:${item.visiteur.mime_type_p};base64,${item.visiteur.image_p}`" 
+              height="80" 
+              class="cni" 
+              alt="CNI recto">
+        </div>
+        <div class="col-6 d-flex justify-content-center">
+          <img @click="imgViewer('image-verso')" 
+              id="image-verso" 
+              :src="`data:${item.visiteur.mime_type_v};base64,${item.visiteur.image_v}`" 
+              height="80" 
+              class="cni" 
+              alt="CNI verso">
+        </div>
       </div>
+
+      <div class="bg-danger text-center text-light" v-if="item.delegation">En délégation</div>
+      <hr />
     </div>
-  </BModal>
+
+
+    <div class="d-flex justify-content-end" v-if="data && data.visiteurs && data.visiteurs.length > 1 && !loadingDetail">
+
+    <vue-awesome-paginate
+      :total-items="data.visiteurs.length"
+      :items-per-page="1"
+      :max-pages-shown="data.visiteurs.length>= 18 ? 2 : 5"
+      v-model="currentPage"
+    />
+    </div>
+    
+  </BModal> 
  
 
   <BCard style="min-height: 10em; margin: 0;">
@@ -116,38 +138,35 @@
             </button>
           </div>
 
-        <!-- Table avec pagination -->
-        <EasyDataTable
-          v-model:server-options="serverOptions"
-          :server-items-length="serverItemsLength"
-          :loading="loading"
-          :headers="headers"
-          :items="items"
-          rows-of-page-separator-message="sur"
-          buttons-pagination
-          table-class-name="customize-table"
-          header-text-direction="center"
-          body-text-direction="center"
-          :rows-items="range"
-          :rows-per-page="range[0]"
-          empty-message="Aucune donnée disponible"
-          rows-per-page-message="Ligne par page"
-          :search-field="searchField"
-          :search-value="searchValue"
 
-          >
+          <vue3-datatable
+            :rows="items"
+            :columns="headers"
+            :loading="loading"
+            :totalRows="serverItemsLength"
+            :isServerMode="true"
+            :pageSize="params.pagesize"
+            :showNumbersCount="3"
+            class="alt-pagination"
+            :pageSizeOptions="[5, 10, 15, 20]"
+            paginationInfo="Afficher de {0} à {1} sur {2} elements"
+            skin="bh-table-striped"
+            pageSize="5"
+            noDataContent="Aucune donnée disponible"
+            @change="changeServer"
+        >
 
+        <template #lib_statut="data">
+          <strong>{{ data.value.email }}</strong>
+          <span v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
+            <span v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
+            <span v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
+            <span v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
+            <span v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
+            <span v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
+        </template>
 
-          <template #item-lib_statut="item">
-            <span v-if="item.statut == 0" class="text-warning">{{ item.lib_statut }}</span>
-            <span v-if="item.statut == 1" class="text-info">{{ item.lib_statut }}</span>
-            <span v-if="item.statut == 2" class="text-success">{{ item.lib_statut }}</span>
-            <span v-if="item.statut == 3" class="text-danger">{{ item.lib_statut }}</span>
-            <span v-if="item.statut == 4" class="text-success">{{ item.lib_statut }}</span>
-            <span v-if="item.statut == 5" class="text-dark">{{ item.lib_statut }}</span>
-          </template>
-
-          <template #item-actions="item">
+        <template #actions="data">
               <div class="d-flex gap-1">
                 <BButton 
                   v-if="permissions.some(perm => perm.show)" 
@@ -155,65 +174,61 @@
                   variant="white" 
                   size="sm" 
                   class="d-flex text-primary justify-content-center align-items-center" 
-                  @click="showDetailsModal(item.uuid)"
+                  @click="showDetailsModal(data.value.uuid)"
                 >
                   <i class="fas fa-eye"></i>
                 </BButton>
 
-                 <!-- Bouton d'impression (prt) -->
+                 
                 <BButton 
                   v-if="permissions.some(perm => perm.prt)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
                   class="d-flex text-primary justify-content-center align-items-center" 
-                  @click="showTicket(item.uuid)"
+                  @click="showTicket(data.value.uuid)"
                 >
                   <i class="uil uil-print font-size-15"></i>
                 </BButton>
 
-                <!-- Bouton de modification (edit) -->
+                
                 <BButton 
                   v-if="permissions.some(perm => perm.cancel)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
                   class="mr-1 fw-bold text-warning d-flex justify-content-center align-items-center" 
-                  @click="rejet(item.uuid)" 
+                  @click="rejet(data.value.uuid)" 
                   v-b-tooltip.hover.bottom="'rejeter'"
                 >
                   <i class="uil uil-ban font-size-15 annuler"></i>
                 </BButton>
 
-                <!-- Bouton de suppression (del) -->
+                
                 <BButton 
                   v-if="permissions.some(perm => perm.del)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
                   class="px-2 text-danger d-flex justify-content-center align-items-center" 
-                  @click="confirmDelete(item.uuid)"
+                  @click="confirmDelete(data.value.uuid)"
                 >
                   <i class="uil uil-trash-alt font-size-15"></i>
                 </BButton>
                       
               </div>
           </template>
-
-          <template #item-heure_fin="item">
-            <div>
-              <span v-if="!item.heure_fin">----</span>
-              <span v-else>{{ item.heure_fin }}</span>
-            </div>
+          <template #heure_fin="data">
+              <div>
+                  <span>----</span>
+              </div>
           </template>
 
-          <!-- Personnaliser le loading -->
-          <template #loading>
-              <ScaleLoader :loading="loading" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
-          </template>
-          
 
-          </EasyDataTable>
+        </vue3-datatable>
+
+
+        
       </div>
     </BCardBody>
   </BCard>
@@ -226,30 +241,32 @@ import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import Swal from 'sweetalert2';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+import Vue3Datatable from '@bhplugin/vue3-datatable'
+import '@bhplugin/vue3-datatable/dist/style.css'
+import Viewer from 'viewerjs'
+ import 'viewerjs/dist/viewer.css';
 
 const authStore = useAuthStore();
-const headers = [
-  { text: "Date", value: "created_at", sortable: true },
-  { text: "Nom & Prénoms", value: "visiteur" },
-  { text: "CNI", value: "numero_piece"},
-  { text: "Société", value: "entreprise"},
-  { text: "Code visiteur", value: "code_visiteur" },
-  { text: "Code visite", value: "code_visite" },
-  { text: "Employé", value: "employe" },
-  { text: "Visite", value: "lib_visite" },
-  { text: "H entrée", value: "heure_entree" },
-  { text: "Statut", value: "lib_statut" },
-  { text: "H Sortie", value: "heure_fin" },
-  { text: "Actions", value: "Actions" },
-];
+const headers = ref([
+  { title: "Date", field: "created_at", width: "40px", sortable: true },
+  { title: "Nom & Prénoms",width: "40px", field: "visiteur" },
+  { title: "CNI",width: "40px", field: "numero_piece"},
+  { title: "Société",width: "40px", field: "entreprise"},
+  { title: "Code visiteur",width: "40px", field: "code_visiteur" },
+  { title: "Code visite",width: "40px", field: "code_visite" },
+  { title: "Employé",width: "40px", field: "employe" },
+  { title: "Visite",width: "40px", field: "lib_visite" },
+  { title: "H entrée",width: "40px", field: "heure_entree" },
+  { title: "Statut",width: "40px", field: "lib_statut" },
+  { title: "H Sortie",width: "40px", field: "heure_fin" },
+  { title: "Actions",width: "40px", field: "actions" },
+]);
 
 const loadingReset = ref(false)
 const permissions = ref([])
-const range = ref([5,10,15,20])
 const items = ref([]);
 const loading = ref(false);
 const serverItemsLength = ref(0);
-const searchField = ["visiteur", "entreprise", "numero_piece", "code_visite", "code_visiteur", "employe", "lib_visite"];
 const searchValue = ref("");
 const detailModal = ref(false)
 const data = ref([])
@@ -258,12 +275,40 @@ const dateDebut = ref(null)
 const dateFin = ref(null)
 const dateselect = ref(null)
 const itemsPerPage = ref(1)
+const currentPage = ref(1)
+const params = reactive({ current_page: 1, pagesize: 5 });
 const serverOptions = ref({
-  page: 1,
-  rowsPerPage: 5,
+  page: params.current_page,
+  rowsPerPage: params.pagesize,
   sortBy: authStore.user.role.code == 'SUPADM' ? 1 : 2,
   code_employe: authStore.user.role.code == 'SUPADM' ? '' : authStore.user.visite.code_visite,
 });
+
+
+
+
+// visualiser piece
+const imgViewer = (id) => {
+    // Sélectionne l'image cliquée par son id
+    const imageElement = document.getElementById(id);
+
+    if (imageElement) {
+      // Crée un nouvel objet Viewer pour cette image
+      const viewer = new Viewer(imageElement, {
+        inline: false,
+        viewed() {
+          viewer.zoomTo(1);  // Ajuste le zoom dès que l'image est vue
+        },
+        
+
+      });
+
+      // Affiche la vue modale de l'image cliquée
+      viewer.show();
+    } else {
+      console.error('Image non trouvée');
+    }
+  }
 
 
 // reactualiser
@@ -281,6 +326,19 @@ function resetAction(){
   }
   
 }
+
+const changeServer = (data) => {
+    params.current_page = data.current_page;
+    params.pagesize = data.pagesize;
+
+    loadFromServer();
+};
+
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1);
+  const end = start + 1;
+  return data.value.visiteurs.slice(start, end);
+});
 
 // Fonction pour charger les données depuis le serveur
 const loadFromServer = async () => {

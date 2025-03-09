@@ -57,16 +57,32 @@
           <p><strong>Heure de Sortie:</strong> {{ !data.fvisite.heure_fin ? "---------" : data.fvisite.heure_fin }}</p>
         </div>
       </div>
+
+      <div class="row carte mt-2 mb-2">
+        <div class="col-6 d-flex justify-content-center">
+          <img @click="imgViewer('image-recto')" 
+              id="image-recto"  
+              :src="`data:${item.visiteur.mime_type_p};base64,${item.visiteur.image_p}`" 
+              height="80" 
+              class="cni" 
+              alt="CNI recto">
+        </div>
+        <div class="col-6 d-flex justify-content-center">
+          <img @click="imgViewer('image-verso')" 
+              id="image-verso" 
+              :src="`data:${item.visiteur.mime_type_v};base64,${item.visiteur.image_v}`" 
+              height="80" 
+              class="cni" 
+              alt="CNI verso">
+        </div>
+      </div>
+
       <div class="bg-danger text-center text-light" v-if="item.delegation">En délégation</div>
       <hr />
     </div>
+
+
     <div class="d-flex justify-content-end" v-if="data && data.visiteurs && data.visiteurs.length > 1 && !loadingDetail">
-      <!-- <BPagination
-      v-model="currentPage"
-      :total-rows="visiteurs.length"
-      :per-page="itemsPerPage"
-      aria-controls="modal-pagination"
-    ></BPagination> -->
 
     <vue-awesome-paginate
       :total-items="data.visiteurs.length"
@@ -79,7 +95,7 @@
   </BModal>  
 
   <BCard style="min-height: 10em; "  >
-    <BCardBody style="margin: -30px;">
+    <BCardBody >
       <div>
         <div class="flex items-center justify-between mb-3">
           <h3 class="text-3xl">Visites enregistrées</h3>
@@ -129,6 +145,11 @@
             :pageSize="params.pagesize"
             :showNumbersCount="3"
             class="alt-pagination"
+            :pageSizeOptions="[5, 10, 15, 20]"
+            paginationInfo="Afficher de {0} à {1} sur {2} elements"
+            skin="bh-table-striped"
+            pageSize="5"
+            noDataContent="Aucune donnée disponible"
             @change="changeServer"
         >
 
@@ -169,7 +190,7 @@
 
                 
                 <BButton 
-                  v-if="permissions.some(perm => perm.edit)" 
+                  v-if="permissions.some(perm => perm.cancel)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
                   size="sm" 
@@ -218,6 +239,10 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import Vue3Datatable from '@bhplugin/vue3-datatable'
 import '@bhplugin/vue3-datatable/dist/style.css'
+import Viewer from 'viewerjs'
+ import 'viewerjs/dist/viewer.css';
+ 
+    
 
 
 const authStore = useAuthStore();
@@ -260,6 +285,29 @@ const serverOptions = ref({
   code_employe: '',
 });
 
+
+// visualiser piece
+const imgViewer = (id) => {
+    // Sélectionne l'image cliquée par son id
+    const imageElement = document.getElementById(id);
+
+    if (imageElement) {
+      // Crée un nouvel objet Viewer pour cette image
+      const viewer = new Viewer(imageElement, {
+        inline: false,
+        viewed() {
+          viewer.zoomTo(1);  // Ajuste le zoom dès que l'image est vue
+        },
+        
+
+      });
+
+      // Affiche la vue modale de l'image cliquée
+      viewer.show();
+    } else {
+      console.error('Image non trouvée');
+    }
+  }
 
 // reactualiser
 function resetAction(){
@@ -476,7 +524,7 @@ const showDetailsModal = async (uuid) => {
 
     if(!response.data.error){
       data.value = response.data.data
-      console.log('Detail-------------: '+JSON.stringify( data.value.visiteurs.length))
+      console.log('Detail-------------: '+JSON.stringify( data.value.visiteurs))
     }else{
       console.error(response.data)
     }
