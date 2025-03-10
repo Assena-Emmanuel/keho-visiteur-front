@@ -100,7 +100,7 @@
       <BCardBody>
         <div>
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-3xl">Liste Visiteur</h3>
+            <h3 class="text-3xl">Reporting</h3>
           </div>
 
 
@@ -110,7 +110,7 @@
               <BFormInput v-model="searchValue" placeholder="Code employé" />
             </div>
             <div class="col-5">
-              <VueDatePicker :enable-time-picker="false" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'"  v-model="dateselect" range multi-calendars  placeholder="date Debut - date Fin" />
+              <VueDatePicker enable-seconds select-text="Selectionner" cancel-text="Annuler" :locale="'fr'"  v-model="dateselect" range multi-calendars  placeholder="date Debut - date Fin" />
             </div>
             
             <div class="col-3">
@@ -241,22 +241,16 @@
   import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
   import Swal from 'sweetalert2';
   import '@vuepic/vue-datepicker/dist/main.css'
-import Vue3Datatable from '@bhplugin/vue3-datatable'
-import '@bhplugin/vue3-datatable/dist/style.css'
-import Viewer from 'viewerjs'
- import 'viewerjs/dist/viewer.css';
- import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css'
-import * as XLSX from 'xlsx';
+  import Vue3Datatable from '@bhplugin/vue3-datatable'
+  import '@bhplugin/vue3-datatable/dist/style.css'
+  import Viewer from 'viewerjs'
+  import 'viewerjs/dist/viewer.css';
+  import VueDatePicker from '@vuepic/vue-datepicker';
+  import '@vuepic/vue-datepicker/dist/main.css'
+  import * as XLSX from 'xlsx';
 
   
   const authStore = useAuthStore();
-  
-  const dateRange = ref({
-  startDate: '2022/08/03', // Initialisation avec une date de départ par défaut
-  endDate: '2022/08/17',   // Initialisation avec une date de fin par défaut
-    });
-
 
   const headers = ref([
     { title: "Date", field: "created_at", width: "40px", sortable: true, hide: false },
@@ -270,7 +264,7 @@ import * as XLSX from 'xlsx';
     { title: "H entrée",width: "40px", field: "heure_entree" , hide: false},
     { title: "Statut",width: "40px", field: "lib_statut" , hide: false},
     { title: "H Sortie",width: "40px", field: "heure_fin" , hide: false},
-    { title: "Actions",width: "40px", field: "actions" , hide: false},
+    { title: "Actions",width: "40px", field: "actions" , hide: true},
   ]);
 
 
@@ -297,7 +291,6 @@ import * as XLSX from 'xlsx';
     code_employe: '',
   });
   const selectPdf = ref("print")
-  const selectEtat = ref(null)
   const optionsPdf = ref([
   {value: "print", text: 'Fichier PDF'},
   {value: "xlsx", text: 'Fichier EXCEL'},
@@ -433,10 +426,10 @@ import * as XLSX from 'xlsx';
     
       // Formater les dates au format 'YYYY-MM-DD HH:mm:ss'
       let formattedEndDate = null
-      const formattedStartDate = startDate.toISOString().slice(0, 10).replace("T", " ");
+      const formattedStartDate = startDate.toISOString().slice(0, 19).replace("T", " ");
     
       if(dateselect.value[1]){
-        formattedEndDate = endDate.toISOString().slice(0, 10).replace("T", " ");
+        formattedEndDate = endDate.toISOString().slice(0, 19).replace("T", " ");
       }
       
       // Mettre à jour la valeur de dateselect pour chaque date
@@ -461,12 +454,13 @@ import * as XLSX from 'xlsx';
         param.date_fin = dateselect.value[1] != null ? date.end : date.start;
 
       } 
+
       // Vérification si searchValue est défini et pas dateDebut et dateFin
       else if (date.start == null && dateselect.value[1] == null && searchValue.value != "") {
-        // alert(2); // Retirer si plus nécessaire pour le débogage
         param.sort_type = 2;
         param.code_employe = searchValue.value;
       } 
+      
       // Tous les critères sont définis
       else if (date.start && dateselect.value[1] !=null && searchValue.value) {
         param.sort_type = 4;
@@ -488,7 +482,6 @@ import * as XLSX from 'xlsx';
 
       // Vérification de la réponse de l'API
       if (!response.data.error) {
-        console.log("Réponse reçue:", response.data.data);
         const data = response.data.data;
         items.value = data?.data;
         serverItemsLength.value = response.data.data.total;

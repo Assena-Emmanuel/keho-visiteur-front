@@ -105,7 +105,7 @@
 
           <BRow class="mb-3">
               <BCol sm="12" md="6">
-                <VueDatePicker cancel-text="Annuler" select-text="Selectionner" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" />
+                <VueDatePicker enable-seconds cancel-text="Annuler" select-text="Selectionner" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" :locale="'fr'"  />
               </BCol> 
               <BCol sm="12" md="4" v-if="authStore.user.role.code == 'SUPADM'">
                 <div>
@@ -387,7 +387,6 @@ const loadFromServer = async () => {
 
   if(!response.data.error){
     permissions.value = response.data
-    console.log("-------------------:per "+JSON.stringify(permissions.value))
 
   }else{
     console.error("Menu error: "+response.message)
@@ -399,6 +398,9 @@ const loadFromServer = async () => {
 // recherche coté server
 const recherche = async () => {
   loading.value = true;
+  let date = {}
+  let code = null
+  
   if (Array.isArray(dateselect.value) && dateselect.value.length === 2) {
     
     const startDate = new Date(dateselect.value[0]);
@@ -418,10 +420,13 @@ const recherche = async () => {
     // Mettre à jour la valeur de dateselect pour chaque date
     
     // Vous pouvez faire d'autres opérations avec ces dates
-    const date = { start: formattedStartDate, end: formattedEndDate };
-    let code = authStore.user.role.code == 'SUPADM' ?  searchValue.value : authStore.user.visite.code_visite
-    
-  
+    date = { start: formattedStartDate, end: formattedEndDate };
+    code = authStore.user.role.code == 'SUPADM' ?  searchValue.value : authStore.user.visite.code_visite
+  }else{
+    resetAction()
+    return
+  }
+  console.log("data---------------: "+JSON.stringify(date))
   try {
     const param = {
       page: 1,
@@ -438,7 +443,7 @@ const recherche = async () => {
         param.sort_type = 3;
         param.date_debut = date.start;
         param.date_fin = dateselect.value[1] != null ? date.end : date.start;
-        alert(4); // Retirer si plus nécessaire pour le débogage
+        alert(4); 
       } 
       // Vérification si searchValue est défini et pas dateDebut et dateFin
       else if (date.start == null && dateselect.value[1] == null && code != null) {
@@ -454,10 +459,7 @@ const recherche = async () => {
         param.code_employe = code;
         alert(4); // Retirer si plus nécessaire pour le débogage
       }
-      else if (date.start == null && date.end == null && code==null) {
-        resetAction()
-        return
-      }
+      
 
     }else{
       param.sort_type = 4;
@@ -491,7 +493,7 @@ const recherche = async () => {
   } finally {
     loading.value = false;
   }
-}
+
 
 }
 

@@ -111,7 +111,7 @@
           </div>
         <BRow class="mb-3">
               <BCol sm="12" md="6">
-                <VueDatePicker :enable-time-picker="false" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
+                <VueDatePicker enable-seconds :enable-time-picker="false" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
               </BCol> 
               <BCol sm="12" md="4" v-if="authStore.user.role.code == 'SUPADM'">
                 <div>
@@ -396,11 +396,10 @@ const paginatedData = computed(() => {
 // recherche coté server
 const recherche = async () => {
   loading.value = true;
-  if (dateselect.value == undefined && searchValue.value === "") {
-    return
-  }
+  let date = {}
+  let code = null
   
-  if (Array.isArray(dateselect.value) && dateselect.value.length === 2) {
+  if ((Array.isArray(dateselect.value) && dateselect.value.length === 2) ) {
     
     const startDate = new Date(dateselect.value[0]);
     let endDate = null
@@ -419,10 +418,18 @@ const recherche = async () => {
     // Mettre à jour la valeur de dateselect pour chaque date
     
     // Vous pouvez faire d'autres opérations avec ces dates
-    const date = { start: formattedStartDate, end: formattedEndDate };
-    let code = authStore.user.role.code == 'SUPADM' ?  searchValue.value : authStore.user.visite.code_visite
-
+    date = { start: formattedStartDate, end: formattedEndDate };
+    
+  }else if(searchValue.value){
+    code = authStore.user.role.code == 'SUPADM' ?  searchValue.value : authStore.user.visite.code_visite  
+  }
+  else{
+    resetAction()
+    return
+  }
+  
   try {
+    // code = authStore.user.role.code == 'SUPADM' ?  searchValue.value : authStore.user.visite.code_visite  
     const param = {
       page: 1,
       limit: 5,
@@ -432,27 +439,37 @@ const recherche = async () => {
       date_fin: null
     }
 
-    // Vérification si dateDebut et dateFin sont définis
-    if (date.start != null  && searchValue.value === "") {
-      param.sort_type = 3;
-      param.date_debut = date.start;
-      param.date_fin = dateselect.value[1] != null ? date.end : date.start;
+    if(authStore.user.role.code == 'SUPADM'){
 
-    } 
-    // Vérification si searchValue est défini et pas dateDebut et dateFin
-    else if (date.start == null && dateselect.value[1] == null && searchValue.value != "") {
-      // alert(2); // Retirer si plus nécessaire pour le débogage
-      param.sort_type = 2;
-      param.code_employe = searchValue.value;
-    } 
-    // Tous les critères sont définis
-    else if (date.start && dateselect.value[1] !=null && searchValue.value) {
+      // Vérification si dateDebut et dateFin sont définis
+      if (date.start != null  && searchValue.value === "") {
+        param.sort_type = 3;
+        param.date_debut = date.start;
+        param.date_fin = dateselect.value[1] != null ? date.end : date.start;
+
+      } 
+      // Vérification si searchValue est défini et pas dateDebut et dateFin
+      else if (!date==false && searchValue.value) {
+        alert(searchValue.value); // Retirer si plus nécessaire pour le débogage
+        param.sort_type = 2;
+        param.code_employe = searchValue.value;
+      } 
+      // Tous les critères sont définis
+      else if (date.start && dateselect.value[1] !=null && searchValue.value) {
+        param.sort_type = 4;
+        param.date_debut = date.start;
+        param.date_fin = date.end;
+        param.code_employe = searchValue.value;
+
+      }
+    }else{
       param.sort_type = 4;
       param.date_debut = date.start;
-      param.date_fin = dateFin.value;
+      param.date_fin = date.end;
       param.code_employe = searchValue.value;
-
     }
+
+    
     
 
     // Envoi de la requête à l'API
@@ -480,10 +497,7 @@ const recherche = async () => {
     loading.value = false;
 
   }
-  }else{
-    loading.value = false;
   }
-}
 
 // Utilisation de debounce pour éviter des appels rapides au serveur
 watch(serverOptions, (value) => { 

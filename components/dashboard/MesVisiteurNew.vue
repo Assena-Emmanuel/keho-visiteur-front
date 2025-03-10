@@ -111,7 +111,7 @@
           </div>
         <BRow class="mb-3">
               <BCol sm="12" md="6">
-                <VueDatePicker v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
+                <VueDatePicker enable-seconds v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
               </BCol> 
               <BCol sm="12" md="4" v-if="authStore.user.role.code == 'SUPADM'">
                 <div>
@@ -258,7 +258,7 @@ const headers = ref([
 
 
 const permissions = ref([])
-const range = ref([5,10,15,20])
+const dateselect = ref(null);
 const items = ref([]);
 const loading = ref(false);
 const serverItemsLength = ref(0);
@@ -277,8 +277,6 @@ const serverOptions = ref({
   code_employe: authStore.user.role.code == 'SUPADM' ? null : authStore.user.visite.code_visite,
 });
 
-// sort_type: authStore.user.role.code == 'SUPADM' ? 1 : 2,
-//   code_employe: authStore.user.role.code == 'SUPADM' ? null : authStore.user.visite.code_visite
 
 const loadingReset = ref(false)
 // reactualiser
@@ -330,6 +328,34 @@ const imgViewer = (id) => {
 // recherche coté server
 const recherche = async () => {
   loading.value = true;
+  let date = {}
+  let code = null
+  
+  if (Array.isArray(dateselect.value) && dateselect.value.length === 2) {
+    
+    const startDate = new Date(dateselect.value[0]);
+    let endDate = null
+    if(dateselect.value[1]){
+       endDate = new Date(dateselect.value[1]);
+    }
+
+
+    // Formater les dates au format 'YYYY-MM-DD HH:mm:ss'
+    let formattedEndDate = null
+    const formattedStartDate = startDate.toISOString().slice(0, 19).replace("T", " ");
+    if(dateselect.value[1]){
+      formattedEndDate = endDate.toISOString().slice(0, 19).replace("T", " ");
+    }
+    
+    // Mettre à jour la valeur de dateselect pour chaque date
+    
+    // Vous pouvez faire d'autres opérations avec ces dates
+    date = { start: formattedStartDate, end: formattedEndDate };
+    code = authStore.user.role.code == 'SUPADM' ?  searchValue.value : authStore.user.visite.code_visite
+  }else{
+    resetAction()
+    return
+  }
   try {
     const param = {
       page: 1,
@@ -340,26 +366,37 @@ const recherche = async () => {
       date_fin: null
     }
 
-    // Vérification si dateDebut et dateFin sont définis
-    if (dateDebut.value != null && dateFin.value != null && searchValue.value == null) {
-      param.sort_type = 3;
-      param.date_debut = dateDebut.value;
-      param.date_fin = dateFin.value;
-      // alert(4); // Retirer si plus nécessaire pour le débogage
-    } 
-    // Vérification si searchValue est défini et pas dateDebut et dateFin
-    else if (dateDebut.value == null && dateFin.value == null && searchValue.value != null) {
-      // alert(2); // Retirer si plus nécessaire pour le débogage
-      param.sort_type = 2;
-      param.code_employe = searchValue.value;
-    } 
-    // Tous les critères sont définis
-    else if (dateDebut.value && dateFin.value && searchValue.value) {
+    if(authStore.user.role.code == 'SUPADM'){
+      alert(1)
+      // Vérification si dateDebut et dateFin sont définis
+      if (date.start != null && code == null) {
+        param.sort_type = 3;
+        param.date_debut = date.start;
+        param.date_fin = dateselect.value[1] != null ? date.end : date.start;
+        alert(4); 
+      } 
+      // Vérification si searchValue est défini et pas dateDebut et dateFin
+      else if (date.start == null && dateselect.value[1] == null && code != null) {
+        alert(2); // Retirer si plus nécessaire pour le débogage
+        param.sort_type = 2;
+        param.code_employe = code;
+      } 
+      // Tous les critères sont définis
+      else if (date.start && date.end && code) {
+        param.sort_type = 4;
+        param.date_debut = date.start;
+        param.date_fin = param.date_fin = dateselect.value[1] != null ? date.end : date.start;
+        param.code_employe = code;
+        alert(4); // Retirer si plus nécessaire pour le débogage
+      }
+      
+
+    }else{
+      
       param.sort_type = 4;
-      param.date_debut = dateDebut.value;
-      param.date_fin = dateFin.value;
-      param.code_employe = searchValue.value;
-      // alert(4); // Retirer si plus nécessaire pour le débogage
+      param.date_debut = date.start;
+      param.date_fin = dateselect.value[1] != null ? date.end : date.start;
+      param.code_employe = code;
     }
 
     // Envoi de la requête à l'API
