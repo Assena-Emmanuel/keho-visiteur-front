@@ -247,6 +247,7 @@ import Viewer from 'viewerjs'
  import 'viewerjs/dist/viewer.css';
  import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+import * as XLSX from 'xlsx';
 
   
   const authStore = useAuthStore();
@@ -299,7 +300,7 @@ import '@vuepic/vue-datepicker/dist/main.css'
   const selectEtat = ref(null)
   const optionsPdf = ref([
   {value: "print", text: 'Fichier PDF'},
-  {value: "", text: 'Fichier EXCEL'},
+  {value: "xlsx", text: 'Fichier EXCEL'},
   {value: "csv", text: 'Fichier CSV'},
   ])
 
@@ -629,11 +630,13 @@ import '@vuepic/vue-datepicker/dist/main.css'
         let records = datatable.value.getSelectedRows();
         if (!records?.length) {
             records = items.value;
+
         }
+        console.log("record-----------: "+JSON.stringify(records))
         const filename = 'table';
 
-        if (type === 'csv' || type === 'txt') {
-            // CSV or TXT
+        if (type === 'csv' || type === 'xlsx') {
+            // CSV or xlsx
             const coldelimiter = ',';
             const linedelimiter = '\n';
             let result = headers.value
@@ -666,13 +669,33 @@ import '@vuepic/vue-datepicker/dist/main.css'
                 link.click();
             }
 
-            if (type === 'txt') {
-                var data = 'data:application/txt;charset=utf-8,' + encodeURIComponent(result);
-                var link = document.createElement('a');
-                link.setAttribute('href', data);
-                link.setAttribute('download', filename + '.txt');
-                link.click();
+            if (type === 'xlsx') {
+              // Générer le fichier Excel avec `xlsx.js`
+              const worksheet = XLSX.utils.json_to_sheet(records.map((item) => {
+                let row = {};
+                headers.value
+                  .filter((d) => !d.hide)
+                  .forEach((d) => {
+                    const val = d.field.split('.').reduce((acc, part) => acc && acc[part], item);
+                    row[d.title] = val !== undefined && val !== null ? val : '';  // Gestion des valeurs vides
+                  });
+                return row;
+              }));
+
+              const workbook = XLSX.utils.book_new();
+              XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+              // Créer un fichier Excel et le télécharger
+              XLSX.writeFile(workbook, `${filename}.xlsx`);
             }
+
+            // if (type === 'txt') {
+            //     var data = 'data:application/txt;charset=utf-8,' + encodeURIComponent(result);
+            //     var link = document.createElement('a');
+            //     link.setAttribute('href', data);
+            //     link.setAttribute('download', filename + '.txt');
+            //     link.click();
+            // }
         } else if (type === 'print') {
             // PRINT
             let rowhtml = '<p>' + filename + '</p>';
