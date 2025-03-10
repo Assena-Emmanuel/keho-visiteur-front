@@ -111,7 +111,7 @@
           </div>
         <BRow class="mb-3">
               <BCol sm="12" md="6">
-                <VueDatePicker v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
+                <VueDatePicker :enable-time-picker="false" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
               </BCol> 
               <BCol sm="12" md="4" v-if="authStore.user.role.code == 'SUPADM'">
                 <div>
@@ -145,7 +145,7 @@
             :pageSize="params.pagesize"
             :showNumbersCount="3"
             class="alt-pagination"
-            :pageSizeOptions="[5, 10, 15, 20]"
+            :pageSizeOptions="[5, 10, 50, 200]"
             paginationInfo="Afficher de {0} à {1} sur {2} elements"
             skin="bh-table-striped"
             pageSize="5"
@@ -265,7 +265,6 @@ const headers = ref([
 
 const loadingReset = ref(false)
 const permissions = ref([])
-const range = ref([5,10,15,20])
 const items = ref([]);
 const loading = ref(false);
 const serverItemsLength = ref(0);
