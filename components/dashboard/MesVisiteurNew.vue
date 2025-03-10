@@ -177,7 +177,7 @@
                 </BButton>
 
                  
-                <BButton 
+                <!-- <BButton 
                   v-if="permissions.some(perm => perm.prt)" 
                   style="width: 15px; height: 15px;" 
                   variant="white" 
@@ -186,7 +186,7 @@
                   @click="showTicket(data.value.uuid)"
                 >
                   <i class="uil uil-print font-size-15"></i>
-                </BButton>
+                </BButton> -->
 
                 
                 <BButton 

@@ -38,9 +38,7 @@
                                     <div class="d-flex justify-content-between  font-size-12 line">
                                         <span class="texte">{{ visiteurs.numCni }}</span> 
                                     </div>
-                                    <!-- <div class="d-flex justify-content-between font-size-12 line">
-                                        <span class="texte">{{ visiteurs.visite }}</span>
-                                    </div> -->
+
                                 </div> 
                                 
                             </div>
@@ -188,41 +186,46 @@
         class=""
         size="md"
     >
-    <div class="card shadow-none">
-      <div class=" ticket">
-        <div class="d-flex justify-content-center mt-4"><img src="/images/total-removebg.png" alt="" width="100"></div>
+    <div class="card shadow-none ticketCard" >
+      <div style="padding: 25px 20px 0 20px; display: flex; justify-content: start; position: absolute">
+          <span><small>17/10/2024 09:15:05</small></span>
+        </div>
+      <div class="ticket mt-3" style="">
+        <div class="d-flex justify-content-center"><img src="/images/total-removebg.png" alt="" width="100"></div>
         <div class="text-center">
-          <span class="texte" style="font-weight: bolder; font-size: 3em;">VTR-0224-0004</span>
+          <span class="texte codeVsite" style="font-weight: bolder;">VTR-0224-0004</span>
           <p><h5 class="texte">Bienvenue chez nous</h5></p>
           <div class="mt-2">
             <div class="row text-center">
               <div class="col-5 text-end"><strong class="texte element">Code visiteur:</strong></div>
-              <div class="col-7 text-start"><span class="code">KA2410-17-05</span></div>
+              <div class="col-7 text-start"><span class="code">{{ visiteurs.visite }}</span></div>
             </div>
             <div class="row">
               <div class="col-5 text-end"><strong class="texte element">Service visité:</strong></div>
-              <div class="col-7 text-start"><span class="service">COMMERCIAL</span></div>
+              <div class="col-7 text-start"><span class="service">{{ (employe?.service?.libelle)?.toUpperCase() }}</span></div>
             </div>
             <div class="row">
               <div class="col-5 text-end"><strong class="texte element">Nom visiteur:</strong></div>
-              <div class="col-7 text-start"><span class="nom">Mme ROKIA SYLLA</span></div>
+              <div class="col-7 text-start"><span class="nom">{{ visiteurs.users.civilite }} {{ (visiteurs.users.nom)?.toUpperCase() }} {{ (visiteurs.users.prenom)?.toUpperCase() }}</span></div>
             </div>
             
           </div>
 
         </div>
-        <div class="d-flex justify-content-end" style="padding: 25px 20px 0 20px;">
-          <span><small>17/10/2024 09:15:05</small></span>
-        </div>
+       
       </div>
       
     </div>
-    <div class="d-flex justify-content-between align-items-center">
-        <button class="btn text-danger" @click="hide">Annuler</button>
-        <button class="btn btn-success" @click="imprimerTicket(codeVisiteur)">
+    <div class="row">
+      <div class="col-6"><button class="btn text-danger" @click="hide">Annuler</button></div>
+      <div class="col-6" style="display: flex; justify-content: end;">
+        <div><button class="btn btn-success" @click="imprimerTicket(codeVisiteur)">
           <i v-if="!loadingImpression" class="uil uil-print"></i>
           <i v-else class="fas fa-spinner fa-spin"></i> 
-        </button>
+        </button></div>
+      </div>
+        
+        
       </div>
   </BModal>
 
@@ -363,6 +366,7 @@
 
             // Recuperer les infos du visité
             employe.value = data.visiteurs[0].visite
+            console.log("employ-------------------: "+JSON.stringify(employe.value))
 
           }else{
             
@@ -393,6 +397,8 @@
               heure_entree: data.fvisite.heure_entree,
               visiteur: data.visiteurs
             };
+            employe.value = data.visiteurs[0].visite
+
 
           }
 
@@ -685,21 +691,55 @@
       font-size: 21px;
     }
 
+    .ticketCard{
+      height: 380px;
+    }
+
+    .codeVsite{
+      font-size: 2.8em;
+    }
+
   @media (max-width: 576px) {
     .element{
       font-size: 15px;
     }
+    .codeVsite{
+      font-size: 2em;
+    }
     .code{
-      font-size: 1.5em; font-weight: bold; color: red;
+      font-size: 1.2em; font-weight: bold; color: red;
     }
   .nom{
-      font-size: 1.5em; font-weight: bold; color: blue;
+      font-size: 1.2em; font-weight: bold; color: blue;
     }
-  
+    .service{
+    font-size: 1em; font-weight: bold; color: green;
+  }
  
   .ticket {
     height: 45vh;
   }
+  .ticketCard{
+      height: 290px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 991px){
+  .code{
+      font-size: 1.6em; font-weight: bold; color: red;
+    }
+  .nom{
+      font-size: 1.6em; font-weight: bold; color: blue;
+    }
+    .service{
+    font-size: 1.3em; font-weight: bold; color: green;
+  }
+  .codeVsite{
+      font-size: 3em;
+    }
+    .ticketCard{
+      height: 340px;
+    }
 }
 
 

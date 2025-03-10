@@ -6,9 +6,9 @@ export default {
   },
   setup() {
     const route = useRoute();
-    const code = route.params.code; // Récupérer le paramètre uuid
-
+    const code = route.params.code; 
     return { code: code}
+    
   },
   data() {
     return {

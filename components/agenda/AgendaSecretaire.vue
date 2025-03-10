@@ -79,13 +79,14 @@
       code: String
     },
 
-    watch:{
-      code(newValue, oldValue) {
-        console.log('Code visite modifié de', oldValue, 'à', newValue);
-        this.getEven(newValue)
-      }
+    // watch:{
+    //   code(newValue, oldValue) {
+    //     alert(1)
+    //     console.log('Code visite modifié de', oldValue, 'à', newValue);
+    //     this.getEven(newValue)
+    //   }
 
-    },
+    // },
     computed: {
       dateToday() {
         const today = new Date();
@@ -94,6 +95,9 @@
     },
 
     async mounted() {
+      if(this.code){
+        this.getEven(this.code)
+      }
       try{
           const response = await apiClient.get("/user/employes", {
             headers: {
