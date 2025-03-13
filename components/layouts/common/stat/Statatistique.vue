@@ -17,8 +17,8 @@ export default {
                     <img :src="imageUrl" class="responsive-image">
                 </div>
                 <div class="text-end">
-                    <p class="text-muted mb-0 title-text">{{ titre }}</p>
-                    <h4 class="mt-1 value-text">{{ valeur }}</h4>
+                    <p class="text-muted mb-0 title-text">{{ titre }}:  <span style="font-size:30px; font-weight:bold">{{ valeur }}</span></p>
+                    <!-- <h4 class="mt-1 value-text">{{ valeur }}</h4> -->
                 </div>
             </div>
         </BCardBody>

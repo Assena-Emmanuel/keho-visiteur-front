@@ -168,7 +168,7 @@
         </template>
 
         <template #created_at="data">
-          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.created_at }}</span></div>
+          <div><span class="tableElement" style="font-size: 11px;">{{ formatDate(data.value.created_at) }}</span></div>
         </template>
 
         <template #employe="data">
@@ -419,6 +419,23 @@ const changeServer = (data) => {
   }
   
 });
+
+// changer le format de la date
+function formatDate(dateString) {
+  // Créer un objet Date à partir de la chaîne d'entrée
+  const date = new Date(dateString);
+
+  // Extraire les différentes parties de la date
+  const day = date.getDate().toString().padStart(2, '0'); // Jour avec 2 chiffres
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Mois (1-12) avec 2 chiffres
+  const year = date.getFullYear();  // Année
+  const hours = date.getHours().toString().padStart(2, '0');  // Heures avec 2 chiffres
+  const minutes = date.getMinutes().toString().padStart(2, '0');  // Minutes avec 2 chiffres
+  const seconds = date.getSeconds().toString().padStart(2, '0');  // Secondes avec 2 chiffres
+
+  // Retourner la date formatée
+  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+}
 
 const paginatedData = computed(() => {
   const start = (currentPage.value - 1);
