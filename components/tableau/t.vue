@@ -144,7 +144,7 @@ export default {
       <BCol cols="12">
         <BCard no-body>
           <BCardBody>
-            <BCardTitle>{{ title }}</BCardTitle>
+            <BCardTitle>{{ title }} </BCardTitle>
 
             <!-- Modal Détail -->
             <BModal v-model="detailModal" :title="`Détail ${capitalize(typeForme)}`" hide-footer>

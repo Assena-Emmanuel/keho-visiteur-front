@@ -6,13 +6,24 @@ import { useApi } from '~/components/api/useApi';
 
 
 // Props
-const props = defineProps({
-  id: Number,
-});
+// const props = defineProps({
+//   id: Number,
+// });
+
+const id = defineModel('id')
 
 // Reactive variables
+const currentPage = ref(1);
+const perPage = ref(5);
+const menus = ref([])
+const permissions = ref({})
+const dataRole = ref({})
 const profileDetail = ref({});
+const fields = ref([])
 const loading = ref(false);
+const totalRows = ref(1);
+const libelle = ref(null)
+const formData = ref({})
 const errorMessage = ref(""); // Nouvelle variable pour gérer les erreurs
 
 const authStore = useAuthStore();
@@ -23,11 +34,10 @@ onMounted(async () => {
   loading.value = true;
   errorMessage.value = ""; // Réinitialiser le message d'erreur
   try {
-    const response = await getById("role", props.id)
-    console.log("--------------------! ",response)
+    const response = await getById("role", id.value)
     if (!response.data.error) {
-      profileDetail.value = { ...response.data }; // Copier les données de manière sécurisée
-    console.log("--------------------! ",profileDetail.value)
+      profileDetail.value = { ...response.data }
+      getPermissions(profileDetail.value.id)
     }
 
   } catch (error) {
@@ -37,22 +47,109 @@ onMounted(async () => {
     loading.value = false;
   }
 });
+
+// recuperer permission
+const getPermissions = async (id) => {
+  const response = await apiClient.get(`/permissions/${id}`,{
+    headers: {
+      'Authorization': `Bearer ${authStore.token}`,
+    },
+  });
+
+  if(!response.data.error){
+
+    dataRole.value = response.data
+
+    // Mappage des menus et permissions
+    menus.value = dataRole.value.menus;
+    totalRows.value = menus.value.length
+
+    // Définir les actions comme les fields pour la table
+    fields.value = extractActionFields(menus.value);
+
+
+      menus.value.map((menu) => {
+        menu.permissions.map((perm) => {
+          formData.value[`${menu.resourceId}-${perm.action_id}`] = perm.habilitation;
+        });
+      });
+
+  }else{
+    console.error("error lors de la recuperation des permission: "+response.data.message)
+  }
+
+}
+
+const paginatedMenus = computed(() => {
+    const start = (currentPage.value - 1) * perPage.value
+    const end = start + perPage.value
+    return menus.value.slice(start, end)
+
+});
+
+const filterOn = computed(() => props.fields.map(field => field.key));
+
+// Extraire les actions pour créer les fields du tableau
+const extractActionFields = (menus) => {
+      let actions = new Set();
+      menus.forEach(menu => {
+        menu.permissions.forEach(permission => {
+          actions.add(permission.action_lib);
+        });
+      });
+      return Array.from(actions);
+};
+
+watch(
+  () => id.value,  
+  async (newid) => {  
+    if (newid) {
+      
+      // isOpen.value = false
+      // recuperation du profil
+      try{
+          // isOpen.value = true
+          isEditMode.value = true
+         
+          const profil = await getById("role", newid);
+          console.log("profil:------------------------- "+JSON.stringify(profil))
+          
+        
+        if(!profil.data.error){
+
+          libelle.value = profil.data.libelle
+          ancienLibelle.value = profil.data.libelle
+          description.value = profil.data.description
+
+
+          
+
+        }else{
+          console.error("recuperation Profil error: "+profil.data.message)
+        }
+        
+        
+      }catch(e){
+        console.error("Erreur: "+e)
+      }finally{
+        loading.value = false
+      }
+      
+    }
+  },
+  { immediate: true }  // Lance le watch dès que possible, même si la prop est déjà présente
+);
 </script>
 
 <template>
     <!-- Détail Profil -->
-    <div v-if="loading" class="loading-ellipses">
-      <span class="dot">.</span>
-      <span class="dot">.</span>
-      <span class="dot">.</span>
-    </div>
-  
-    <div v-if="profileDetail && !loading" class="card shadow-sm border-0">
+    <ScaleLoader :loading="loading" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
+    <div v-if="!loading" class="card border-0">
       <div class="card-body p-4">
         <!-- En-tête du Profil -->
         <div class="mb-4">
           <div class="text-primary">
-            <i class="fas fa-user-circle me-2"></i><span class="fw-bold h4 text-primary">{{ profileDetail.libelle }}</span>
+            <i class="fas fa-user-circle me-2"></i><span class="fw-bold h4 text-primary">{{ (profileDetail.libelle)?.toUpperCase() }}</span>
           </div>
           <div class="">
             <div style="margin-left: 30px;">
@@ -67,21 +164,48 @@ onMounted(async () => {
         </h6>
   
         <!-- Liste des Permissions -->
-        <ul class="list-group">
-          <li v-if="profileDetail.permissions && profileDetail.permissions.length" 
-              v-for="permission in profileDetail.permissions" 
-              :key="permission.id" 
-              class="list-group-item d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-              <span>*</span>
-              <strong>{{ permission.libelle }}</strong>
-            </div>
-            <span class="badge bg-secondary rounded-pill">{{ permission.code }}</span>
-          </li>
-          <li v-else class="list-group-item">
-            <span>Aucune permission attribuée à ce profil.</span>
-          </li>
-        </ul>
+
+
+        <table class="table" v-if="id">
+          <thead class="table-dark">
+            <tr>
+              <th>Menu</th>
+              <th v-for="action in fields" :key="action.id">
+                <th>{{ action }}</th>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="menu in paginatedMenus" :key="menu.resourceId">
+              <td>{{ menu.resourceName }}</td>
+              <td class="text-center" v-for="action in menu.permissions" :key="action.action_id">
+                <input
+                  type="checkbox"
+                  disabled
+                  :name="`${menu.resourceId}-${action.action_id}`"
+                  :checked="action.habilitation ? true : false"
+                  v-model="formData[`${menu.resourceId}-${action.action_id}`]"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <BRow>
+        <BCol>
+          <div class="dataTables_paginate paging_simple_numbers d-flex justify-content-between pb-2" style="font-size: 12px;">
+              <div id="tickets-table_length" class="dataTables_length">
+              <label class="d-inline-flex align-items-center">
+                  Afficher de 1 à {{ perPage }} sur {{ totalRows }} éléments
+              </label>
+              </div>
+              <ul class="pagination pagination-rounded mb-0">
+              <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage" />
+              </ul>
+          </div>
+        </BCol>
+      </BRow>
+
       </div>
     </div>
   </template>

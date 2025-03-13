@@ -2,11 +2,7 @@
   <DashboardCommonStat />
     <!-- Modal détail -->
     <BModal  v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur" >
-      <!-- <template v-slot:header>
-        <div class="d-flex justify-content-start w-100" style="position: relative;">
-          <img src="/images/total-removebg.png" alt="" width="50">
-        </div>
-      </template> -->
+
     <ScaleLoader :loading="loadingDetail" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
     <div v-if="data && data.visiteurs && !loadingDetail"  v-for="item in paginatedData" :key="item['Code visite']">
       <div class="text-center"><h3>{{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</h3>

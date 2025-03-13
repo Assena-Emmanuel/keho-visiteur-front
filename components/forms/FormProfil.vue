@@ -85,9 +85,7 @@ const onSaveprofil = async () => {
       const data = await createResource(`role`, formData);
       alert(1)
       if(!data.data.error){
-        alert(2)
         const data = await getAll("role");
-        console.log("data save:------------"+JSON.stringify(data.data))
         gestionStore.setProfils(data.data)
         alertMessage(data.data.message, 'success')
         resetForm()
@@ -191,6 +189,7 @@ watch(
   { immediate: true }  // Lance le watch dès que possible, même si la prop est déjà présente
 );
 
+
 // Fonction de mise à jour du département
 const onUpdateprofil = async () => {
   submitted.value = true;
@@ -198,7 +197,6 @@ const onUpdateprofil = async () => {
 
   // Vérification des erreurs de validation
   if (!id.value || id.value <= 0) {
-    alert("L'ID est invalide");
     return; // Si des erreurs existent, on arrête la fonction
   }
 

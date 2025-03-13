@@ -153,7 +153,6 @@ const handleEdit = (row) => {
     emit('data-selected', { id: row.id });
 
   } else if (props.typeForme === "profil") {
-    console.log("profil-------------------------id: "+row.id)
     emit('data-selected', { id: row.id });
 
   }else if (props.typeForme === "menu") {
@@ -270,7 +269,7 @@ const capitalizeText = (text) => {
             <BCardTitle>{{ title }}</BCardTitle>
 
             <!-- Modal Détail -->
-            <BModal @hide="hideModal" v-if="detailModal" v-model="detailModal" :title="`Détail ${capitalizeText(typeForme)}`" hide-footer>
+            <BModal @hide="hideModal" size="lg" v-if="detailModal" v-model="detailModal" :title="`Détail ${capitalizeText(typeForme)}`" hide-footer>
               <TableauDetailUser :uuid="uuid" v-if="typeForme == 'user'" />
               <TableauDetailDepartement :id="id" v-if="typeForme == 'departement'"/>
               <TableauDetailService :id="id" v-if="typeForme == 'service'"/>
