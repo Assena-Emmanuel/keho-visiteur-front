@@ -456,7 +456,10 @@ const recherche = async () => {
     // Vous pouvez faire d'autres opérations avec ces dates
     date = { start: formattedStartDate, end: formattedEndDate };
     code = authStore.user.role.code == 'SUPADM' ?  searchValue.value : authStore.user.visite.code_visite
-  }else{
+  }else if(searchValue.value){
+    code = authStore.user.role.code == 'SUPADM' ?  searchValue.value : authStore.user.visite.code_visite  
+  }
+  else{
     resetAction()
     return
   }
@@ -477,11 +480,9 @@ const recherche = async () => {
         param.sort_type = 3;
         param.date_debut = date.start;
         param.date_fin = dateselect.value[1] != null ? date.end : date.start;
-        alert(4); 
       } 
       // Vérification si searchValue est défini et pas dateDebut et dateFin
-      else if (date.start == null && dateselect.value[1] == null && code != null) {
-        alert(2); // Retirer si plus nécessaire pour le débogage
+      else if (!date==false && searchValue.value) {
         param.sort_type = 2;
         param.code_employe = code;
       } 
@@ -491,7 +492,6 @@ const recherche = async () => {
         param.date_debut = date.start;
         param.date_fin = param.date_fin = dateselect.value[1] != null ? date.end : date.start;
         param.code_employe = code;
-        alert(4); // Retirer si plus nécessaire pour le débogage
       }
       
 
@@ -650,7 +650,6 @@ const confirmDelete = async (uuid) => {
             
             console.log("Sup-----------: " + JSON.stringify(response.data));
             loadFromServer();
-            // Fermer l'alerte de chargement et afficher une alerte de succès
             swalLoading.close();
             Swal.fire('Supprimé!', `${response.data.message}`, 'success');
           } else {
@@ -711,7 +710,6 @@ const rejet = async (uuid) => {
           });
           if (!response.data.error) {
             loadFromServer();
-            // Fermer l'alerte de chargement et afficher une alerte de succès
             swalLoading.close();
             Swal.fire('Supprimé!', `${response.data.message}`, 'success');
           } else {
