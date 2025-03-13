@@ -93,44 +93,43 @@
   <BCard style="min-height: 10em;">
     <BCardBody style="margin: -22px -20px -20px -20px;">
       <div>
-        
-          <div class="row">
             <div class="col-sm-3">
               <h5 class="text-3xl">Visites enregistrées</h5>
             </div>
-            <div class="col-sm-9" style="display: flex; justify-content: end;">
-              <BRow class="mb-3 ">
-                <BCol sm="5" md="5">
-                  <VueDatePicker class="custom-datepicker" enable-seconds v-model="dateselect" range multi-calendars  placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
-                </BCol> 
-                <BCol sm="3" md="3" v-if="authStore.user.role.code == 'SUPADM'">
-                  <div>
-                    <div class="input-group rounded-1">
-                    <span class="input-group-text">
-                        <i class="fas fa-search font-size-10"></i>
-                    </span>
-                    <BFormInput
-                        v-model="searchValue"
-                        type="search"
-                        id="input-small"
-                        class="form-control"
-                        placeholder="Rechercher..."
-                        @input="convertToUpper"
-                    />
-                    </div>
+            
+            <BRow class="mb-3 d-flex justify-content-end">
+              <BCol sm="6" md="6">
+                <VueDatePicker class="custom-datepicker" enable-seconds :enable-time-picker="false" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
+              </BCol> 
+              <BCol sm="4" md="4" v-if="authStore.user.role.code == 'SUPADM'">
+                <div>
+                  <div class="input-group rounded-1">
+                  <span class="input-group-text">
+                      <i class="fas fa-search font-size-10"></i>
+                  </span>
+                  <BFormInput
+                      size="sm"
+                      v-model="searchValue"
+                      type="search"
+                      id="input-small"
+                      class="form-control"
+                      placeholder="Rechercher..."
+                      @input="convertToUpper"
+                  />
                   </div>
-                </BCol>
-                <BCol sm="4" md="4" class="d-flex justify-content-between">
-                  <BButton size="sm"  variant="primary" class="me-2"  @click="recherche">Rechercher</BButton>
-                  <BButton size="sm" @click="resetAction" :disabled="loadingReset" class="btn btn-outline-primary btn-sm">
-                    <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
-                    <i v-else class="fas fa-spinner fa-spin"></i> 
-                  </BButton>
-                    <!-- <BButton style="width: 100%;"  @click="recherche">Rechercher</BButton> -->
-                </BCol>  
-              </BRow>
-            </div>
-          </div>
+                </div>
+              </BCol>
+              <BCol sm="2" md="2" class="">
+                <BButton size="sm"  variant="primary" class="me-2"  @click="recherche">Rechercher</BButton>
+                <BButton size="sm" @click="resetAction" :disabled="loadingReset" class="btn btn-outline-primary btn-sm">
+                  <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
+                  <i v-else class="fas fa-spinner fa-spin"></i> 
+                </BButton>
+              </BCol>
+              
+          </BRow>
+            
+         
 
 
           <vue3-datatable
@@ -160,23 +159,23 @@
         </template>
 
         <template #visiteur="data">
-          <div><span class=" fw-bold" style="font-size: 14px;">{{ data.value.visiteur }}</span></div>
+          <div><span class=" fw-bold" style="font-size: 12px;">{{ data.value.visiteur }}</span></div>
           <div><span style="font-size: 10px;">{{ data.value.numero_piece }}</span></div>
         </template>
         <template #created_at="data">
-          <div><span style="font-size: 14px;">{{ formatDate(data.value.created_at) }}</span></div>
+          <div><span style="font-size: 12px;">{{ formatDate(data.value.created_at) }}</span></div>
         </template>
 
         <template #entreprise="data">
-          <div><span style="font-size: 14px;">{{ data.value.entreprise }}</span></div>
+          <div><span style="font-size: 12px;">{{ data.value.entreprise }}</span></div>
         </template>
 
         <template #code_visiteur="data">
-          <div><span style="font-size: 14px;">{{ data.value.code_visiteur }}</span></div>
+          <div><span style="font-size: 12px;">{{ data.value.code_visiteur }}</span></div>
         </template>
 
         <template #lib_visite="data">
-          <div><span style="font-size: 14px;">{{ data.value.lib_visite }}</span></div>
+          <div><span style="font-size: 12px;">{{ data.value.lib_visite }}</span></div>
         </template>
 
         <template #heure_entree="data">
@@ -184,11 +183,11 @@
         </template>
 
         <!-- <template #lib_statut="data">
-          <div><span style="font-size: 14px;">{{ data.value.lib_statut }}</span></div>
+          <div><span style="font-size: 12px;">{{ data.value.lib_statut }}</span></div>
         </template> -->
 
         <!-- <template #heure_fin="data">
-          <div><span style="font-size: 14px;">{{ data.value.heure_fin }}</span></div>
+          <div><span style="font-size: 12px;">{{ data.value.heure_fin }}</span></div>
         </template> -->
 
         <template #actions="data">
@@ -751,9 +750,9 @@ const hideModal = () => {
 
 <style>
   .customize-table{
-      --easy-table-header-font-size: 14px;
+      --easy-table-header-font-size: 12px;
       --easy-table-body-row-height: 30px;
-      --easy-table-body-row-font-size: 14px;
+      --easy-table-body-row-font-size: 12px;
 
       --easy-table-header-item-padding: 10px 15px;
 
@@ -812,7 +811,7 @@ const hideModal = () => {
 .bh-table-responsive table tbody tr td, 
 .bh-table-responsive table tfoot tr th, 
 .bh-table-responsive table thead tr th {
-  padding: 0.3rem 0; /* Réduit le padding ici */
+  padding: 0.3rem 0 0.3rem 10px; /* Réduit le padding ici */
   text-align: left;
 }
 </style>
