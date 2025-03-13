@@ -269,10 +269,13 @@ const capitalizeText = (text) => {
             <BCardTitle>{{ title }}</BCardTitle>
 
             <!-- Modal Détail -->
-            <BModal @hide="hideModal" size="lg" v-if="detailModal" v-model="detailModal" :title="`Détail ${capitalizeText(typeForme)}`" hide-footer>
+            <BModal @hide="hideModal" v-if="detailModal" v-model="detailModal" :title="`Détail ${capitalizeText(typeForme)}`" hide-footer>
               <TableauDetailUser :uuid="uuid" v-if="typeForme == 'user'" />
               <TableauDetailDepartement :id="id" v-if="typeForme == 'departement'"/>
               <TableauDetailService :id="id" v-if="typeForme == 'service'"/>
+              <TableauDetailProfil :id="id" v-if="typeForme == 'profil'"/>
+            </BModal>
+            <BModal @hide="hideModal" size="lg" v-if="detailModal" v-model="detailModal" :title="`Détail ${capitalizeText(typeForme)}`" hide-footer>
               <TableauDetailProfil :id="id" v-if="typeForme == 'profil'"/>
             </BModal>
 

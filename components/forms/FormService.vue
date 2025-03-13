@@ -7,6 +7,7 @@ import apiClient from '~/components/api/intercepteur';
 import { useGestionStore } from "~/stores/gestion.js";
 import { useApi } from '~/components/api/useApi';
 import Swal from "sweetalert2";
+import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 
 const authStore = useAuthStore()
 const gestionStore = useGestionStore()
@@ -16,21 +17,24 @@ const { getCategorieBySlug, createResource } = useApi(authStore.token);
 const SLUG = "SRV"
 
 // Déclaration des props
-const props = defineProps({
-  isOpen: Boolean,
-  id: Number,
-  isEditMode: Boolean,
-  selectedIndex: Number, // L'index de l'élément à éditer
-});
+// const props = defineProps({
+//   isOpen: Boolean,
+//   id: Number,
+//   isEditMode: Boolean,
+//   selectedIndex: Number, // L'index de l'élément à éditer
+// });
 
-// Déclaration des événements
-const emit = defineEmits(["update:isOpen", "update:id"]);
+const isOpen = defineModel('isOpen')
+const id = defineModel('id')
+const isEditMode = defineModel('isEditMode')
+
+
 
 // Variables réactives
 const libelle = ref("");
 const code = ref("");
 const slug = ref("SRV");
-const statut = ref("");
+const statut = ref(1);
 const categorie = ref("");
 const submitted = ref(false);
 const loading = ref(false);
@@ -52,10 +56,9 @@ const ediData = ref({
 const rules = computed(() => ({
   libelle: { required },
   code: { required },
-  slug: { required },
 }));
 
-const v$ = useVuelidate(rules, { libelle, code, slug });
+const v$ = useVuelidate(rules, { libelle, code });
 
 // Méthodes
 const onSaveService = async () => {
@@ -70,7 +73,7 @@ const onSaveService = async () => {
     try{
       const formData = {
       libelle: libelle.value,
-      slug: slug.value,
+      slug: "SRV",
       code: code.value,
       position: 1,
       statut: statut.value || 1,
@@ -79,12 +82,10 @@ const onSaveService = async () => {
     };
 
       const data = await createResource(`categorie`, formData);
-      console.log("Error:------------"+JSON.stringify(data))
       if(!data.data.error){
         
 
         const data = await getCategorieBySlug(SLUG);
-        console.log("data save:------------"+JSON.stringify(data.data))
         gestionStore.setServices(data.data.data)
         alertMessage(data.data.message, 'success')
         resetForm()
@@ -92,7 +93,8 @@ const onSaveService = async () => {
         
       }else{
         erreur.value = true
-        errorMessage = data.data.message
+        console.log(JSON.stringify(data.data))
+        errorMessage.value =`${data.data?.data?.libelle} \n ${data.data?.data?.code}`
       }
       
       
@@ -119,9 +121,10 @@ try {
 
 
 watch(
-  () => props.id,  
+  () => id.value,  
   async (newid) => {  
     if (newid) {
+      isEditMode.value = true
       await getCategorie(newid);  
     }
   },
@@ -155,7 +158,7 @@ const onUpdateDepartement = async () => {
     }
 
     // Appel API pour mettre à jour le département
-    const response = await apiClient.put(`/categorie/${props.id}`, formData, {
+    const response = await apiClient.put(`/categorie/${id.value}`, formData, {
       headers: {
         'Authorization': `Bearer ${authStore.token}`,  // Utilisation du token d'authentification
       },
@@ -163,14 +166,14 @@ const onUpdateDepartement = async () => {
 
     // Vérification de la réponse
     if (!response.data.error) {
-      console.log("Modification réussie : ", response.data.message);
       departements();  // Recharger les départements après la mise à jour
       erreur.value = false;  // Réinitialiser l'état d'erreur
+      isEditMode.value = false
       resetForm();  // Réinitialiser le formulaire après une mise à jour réussie
     } else {
       // Si une erreur se produit dans la réponse de l'API
       erreur.value = true;
-      errorMessage.value = "Mise à jour échouée !";
+      errorMessage.value = response.data.message;
       console.error(response.data.message);
     }
 
@@ -271,9 +274,10 @@ const resetForm = () => {
   slug.value = "";
   submitted.value = false;
   erreur.value = false
-  
-  emit("update:isOpen", false);
-  emit("update:id", null);
+
+  isOpen.value = false
+  id.value = false
+  isEditMode.value = false
 
   v$.value.$reset();
 };
@@ -283,7 +287,7 @@ const resetForm = () => {
 <template>
   <BModal 
       @hide="resetForm" 
-      :modelValue="isOpen" 
+      v-model="isOpen" 
       size="lg"
       :title="isEditMode ? `Modifier le service ` : 'Créer un Service'" 
       title-class="font-18" 
@@ -291,20 +295,16 @@ const resetForm = () => {
       no-close-on-backdrop
   >
 
-  <div v-if="loading" class="loading-ellipses">
-    <span class="dot">.</span>
-    <span class="dot">.</span>
-    <span class="dot">.</span>
-  </div>
+  <ScaleLoader :loading="loading" style="margin: 10em 0;" :color="'#FE0201'" />
 
-  <BForm v-else class="form-vertical px-3" role="form">
+  <BForm v-if="!loading" class="form-vertical px-3" role="form">
     <div class="alert alert-danger" v-if="erreur">
       {{ errorMessage }}
     </div>
 
     <div class="row mb-3">
       <div class="col-sm-8 col-md-8">
-      <label for="libelle" style="font-size: 12px;">Libellé</label>
+      <label for="libelle" style="font-size: 12px;">Libellé <span class="text-danger">*</span></label>
       <input 
         v-model="libelle" 
         type="text" class="form-control form-control-sm" 
@@ -322,7 +322,7 @@ const resetForm = () => {
         </div>
     </div>
     <div class="col-sm-4 col-md-4">
-      <label for="departement" style="font-size: 12px;">Statut</label>
+      <label for="departement" style="font-size: 12px;">Statut <span class="text-danger">*</span></label>
       <div class="input-group">
         <select v-model="statut" id="departement" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example"
         >
@@ -337,7 +337,7 @@ const resetForm = () => {
     
     <div class="row mb-3">
       <div class="col-6 col-sm-6 col-md-6">
-      <label for="code" style="font-size: 12px;">Code </label>
+      <label for="code" style="font-size: 12px;">Code <span class="text-danger">*</span> </label>
       <div>
         <input 
           v-model="code" 
@@ -357,7 +357,7 @@ const resetForm = () => {
     </div>
 
 
-    <div class="col-6 col-sm-6 col-md-6">
+    <!-- <div class="col-6 col-sm-6 col-md-6">
       <label for="code" style="font-size: 12px;">Slug </label>
       <div>
         <input 
@@ -366,21 +366,11 @@ const resetForm = () => {
           id="code" 
           class="form-control form-control-sm"  
           type="text"
-          :class="{
-          'is-invalid': submitted && v$.slug.$error,
-          'border border-danger': submitted && v$.slug.$error,
-          'border border-dark': !(submitted && v$.slug.$error)
-        }">
-        <div v-if="submitted && v$.slug.$error" class="invalid-feedback">
-          <span v-if="v$.slug.required.$invalid" class="font-size-12">champ obligatoire
-          </span>
-        </div>
+        >
       </div>
-    </div>
-    </div>
+    </div> -->
 
-
-    <div class="mb-3">
+    <div class="col-6 col-sm-6 col-md-6">
       <label for="departement" style="font-size: 12px">Département Principal</label>
       <div class="input-group">
         <select v-model="departementPrincipale" id="departement" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example"
@@ -399,6 +389,10 @@ const resetForm = () => {
         </select>
       </div>
     </div> 
+    </div>
+
+
+    
 
     <div class="mt-4 d-flex justify-content-center">
       <BButton :loading="loadingAdd" 

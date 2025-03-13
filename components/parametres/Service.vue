@@ -118,11 +118,9 @@ export default {
         <div class="mb-0">Gestion des Services</div>
         <BButton variant="primary" @click="openAddModal" style="width: 100px;" class="btn-sm mb-3"> <strong>Créer</strong>  </BButton>
         <FormsFormService
-            :isOpen="modal"
-            :id="selectedRow"
-            @update:isOpen="modal = $event"
-            :isEditMode="isEditMode"
-            @update:id="modal = $event"
+            v-model:isOpen="modal"
+            v-model:id="selectedRow"
+            v-model:isEditMode="isEditMode"
         />
 
     </div>
