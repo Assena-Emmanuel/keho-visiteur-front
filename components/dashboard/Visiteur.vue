@@ -95,44 +95,42 @@
   </BModal>  
 
   <BCard style="min-height: 10em; "  >
-    <BCardBody >
+    <BCardBody style="margin: -28px -23px -23px -23px;">
       <div>
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-3xl">Visites enregistrées</h3>
+          <h5 class="text-3xl">Visites enregistrées</h5>
         </div>
-        <div class="d-flex justify-content-end mb-3" style="margin-top: -20px;">
-            <button 
-              @click="resetAction" 
-              :disabled="loadingReset"
-              class="btn btn-outline-primary">
-              <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
-              <i v-else class="fas fa-spinner fa-spin"></i> 
-            </button>
-          </div>
-        <BRow class="mb-3">
-              <BCol sm="12" md="6">
-                <VueDatePicker enable-seconds :enable-time-picker="false" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
+        
+        <BRow class="mb-3 d-flex justify-content-end">
+              <BCol sm="6" md="6">
+                <VueDatePicker class="custom-datepicker" enable-seconds :enable-time-picker="false" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" select-text="Selectionner" cancel-text="Annuler" :locale="'fr'" />
               </BCol> 
-              <BCol sm="12" md="4" v-if="authStore.user.role.code == 'SUPADM'">
+              <BCol sm="4" md="4" v-if="authStore.user.role.code == 'SUPADM'">
                 <div>
-                  <div class="input-group border border-secondary rounded-1">
+                  <div class="input-group rounded-1">
                   <span class="input-group-text">
                       <i class="fas fa-search font-size-10"></i>
                   </span>
                   <BFormInput
+                      size="sm"
                       v-model="searchValue"
                       type="search"
                       id="input-small"
                       class="form-control"
                       placeholder="Rechercher..."
+                      @input="convertToUpper"
                   />
                   </div>
                 </div>
               </BCol>
-              <BCol sm="12" md="2">
-                  <BButton style="width: 100%;"  @click="recherche">Rechercher</BButton>
+              <BCol sm="2" md="2" class="">
+                <BButton size="sm"  variant="primary" class="me-2"  @click="recherche">Rechercher</BButton>
+                <BButton size="sm" @click="resetAction" :disabled="loadingReset" class="btn btn-outline-primary btn-sm">
+                  <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
+                  <i v-else class="fas fa-spinner fa-spin"></i> 
+                </BButton>
               </BCol>
-            
+              
           </BRow>
           
 
@@ -153,15 +151,50 @@
             @change="changeServer"
         >
 
-        <template #lib_statut="data">
-          <strong>{{ data.value.email }}</strong>
-          <span v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
+        <template #lib_statut="data" >
+          <!-- <strong>{{ data.value.email }}</strong> -->
+          <span style="font-size: 11px;" v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
         </template>
+
+
+        <template #visiteur="data">
+          <div><span class="tableElement fw-bold" style="font-size: 11px;">{{ data.value.visiteur }}</span></div>
+          <div><span style="font-size: 11px;">{{ data.value.numero_piece }}</span></div>
+        </template>
+
+        <template #created_at="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.created_at }}</span></div>
+        </template>
+
+        <template #employe="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.employe }}</span></div>
+        </template>
+
+        <template #entreprise="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.entreprise }}</span></div>
+        </template>
+
+        <template #code_visiteur="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.code_visiteur }}</span></div>
+        </template>
+
+        <template #code_visite="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.code_visite }}</span></div>
+        </template>
+
+        <template #lib_visite="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.lib_visite }}</span></div>
+        </template>
+
+        <template #heure_entree="data">
+          <div><span style="font-size: 11px;">{{ data.value.heure_entree }} / {{ data.value.heure_fin != null ? data.value.heure_fin : "----" }}</span></div>
+        </template>
+
 
         <template #actions="data">
               <div class="d-flex gap-1">
@@ -215,11 +248,11 @@
                       
               </div>
           </template>
-          <template #heure_fin="data">
+          <!-- <template #heure_fin="data">
               <div>
                   <span>----</span>
               </div>
-          </template>
+          </template> -->
 
 
         </vue3-datatable>
@@ -240,7 +273,7 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import Vue3Datatable from '@bhplugin/vue3-datatable'
 import '@bhplugin/vue3-datatable/dist/style.css'
 import Viewer from 'viewerjs'
- import 'viewerjs/dist/viewer.css';
+import 'viewerjs/dist/viewer.css';
  
     
 
@@ -248,19 +281,19 @@ import Viewer from 'viewerjs'
 const authStore = useAuthStore();
 
 const headers = ref([
-  { title: "Date", field: "created_at", width: "40px", sortable: true },
-  { title: "Nom & Prénoms",width: "40px", field: "visiteur" },
-  { title: "CNI",width: "40px", field: "numero_piece"},
-  { title: "Société",width: "40px", field: "entreprise"},
-  { title: "Code visiteur",width: "40px", field: "code_visiteur" },
-  { title: "Code visite",width: "40px", field: "code_visite" },
-  { title: "Employé",width: "40px", field: "employe" },
-  { title: "Visite",width: "40px", field: "lib_visite" },
-  { title: "H entrée",width: "40px", field: "heure_entree" },
-  { title: "Statut",width: "40px", field: "lib_statut" },
-  { title: "H Sortie",width: "40px", field: "heure_fin" },
-  { title: "Actions",width: "40px", field: "actions" },
+  { title: "Date", field: "created_at", width: "100px", sortable: true },
+  { title: "Nom & Prénoms", width: "40px", field: "visiteur" },
+  { title: "Société", width: "40px", field: "entreprise" },
+  { title: "Code visiteur", width: "40px", field: "code_visiteur" },
+  { title: "Code visite", width: "20px", field: "code_visite" },
+  { title: "Employé", width: "100px", field: "employe" },
+  { title: "Visite", width: "10px", field: "lib_visite" },
+  { title: "H entrée / Sortie ", width: "20px", field: "heure_entree" },
+  { title: "Statut", width: "40px", field: "lib_statut" },
+  // { title: "H Sortie", width: "40px", field: "heure_fin" },
+  { title: "Actions", width: "40px", field: "actions" },
 ]);
+
 
 
 const loadingReset = ref(false)
@@ -450,7 +483,6 @@ const recherche = async () => {
       } 
       // Vérification si searchValue est défini et pas dateDebut et dateFin
       else if (!date==false && searchValue.value) {
-        alert(searchValue.value); // Retirer si plus nécessaire pour le débogage
         param.sort_type = 2;
         param.code_employe = searchValue.value;
       } 
@@ -537,7 +569,6 @@ const showDetailsModal = async (uuid) => {
 
     if(!response.data.error){
       data.value = response.data.data
-      console.log('Detail-------------: '+JSON.stringify( data.value.visiteurs))
     }else{
       console.error(response.data)
     }
@@ -550,7 +581,10 @@ const showDetailsModal = async (uuid) => {
 };
 
 
-
+// convertire la saisir en majuscule
+const convertToUpper = () => {
+      searchValue.value = searchValue.value.toUpperCase();  // Convertit la saisie en majuscule
+}
 
 
 
@@ -571,7 +605,7 @@ const confirmDelete = async (uuid) => {
       if (result.isConfirmed) {
         // Afficher un indicateur de chargement pendant la suppression
         const swalLoading = Swal.fire({
-          title: 'Suppression en cours...',
+          title: 'Rejet en cours...',
           text: 'Veuillez patienter.',
           icon: 'info',
           showConfirmButton: false,
@@ -590,13 +624,19 @@ const confirmDelete = async (uuid) => {
 
           if (!response.data.error) {
             loadFromServer();
-            // Fermer l'alerte de chargement et afficher une alerte de succès
             swalLoading.close();
-            Swal.fire('Supprimé!', `${response.data.message}`, 'success');
+            // Swal.fire('Rejet!', `${response.data.message}`, 'success');
+            Swal.fire({
+              position: "top",
+              icon:'success',
+              text: `${response.data.message}`,
+              showConfirmButton: false,
+              timer: 2000,
+            })
           } else {
             console.error(response.data);
             swalLoading.close();
-            Swal.fire('Erreur', 'Impossible de supprimer l\'élément', 'error');
+            Swal.fire('Erreur', 'Impossible de Rejeter la visite', 'error');
           }
 
         } catch (error) {
@@ -740,4 +780,14 @@ const hideModal = () => {
   .active-page:hover {
     background-color: #2988c8;
   }
+
+  /* Tableau */
+  .tableElement{
+    font-size: 4px;
+  }
+
+  .custom-datepicker {
+  --dp-input-padding: 2px 15px 2px 8px;
+}
+  
 </style>

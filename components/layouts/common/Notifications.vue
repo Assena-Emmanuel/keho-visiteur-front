@@ -113,7 +113,6 @@ channel.bind("visitor.notified", (data) => {
 
 
 const showModal = async (notif) =>{
-  console.log("-----notif: "+JSON.stringify(notif))
   modal.value = !modal.value
   
   visiteur.value = {

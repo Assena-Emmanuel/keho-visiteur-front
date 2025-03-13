@@ -97,17 +97,17 @@
  
 
   <BCard style="min-height: 10em; margin: 0;">
-    <BCardBody style="margin: 0;">
+    <BCardBody style="margin: -28px -23px -23px -23px;">
       <div>
         <div class="flex items-center justify-between mb-3">
-          <h4 class="text-3xl">Historique des Visites</h4>
+          <h5 class="text-3xl">Historique des Visites</h5>
         </div>
 
           <BRow class="mb-3">
-              <BCol sm="12" md="6">
-                <VueDatePicker enable-seconds cancel-text="Annuler" select-text="Selectionner" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" :locale="'fr'"  />
+              <BCol sm="6" md="6">
+                <VueDatePicker class="custom-datepicker" enable-seconds cancel-text="Annuler" select-text="Selectionner" v-model="dateselect" range multi-calendars   placeholder="Date Debut - Date Fin" :locale="'fr'"  />
               </BCol> 
-              <BCol sm="12" md="4" v-if="authStore.user.role.code == 'SUPADM'">
+              <BCol sm="4" md="4" v-if="authStore.user.role.code == 'SUPADM'">
                 <div>
                   <div class="input-group border border-secondary rounded-1">
                   <span class="input-group-text">
@@ -115,28 +115,28 @@
                   </span>
                   <BFormInput
                       v-model="searchValue"
+                      size="sm"
                       type="search"
                       id="input-small"
                       class="form-control"
                       placeholder="Rechercher..."
+                      @input="convertToUpper"
                   />
                   </div>
                 </div>
               </BCol>
-              <BCol sm="12" md="2">
+              <!-- <BCol sm="12" md="2">
                   <BButton style="width: 100%;"  @click="recherche">Rechercher</BButton>
+              </BCol> -->
+              <BCol sm="2" md="2" class="">
+                <BButton size="sm"  variant="primary" class="me-2"  @click="recherche">Rechercher</BButton>
+                <BButton size="sm" @click="resetAction" :disabled="loadingReset" class="btn btn-outline-primary btn-sm">
+                  <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
+                  <i v-else class="fas fa-spinner fa-spin"></i> 
+                </BButton>
               </BCol>
             
           </BRow>
-          <div class="d-flex justify-content-end mb-3">
-            <button 
-              @click="resetAction" 
-              :disabled="loadingReset"
-              class="btn btn-outline-primary">
-              <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
-              <i v-else class="fas fa-spinner fa-spin"></i> 
-            </button>
-          </div>
 
 
           <vue3-datatable
@@ -156,15 +156,50 @@
             @change="changeServer"
         >
 
-        <template #lib_statut="data">
-          <strong>{{ data.value.email }}</strong>
-          <span v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
+        <template #lib_statut="data" >
+          <!-- <strong>{{ data.value.email }}</strong> -->
+          <span style="font-size: 11px;" v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
         </template>
+
+
+        <template #visiteur="data">
+          <div><span class="tableElement fw-bold" style="font-size: 11px;">{{ data.value.visiteur }}</span></div>
+          <div><span style="font-size: 11px;">{{ data.value.numero_piece }}</span></div>
+        </template>
+
+        <template #created_at="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.created_at }}</span></div>
+        </template>
+
+        <template #employe="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.employe }}</span></div>
+        </template>
+
+        <template #entreprise="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.entreprise }}</span></div>
+        </template>
+
+        <template #code_visiteur="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.code_visiteur }}</span></div>
+        </template>
+
+        <template #code_visite="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.code_visite }}</span></div>
+        </template>
+
+        <template #lib_visite="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.lib_visite }}</span></div>
+        </template>
+
+        <template #heure_entree="data">
+          <div><span style="font-size: 11px;">{{ data.value.heure_entree }} / {{ data.value.heure_fin != null ? data.value.heure_fin : "----" }}</span></div>
+        </template>
+
 
         <template #actions="data">
               <div class="d-flex gap-1">
@@ -248,18 +283,17 @@ import Viewer from 'viewerjs'
 
 const authStore = useAuthStore();
 const headers = ref([
-  { title: "Date", field: "created_at", width: "40px", sortable: true },
-  { title: "Nom & Prénoms",width: "40px", field: "visiteur" },
-  { title: "CNI",width: "40px", field: "numero_piece"},
-  { title: "Société",width: "40px", field: "entreprise"},
-  { title: "Code visiteur",width: "40px", field: "code_visiteur" },
-  { title: "Code visite",width: "40px", field: "code_visite" },
-  { title: "Employé",width: "40px", field: "employe" },
-  { title: "Visite",width: "40px", field: "lib_visite" },
-  { title: "H entrée",width: "40px", field: "heure_entree" },
-  { title: "Statut",width: "40px", field: "lib_statut" },
-  { title: "H Sortie",width: "40px", field: "heure_fin" },
-  { title: "Actions",width: "40px", field: "actions" },
+  { title: "Date", field: "created_at", width: "100px", sortable: true },
+  { title: "Nom & Prénoms", width: "40px", field: "visiteur" },
+  { title: "Société", width: "40px", field: "entreprise" },
+  { title: "Code visiteur", width: "40px", field: "code_visiteur" },
+  { title: "Code visite", width: "20px", field: "code_visite" },
+  { title: "Employé", width: "100px", field: "employe" },
+  { title: "Visite", width: "10px", field: "lib_visite" },
+  { title: "H entrée / Sortie ", width: "20px", field: "heure_entree" },
+  { title: "Statut", width: "40px", field: "lib_statut" },
+  // { title: "H Sortie", width: "40px", field: "heure_fin" },
+  { title: "Actions", width: "40px", field: "actions" },
 ]);
 
 const loadingReset = ref(false)
@@ -426,7 +460,7 @@ const recherche = async () => {
     resetAction()
     return
   }
-  console.log("data---------------: "+JSON.stringify(date))
+  // console.log("data---------------: "+JSON.stringify(date))
   try {
     const param = {
       page: 1,
@@ -495,6 +529,11 @@ const recherche = async () => {
   }
 
 
+}
+
+// convertire la saisir en majuscule
+const convertToUpper = () => {
+      searchValue.value = searchValue.value.toUpperCase();  // Convertit la saisie en majuscule
 }
 
 // Utilisation de debounce pour éviter des appels rapides au serveur
@@ -704,6 +743,14 @@ const hideModal = () => {
 </script>
 
 <style>
+.tableElement{
+    font-size: 4px;
+  }
+
+  .custom-datepicker {
+    --dp-input-padding: 2px 15px 2px 8px;
+  }
+
   .customize-table{
       --easy-table-header-font-size: 12px;
       --easy-table-body-row-height: 26px;
