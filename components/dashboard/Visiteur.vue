@@ -806,5 +806,12 @@ const hideModal = () => {
   .custom-datepicker {
   --dp-input-padding: 2px 15px 2px 8px;
 }
+
+.bh-table-responsive table tbody tr td, 
+.bh-table-responsive table tfoot tr th, 
+.bh-table-responsive table thead tr th {
+  padding: 0.3rem 0; /* Réduit le padding ici */
+  text-align: left;
+}
   
 </style>

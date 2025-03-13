@@ -2,11 +2,7 @@
   
       <!-- Modal détail -->
       <BModal  v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur" >
-      <!-- <template v-slot:header>
-        <div class="d-flex justify-content-start w-100" style="position: relative;">
-          <img src="/images/total-removebg.png" alt="" width="50">
-        </div>
-      </template> -->
+
     <ScaleLoader :loading="loadingDetail" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
     <div v-if="data && data.visiteurs && !loadingDetail"  v-for="item in paginatedData" :key="item['Code visite']">
       <div class="text-center"><h3>{{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</h3>
@@ -97,10 +93,10 @@
     <BCard style="min-height: 10em;">
       
 
-      <BCardBody>
+      <BCardBody style="margin: -28px -23px -23px -23px;">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-3xl">Reporting</h3>
+            <h5 class="text-3xl">Reporting</h5>
           </div>
 
 
@@ -160,14 +156,48 @@
               @change="changeServer"
           >
 
-        <template #lib_statut="data">
-          <strong>{{ data.value.email }}</strong>
-          <span v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
+          <template #lib_statut="data" >
+          <!-- <strong>{{ data.value.email }}</strong> -->
+          <span style="font-size: 11px;" v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
+        </template>
+
+
+        <template #visiteur="data">
+          <div><span class="tableElement fw-bold" style="font-size: 11px;">{{ data.value.visiteur }}</span></div>
+          <div><span style="font-size: 11px;">{{ data.value.numero_piece }}</span></div>
+        </template>
+
+        <template #created_at="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ formatDate(data.value.created_at) }}</span></div>
+        </template>
+
+        <template #employe="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.employe }}</span></div>
+        </template>
+
+        <template #entreprise="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.entreprise }}</span></div>
+        </template>
+
+        <template #code_visiteur="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.code_visiteur }}</span></div>
+        </template>
+
+        <template #code_visite="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.code_visite }}</span></div>
+        </template>
+
+        <template #lib_visite="data">
+          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.lib_visite }}</span></div>
+        </template>
+
+        <template #heure_entree="data">
+          <div><span style="font-size: 11px;">{{ data.value.heure_entree }} / {{ data.value.heure_fin != null ? data.value.heure_fin : "----" }}</span></div>
         </template>
 
         <template #actions="data">
@@ -253,19 +283,18 @@
   const authStore = useAuthStore();
 
   const headers = ref([
-    { title: "Date", field: "created_at", width: "40px", sortable: true, hide: false },
-    { title: "Nom & Prénoms",width: "40px", field: "visiteur", hide: false },
-    { title: "CNI",width: "40px", field: "numero_piece", hide: false},
-    { title: "Société",width: "40px", field: "entreprise", hide: false},
-    { title: "Code visiteur",width: "40px", field: "code_visiteur", hide: false},
-    { title: "Code visite",width: "40px", field: "code_visite", hide: false},
-    { title: "Employé",width: "40px", field: "employe" , hide: false},
-    { title: "Visite",width: "40px", field: "lib_visite", hide: false},
-    { title: "H entrée",width: "40px", field: "heure_entree" , hide: false},
-    { title: "Statut",width: "40px", field: "lib_statut" , hide: false},
-    { title: "H Sortie",width: "40px", field: "heure_fin" , hide: false},
-    { title: "Actions",width: "40px", field: "actions" , hide: true},
-  ]);
+  { title: "Date", field: "created_at", width: "100px", sortable: true },
+  { title: "Nom & Prénoms", width: "40px", field: "visiteur" },
+  { title: "Société", width: "40px", field: "entreprise" },
+  { title: "Code visiteur", width: "40px", field: "code_visiteur" },
+  { title: "Code visite", width: "20px", field: "code_visite" },
+  { title: "Employé", width: "100px", field: "employe" },
+  { title: "Visite", width: "10px", field: "lib_visite" },
+  { title: "H entrée / Sortie ", width: "20px", field: "heure_entree" },
+  { title: "Statut", width: "40px", field: "lib_statut" },
+  // { title: "H Sortie", width: "40px", field: "heure_fin" },
+  { title: "Actions", width: "40px", field: "actions" },
+]);
 
 
   const datatable = ref(null);
@@ -338,6 +367,23 @@
     const end = start + 1;
     return data.value.visiteurs.slice(start, end);
   });
+
+  // changer le format de la date
+function formatDate(dateString) {
+  // Créer un objet Date à partir de la chaîne d'entrée
+  const date = new Date(dateString);
+
+  // Extraire les différentes parties de la date
+  const day = date.getDate().toString().padStart(2, '0'); // Jour avec 2 chiffres
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Mois (1-12) avec 2 chiffres
+  const year = date.getFullYear();  // Année
+  const hours = date.getHours().toString().padStart(2, '0');  // Heures avec 2 chiffres
+  const minutes = date.getMinutes().toString().padStart(2, '0');  // Minutes avec 2 chiffres
+  const seconds = date.getSeconds().toString().padStart(2, '0');  // Secondes avec 2 chiffres
+
+  // Retourner la date formatée
+  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+}
   
   // reactualiser
   function resetAction(){
@@ -759,4 +805,11 @@
   .bh-datatable .bh-table-responsive {
       @apply min-h-[380px];
   }
+
+.bh-table-responsive table tbody tr td, 
+.bh-table-responsive table tfoot tr th, 
+.bh-table-responsive table thead tr th {
+  padding: 0.3rem 0; /* Réduit le padding ici */
+  text-align: left;
+}
 </style>

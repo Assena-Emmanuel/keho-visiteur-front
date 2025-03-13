@@ -22,7 +22,7 @@
           <span v-if="data.fvisite.statut==4" class="text-info px-2 ms-2">statut: <span class="">Confirmé</span></span>
           <span v-if="data.fvisite.statut==5" class="text-succes px-2 ms-2">statut: <span class="">Clôturé</span></span>
         </div>
-        <div><small class=" px-2 ms-2 "><i class="fa fa-clock"></i> <small>{{ formatDateTime(data.fvisite.created_at)  }}</small></small></div>
+        <div><small class=" px-2 ms-2 "><i class="fa fa-clock"></i> <small>{{ formatDate(data.value.created_at)  }}</small></small></div>
       </div>
       <hr class="text-secondary">
       <div class="row">
@@ -173,7 +173,7 @@
         </template>
 
         <template #created_at="data">
-          <div><span class="tableElement" style="font-size: 11px;">{{ data.value.created_at }}</span></div>
+          <div><span class="tableElement" style="font-size: 11px;">{{ formatDate(data.value.created_at) }}</span></div>
         </template>
 
         <template #employe="data">
@@ -344,6 +344,22 @@ const imgViewer = (id) => {
     }
   }
 
+// changer le format de la date
+function formatDate(dateString) {
+  // Créer un objet Date à partir de la chaîne d'entrée
+  const date = new Date(dateString);
+
+  // Extraire les différentes parties de la date
+  const day = date.getDate().toString().padStart(2, '0'); // Jour avec 2 chiffres
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Mois (1-12) avec 2 chiffres
+  const year = date.getFullYear();  // Année
+  const hours = date.getHours().toString().padStart(2, '0');  // Heures avec 2 chiffres
+  const minutes = date.getMinutes().toString().padStart(2, '0');  // Minutes avec 2 chiffres
+  const seconds = date.getSeconds().toString().padStart(2, '0');  // Secondes avec 2 chiffres
+
+  // Retourner la date formatée
+  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+}
 
 // reactualiser
 function resetAction(){
@@ -760,4 +776,11 @@ const hideModal = () => {
 
       
   }
+
+  .bh-table-responsive table tbody tr td, 
+.bh-table-responsive table tfoot tr th, 
+.bh-table-responsive table thead tr th {
+  padding: 0.3rem 0; /* Réduit le padding ici */
+  text-align: left;
+}
 </style>

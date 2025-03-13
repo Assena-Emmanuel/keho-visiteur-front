@@ -160,23 +160,23 @@
         </template>
 
         <template #visiteur="data">
-          <div><span class=" fw-bold" style="font-size: 11px;">{{ data.value.visiteur }}</span></div>
+          <div><span class=" fw-bold" style="font-size: 14px;">{{ data.value.visiteur }}</span></div>
           <div><span style="font-size: 10px;">{{ data.value.numero_piece }}</span></div>
         </template>
         <template #created_at="data">
-          <div><span style="font-size: 11px;">{{ data.value.created_at }}</span></div>
+          <div><span style="font-size: 14px;">{{ formatDate(data.value.created_at) }}</span></div>
         </template>
 
         <template #entreprise="data">
-          <div><span style="font-size: 11px;">{{ data.value.entreprise }}</span></div>
+          <div><span style="font-size: 14px;">{{ data.value.entreprise }}</span></div>
         </template>
 
         <template #code_visiteur="data">
-          <div><span style="font-size: 11px;">{{ data.value.code_visiteur }}</span></div>
+          <div><span style="font-size: 14px;">{{ data.value.code_visiteur }}</span></div>
         </template>
 
         <template #lib_visite="data">
-          <div><span style="font-size: 11px;">{{ data.value.lib_visite }}</span></div>
+          <div><span style="font-size: 14px;">{{ data.value.lib_visite }}</span></div>
         </template>
 
         <template #heure_entree="data">
@@ -184,11 +184,11 @@
         </template>
 
         <!-- <template #lib_statut="data">
-          <div><span style="font-size: 11px;">{{ data.value.lib_statut }}</span></div>
+          <div><span style="font-size: 14px;">{{ data.value.lib_statut }}</span></div>
         </template> -->
 
         <!-- <template #heure_fin="data">
-          <div><span style="font-size: 11px;">{{ data.value.heure_fin }}</span></div>
+          <div><span style="font-size: 14px;">{{ data.value.heure_fin }}</span></div>
         </template> -->
 
         <template #actions="data">
@@ -270,14 +270,14 @@ import '@vuepic/vue-datepicker/dist/main.css'
 const authStore = useAuthStore();
 
 const headers = ref([
-  { title: "Date", field: "created_at", width: "150px", sortable: true },
-  { title: "Nom & Prénoms",width: "200px", field: "visiteur" },
+  { title: "Date", field: "created_at", width: "90px", sortable: true },
+  { title: "Nom & Prénoms",width: "150px", field: "visiteur" },
   // { title: "CNI",width: "40px", field: "numero_piece"},
-  { title: "Société",width: "40px", field: "entreprise"},
-  { title: "Code visiteur",width: "40px", field: "code_visiteur" },
-  { title: "Visite",width: "30px", field: "lib_visite" },
-  { title: "H entrée",width: "40px", field: "heure_entree" },
-  { title: "Statut",width: "90px", field: "lib_statut" },
+  { title: "Société",width: "0px", field: "entreprise"},
+  { title: "Code visiteur",width: "100px", field: "code_visiteur" },
+  { title: "Visite",width: "40px", field: "lib_visite" },
+  { title: "H entrée",width: "30px", field: "heure_entree" },
+  { title: "Statut",width: "40px", field: "lib_statut" },
   { title: "H Sortie",width: "40px", field: "heure_fin" },
   { title: "Actions",width: "40px", field: "actions" },
 ]);
@@ -724,7 +724,22 @@ const showTicket = async (uuid) =>{
   }
 }
 
+// changer le format de la date
+function formatDate(dateString) {
+  // Créer un objet Date à partir de la chaîne d'entrée
+  const date = new Date(dateString);
 
+  // Extraire les différentes parties de la date
+  const day = date.getDate().toString().padStart(2, '0'); // Jour avec 2 chiffres
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Mois (1-12) avec 2 chiffres
+  const year = date.getFullYear();  // Année
+  const hours = date.getHours().toString().padStart(2, '0');  // Heures avec 2 chiffres
+  const minutes = date.getMinutes().toString().padStart(2, '0');  // Minutes avec 2 chiffres
+  const seconds = date.getSeconds().toString().padStart(2, '0');  // Secondes avec 2 chiffres
+
+  // Retourner la date formatée
+  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+}
 
 
 
@@ -792,5 +807,12 @@ const hideModal = () => {
 
   .custom-datepicker {
   --dp-input-padding: 2px 15px 2px 8px;
+}
+
+.bh-table-responsive table tbody tr td, 
+.bh-table-responsive table tfoot tr th, 
+.bh-table-responsive table thead tr th {
+  padding: 0.3rem 0; /* Réduit le padding ici */
+  text-align: left;
 }
 </style>
