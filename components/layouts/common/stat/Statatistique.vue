@@ -4,7 +4,8 @@ export default {
     titre: String,
     valeur: Number,
     imageUrl: String,
-    couleur: String
+    couleur: String,
+    type: String
   }
 }
 </script>
@@ -12,7 +13,8 @@ export default {
 <template>
     <BCard no-body style="height: 80px;">
         <BCardBody style="padding: 10px;"> 
-            <div class="d-flex justify-content-between align-items-center">
+            <!-- //TV: total visiteurs -->
+            <div class="d-flex justify-content-between align-items-center" v-if="type=='TV'"> 
                 <div class="circle-container" :style="{ backgroundColor: couleur }">
                     <img :src="imageUrl" class="responsive-image">
                 </div>
@@ -21,14 +23,43 @@ export default {
                     <!-- <h4 class="mt-1 value-text">{{ valeur }}</h4> -->
                 </div>
             </div>
+
+            <div class="d-flex justify-content-between align-items-center" v-else-if="type=='AR'"> <!-- //AR: Accepté Rejeté -->
+                
+                <div class="d-flex justify-content-between gap-2">
+                    <div class="circle-container" :style="{ backgroundColor: couleur }">
+                        <img :src="imageUrl" class="responsive-image">
+                    </div>
+                    <div>
+                        <p class="text-muted mb-0 title-text"> <span class="d-none d-sm-inline">Visites acceptées</span> <span class="text-success" style="font-size:18px; font-weight:bold"> 111 </span></p>
+                    </div>
+                </div>
+                <!-- imageUrl: '/images/stats/rejetes.png', couleur: '#F1947F' -->
+                <div class="d-flex justify-content-between gap-2">
+                    <div class="circle-container" style="background-color: #F1947F">
+                        <img src="/images/stats/rejetes.png" class="responsive-image">
+                    </div>
+
+                    <div>
+                        <p class="text-muted mb-0 title-text"><span class="d-none d-sm-inline">Visites rejetées</span>  <span class="text-danger" style="font-size:18px; font-weight:bold"> 12</span></p>
+                    </div>
+                </div>
+                <!-- <div class="circle-container" :style="{ backgroundColor: couleur }">
+                    <img :src="imageUrl" class="responsive-image">
+                </div>
+                <div class="text-end">
+                    <p class="text-muted mb-0 title-text">Visites acceptées  <span class="text-success" style="font-size:18px; font-weight:bold"> 111 </span></p>
+                    <p class="text-muted mb-0 title-text">Visites rejetées  <span class="text-danger" style="font-size:18px; font-weight:bold"> 12</span></p>
+                </div> -->
+            </div>
         </BCardBody>
 </BCard>
 
 </template>
 <style>
 .circle-container {
-    width: 50px; /* Largeur de la div */
-    height: 50px; /* Hauteur de la div */
+    width: 30px; /* Largeur de la div */
+    height: 30px; /* Hauteur de la div */
     border-radius: 50%; /* Rendre la div circulaire */
     display: flex;
     align-items: center; /* Centrer verticalement */
@@ -72,11 +103,11 @@ export default {
     }
 
     .title-text {
-        font-size: 0.7rem; /* Réduire davantage la taille du titre */
+        font-size: 0.6rem; /* Réduire davantage la taille du titre */
     }
 
     .value-text {
-        font-size: 0.9rem; /* Réduire davantage la taille de la valeur */
+        font-size: 0.7rem; /* Réduire davantage la taille de la valeur */
     }
 }
 </style>

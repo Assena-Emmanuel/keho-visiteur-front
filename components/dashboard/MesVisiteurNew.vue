@@ -269,7 +269,7 @@ import '@vuepic/vue-datepicker/dist/main.css'
 const authStore = useAuthStore();
 
 const headers = ref([
-  { title: "Date", field: "created_at", width: "90px", sortable: true },
+  { title: "Date", field: "created_at", width: "80px", sortable: true },
   { title: "Nom & Prénoms",width: "150px", field: "visiteur" },
   // { title: "CNI",width: "40px", field: "numero_piece"},
   { title: "Société",width: "0px", field: "entreprise"},

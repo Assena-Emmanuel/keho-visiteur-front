@@ -17,8 +17,12 @@ export default {
         {imageUrl: '/images/stats/inopinees.png', couleur: '#EFC257'},
         {imageUrl: '/images/stats/rejetes.png', couleur: '#F1947F'},
       ],
+      type: ['TV', 'AR', 'ARj']
     }
+
   },
+
+
   computed:{
     getCol(){
       return 12 / this.datas.length
@@ -35,6 +39,7 @@ export default {
         :valeur="data.valeur" 
         :imageUrl="dataStatic[index].imageUrl"
         :couleur="dataStatic[index].couleur"
+        :type="type[index]"
       />
     </BCol>
   </BRow>

@@ -281,7 +281,7 @@ import 'viewerjs/dist/viewer.css';
 const authStore = useAuthStore();
 
 const headers = ref([
-  { title: "Date", field: "created_at", width: "100px", sortable: true },
+  { title: "Date", field: "created_at", width: "80px", sortable: true },
   { title: "Nom & Prénoms", width: "40px", field: "visiteur" },
   { title: "Société", width: "40px", field: "entreprise" },
   { title: "Code visiteur", width: "40px", field: "code_visiteur" },

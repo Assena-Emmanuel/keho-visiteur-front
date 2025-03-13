@@ -1,5 +1,5 @@
 <template>
-    <DashboardCommonStat />
+    <DashboardCommonStat type="TV" />
     <BRow>
         <BCol lg="6">
             <DashboardCommonDiagramme />
