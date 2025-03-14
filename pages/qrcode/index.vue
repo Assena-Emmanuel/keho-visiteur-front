@@ -45,8 +45,10 @@ function onDetect(detectedCodes) {
     }else{
       error.value = "Veuillez scanner le bon QR Code"
     }  
+  }else{
+    error.value = "Aucune donnée trouvée"
   }
-  error.value = "Aucune donnée trouvée"
+  
 }
 
 /*** select camera ***/
