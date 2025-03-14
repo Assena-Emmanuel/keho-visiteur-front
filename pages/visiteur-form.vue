@@ -538,7 +538,6 @@
             },
 
             async onSaveVisiteur(){
-                console.log("Start--------------- : 1"+JSON.stringify(this.rectoImage)+" 2-- "+JSON.stringify(this.versoImage));
                 this.submitted = true;
                 this.v$.$touch();
 

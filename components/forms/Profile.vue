@@ -65,7 +65,6 @@
       handleFileUpload(event) {
       // Récupérer le fichier sélectionné
       const file = event.target.files[0];
-      console.log(file);
 
   
       },

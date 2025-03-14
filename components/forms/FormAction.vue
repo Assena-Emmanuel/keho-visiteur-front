@@ -191,10 +191,8 @@ const onUpdateAction = async () => {
     });
 
     // Vérification de la réponse
-    console.log("Mise ajour: "+id.value+" "+JSON.stringify(response.data));
     if (!response.data.error) {
       const actions = await getAll("action")
-      console.log("Data--------------------: +"+JSON.stringify(actions))
       gestionStore.setActions(actions.data); 
       erreur.value = false;  // Réinitialiser l'état d'erreur
       isOpen.value = false

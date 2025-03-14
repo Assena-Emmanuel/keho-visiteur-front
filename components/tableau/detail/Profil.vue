@@ -112,9 +112,7 @@ watch(
           isEditMode.value = true
          
           const profil = await getById("role", newid);
-          console.log("profil:------------------------- "+JSON.stringify(profil))
-          
-        
+                
         if(!profil.data.error){
 
           libelle.value = profil.data.libelle

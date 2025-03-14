@@ -121,7 +121,7 @@
               </BCol>
               <BCol sm="2" md="2" class="">
                 <BButton size="sm"  variant="primary" class="me-2"  @click="recherche">Rechercher</BButton>
-                <BButton size="sm" @click="resetAction" :disabled="loadingReset" class="btn btn-outline-primary btn-sm">
+                <BButton size="sm" @click="resetAction" :disabled="loadingReset" class="btn btn-sm" style="background-color: #4CAF50;">
                   <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
                   <i v-else class="fas fa-spinner fa-spin"></i> 
                 </BButton>
@@ -150,18 +150,19 @@
 
         <template #lib_statut="data">
           <strong>{{ data.value.email }}</strong>
-          <span v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
-            <span v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
+          <span v-if="data.value.statut == 0" class="text-warning fw-bold">{{ data.value.lib_statut }}</span>
+            <span v-if="data.value.statut == 1" class="text-info fw-bold">{{ data.value.lib_statut }}</span>
+            <span v-if="data.value.statut == 2" class="text-success fw-bold">{{ data.value.lib_statut }}</span>
+            <span v-if="data.value.statut == 3" class="text-danger fw-bold">{{ data.value.lib_statut }}</span>
+            <span v-if="data.value.statut == 4" class="text-success fw-bold">{{ data.value.lib_statut }}</span>
+            <span v-if="data.value.statut == 5" class="text-dark fw-bold">{{ data.value.lib_statut }}</span>
         </template>
 
         <template #visiteur="data">
-          <div><span class=" fw-bold" style="font-size: 12px;">{{ data.value.visiteur }}</span></div>
+          <div><span class=" fw-bold" style="font-size: 14px;">{{ (data.value.visiteur).toUpperCase() }}</span></div>
           <div><span style="font-size: 10px;">{{ data.value.numero_piece }}</span></div>
         </template>
+
         <template #created_at="data">
           <div><span style="font-size: 12px;">{{ formatDate(data.value.created_at) }}</span></div>
         </template>
@@ -244,7 +245,8 @@
           </template>
           <template #heure_fin="data">
               <div>
-                  <span>----</span>
+                  <span v-if="data.value.heure_fin == null">----</span>
+                  <span v-else class="fw-bold text-success">{{ data.value.heure_fin }}</span>
               </div>
           </template>
 
@@ -276,8 +278,9 @@ const headers = ref([
   { title: "Code visiteur",width: "100px", field: "code_visiteur" },
   { title: "Visite",width: "40px", field: "lib_visite" },
   { title: "H entrée",width: "30px", field: "heure_entree" },
-  { title: "Statut",width: "40px", field: "lib_statut" },
   { title: "H Sortie",width: "40px", field: "heure_fin" },
+  { title: "Statut",width: "40px", field: "lib_statut" },
+ 
   { title: "Actions",width: "40px", field: "actions" },
 ]);
 
@@ -297,8 +300,8 @@ const params = reactive({ current_page: 1, pagesize: 5 });
 const serverOptions = ref({
   page: params.current_page,
   rowsPerPage: params.pagesize,
-  sortBy: authStore.user.role.code == 'SUPADM' ? 1 : 2,
-  code_employe: authStore.user.role.code == 'SUPADM' ? null : authStore.user.visite.code_visite,
+  sortBy: 2,
+  code_employe: authStore.user.visite.code_visite,
 });
 
 
@@ -375,7 +378,7 @@ const recherche = async () => {
     
     // Vous pouvez faire d'autres opérations avec ces dates
     date = { start: formattedStartDate, end: formattedEndDate };
-    code = authStore.user.role.code == 'SUPADM' ?  searchValue.value : authStore.user.visite.code_visite
+    code = authStore.user.visite.code_visite
   }else{
     resetAction()
     return
@@ -390,7 +393,6 @@ const recherche = async () => {
       date_fin: null
     }
 
-    if(authStore.user.role.code == 'SUPADM'){
       // Vérification si dateDebut et dateFin sont définis
       if (date.start != null && code == null) {
         param.sort_type = 3;
@@ -411,13 +413,6 @@ const recherche = async () => {
       }
       
 
-    }else{
-      
-      param.sort_type = 4;
-      param.date_debut = date.start;
-      param.date_fin = dateselect.value[1] != null ? date.end : date.start;
-      param.code_employe = code;
-    }
 
     // Envoi de la requête à l'API
     const response = await apiClient.get("/fvisites/lvisite", {
@@ -429,7 +424,6 @@ const recherche = async () => {
 
     // Vérification de la réponse de l'API
     if (!response.data.error) {
-      console.log("Réponse reçue:", response.data.data);
       const data = response.data.data;
       items.value = data?.data;
       serverItemsLength.value = response.data.data.total;
@@ -719,7 +713,6 @@ const rejet = async (uuid) => {
 
 const showTicket = async (uuid) =>{
   if(uuid){
-    console.log("TRicket--------: "+ JSON.stringify(uuid))
   }
 }
 
@@ -732,12 +725,9 @@ function formatDate(dateString) {
   const day = date.getDate().toString().padStart(2, '0'); // Jour avec 2 chiffres
   const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Mois (1-12) avec 2 chiffres
   const year = date.getFullYear();  // Année
-  const hours = date.getHours().toString().padStart(2, '0');  // Heures avec 2 chiffres
-  const minutes = date.getMinutes().toString().padStart(2, '0');  // Minutes avec 2 chiffres
-  const seconds = date.getSeconds().toString().padStart(2, '0');  // Secondes avec 2 chiffres
-
+  
   // Retourner la date formatée
-  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  return `${day}-${month}-${year}`;
 }
 
 

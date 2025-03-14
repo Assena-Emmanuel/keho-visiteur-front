@@ -260,7 +260,7 @@ function alertMessage(message, icon = "error") {
         title: 'custom-title'
       }
     });
-  }
+}
 
 // Fonction asynchrone pour récupérer l'utilisateur par uuid
 async function getCategorie(id) {

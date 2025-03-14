@@ -168,7 +168,7 @@
 
 
         <template #visiteur="data">
-          <div><span class="tableElement fw-bold" style="font-size: 11px;">{{ data.value.visiteur }}</span></div>
+          <div><span class="tableElement fw-bold" style="font-size: 11px;">{{ (data.value.visiteur).toUpperCase() }}</span></div>
           <div><span style="font-size: 11px;">{{ data.value.numero_piece }}</span></div>
         </template>
 
@@ -369,6 +369,7 @@
   });
 
   // changer le format de la date
+// changer le format de la date
 function formatDate(dateString) {
   // Créer un objet Date à partir de la chaîne d'entrée
   const date = new Date(dateString);
@@ -377,12 +378,9 @@ function formatDate(dateString) {
   const day = date.getDate().toString().padStart(2, '0'); // Jour avec 2 chiffres
   const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Mois (1-12) avec 2 chiffres
   const year = date.getFullYear();  // Année
-  const hours = date.getHours().toString().padStart(2, '0');  // Heures avec 2 chiffres
-  const minutes = date.getMinutes().toString().padStart(2, '0');  // Minutes avec 2 chiffres
-  const seconds = date.getSeconds().toString().padStart(2, '0');  // Secondes avec 2 chiffres
-
+  
   // Retourner la date formatée
-  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  return `${day}-${month}-${year}`;
 }
   
   // reactualiser
@@ -671,7 +669,7 @@ function formatDate(dateString) {
             records = items.value;
 
         }
-        console.log("record-----------: "+JSON.stringify(records))
+
         const filename = 'table';
 
         if (type === 'csv' || type === 'xlsx') {

@@ -74,12 +74,10 @@ const onSaveService = async () => {
     };
 
       const data = await createResource(`categorie`, formData);
-      console.log("Error:------------"+JSON.stringify(data))
       if(!data.data.error){
         
 
         const data = await getCategorieBySlug(SLUG);
-        console.log("data save:------------"+JSON.stringify(data.data))
         gestionStore.setServices(data.data.data)
         alertMessage(data.data.message, 'success')
         resetForm()
@@ -107,7 +105,6 @@ try {
   // Récupérer tous les départements
   const categories = await getAll("categorie");
   selectCategories.value = categories.data; 
-  // console.log("Categorie------: "+JSON.stringify(categories.data))
   
 } catch (error) {
   console.error('Erreur lors de la récupération des données:', error);
@@ -160,7 +157,6 @@ const onUpdatecategorie = async () => {
 
     // Vérification de la réponse
     if (!response.data.error) {
-      console.log("Modification réussie : ", response.data.message);
       categories();  
       isOpen.value = false
       isEditMode.value = false

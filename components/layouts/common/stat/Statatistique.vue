@@ -12,7 +12,7 @@ export default {
 
 <template>
     <BCard no-body style="height: 80px;">
-        <BCardBody style="padding: 10px;"> 
+        <BCardBody style="padding: 10px"> 
             <!-- //TV: total visiteurs -->
             <div class="d-flex justify-content-between align-items-center" v-if="type=='TV'"> 
                 <div class="circle-container" :style="{ backgroundColor: couleur }">
@@ -34,7 +34,7 @@ export default {
                         <p class="text-muted mb-0 title-text"> <span class="d-none d-sm-inline">Visites acceptées</span> <span class="text-success" style="font-size:18px; font-weight:bold"> 111 </span></p>
                     </div>
                 </div>
-                <!-- imageUrl: '/images/stats/rejetes.png', couleur: '#F1947F' -->
+
                 <div class="d-flex justify-content-between gap-2">
                     <div class="circle-container" style="background-color: #F1947F">
                         <img src="/images/stats/rejetes.png" class="responsive-image">
@@ -44,13 +44,34 @@ export default {
                         <p class="text-muted mb-0 title-text"><span class="d-none d-sm-inline">Visites rejetées</span>  <span class="text-danger" style="font-size:18px; font-weight:bold"> 12</span></p>
                     </div>
                 </div>
-                <!-- <div class="circle-container" :style="{ backgroundColor: couleur }">
-                    <img :src="imageUrl" class="responsive-image">
+            </div>
+
+            <!-- Total visite jour -->
+            <div v-else-if="type=='ARj'" > <!-- //AR: Accepté Rejeté -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between gap-2">
+                        <div class="circle-container" :style="{ backgroundColor: couleur }">
+                            <img :src="imageUrl" class="responsive-image">
+                        </div>
+                        <div>
+                            <p class="text-muted mb-0 title-text"> <span class="d-none d-sm-inline">Visites acceptées</span> <span class="text-success" style="font-size:18px; font-weight:bold"> 09 </span></p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between gap-2">
+                        <div class="circle-container" style="background-color: #F1947F">
+                            <img src="/images/stats/rejetes.png" class="responsive-image">
+                        </div>
+
+                        <div>
+                            <p class="text-muted mb-0 title-text"><span class="d-none d-sm-inline">Visites rejetées</span>  <span class="text-danger" style="font-size:18px; font-weight:bold"> 01</span></p>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-end">
-                    <p class="text-muted mb-0 title-text">Visites acceptées  <span class="text-success" style="font-size:18px; font-weight:bold"> 111 </span></p>
-                    <p class="text-muted mb-0 title-text">Visites rejetées  <span class="text-danger" style="font-size:18px; font-weight:bold"> 12</span></p>
-                </div> -->
+                <div class="text-center">
+                    <small class="fw-bold text-secondary">Journaliere</small>
+                </div>
+                
             </div>
         </BCardBody>
 </BCard>
@@ -58,6 +79,15 @@ export default {
 </template>
 <style>
 .circle-container {
+    width: 33px; /* Largeur de la div */
+    height: 33px; /* Hauteur de la div */
+    border-radius: 50%; /* Rendre la div circulaire */
+    display: flex;
+    align-items: center; /* Centrer verticalement */
+    justify-content: center; /* Centrer horizontalement */
+    overflow: hidden; /* Cacher les débordements */
+}
+.circle-container1 {
     width: 30px; /* Largeur de la div */
     height: 30px; /* Hauteur de la div */
     border-radius: 50%; /* Rendre la div circulaire */
@@ -68,7 +98,7 @@ export default {
 }
 
 .circle-container img {
-    width: 70%; /* Prendre toute la largeur */
+    width: 50%; /* Prendre toute la largeur */
     height: auto; /* Conserver le ratio d'aspect */
 }
 

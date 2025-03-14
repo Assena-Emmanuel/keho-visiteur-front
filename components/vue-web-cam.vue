@@ -239,7 +239,6 @@ export default {
 
     // Emission de l'image au parent (sans indexation)
     if (canvas === 'canvas') {
-        console.log("----------------fichier: ", file);  // Affiche directement l'objet File
         this.$emit('update:rectoImage', file);  // Passe l'objet File complet
     } else {
         this.$emit('update:versoImage', file);  // Passe l'objet File complet

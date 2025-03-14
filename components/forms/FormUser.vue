@@ -381,7 +381,6 @@ const onDepartement = async () => {
   if(departement.value){
     try{
       const response = await getById("categorie", departement.value )
-      console.log("RESPONSE------------: "+JSON.stringify(response))
       if(!response.error){
         selectServices.value = response.data.children
       }

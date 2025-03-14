@@ -14,7 +14,7 @@ export const useNotifiedStore = defineStore("notified", {
       const response = await apiClient.get(`user/notifs`,
         {
           headers: {
-            Authorization: `Bearer ${authToken.token}`, // Ajoutez le token Bearer ici
+            Authorization: `Bearer ${authToken.token}`, 
             Accept: "application/json",
           },
         }

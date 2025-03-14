@@ -80,7 +80,6 @@ watch(
   if (newUuid) {
     data.value = await getUser(newUuid); 
     if(data.value) {
-      console.log("USER ---------------: "+JSON.stringify(data.value))
       nom.value = data.value.nom;
       prenom.value = data.value.prenom;
       e_mail.value = data.value.email;
@@ -196,7 +195,6 @@ const onUpdateUser = async () => {
         formData.append('image', photo.value);
       }
 
-      console.log("VISIte-------"+  matricule.value)
       const response = await apiClient.post(`/user/${uuid.value}`, formData, {
         headers: { 'Authorization': `Bearer ${authStore.token}` },
       });
@@ -291,7 +289,6 @@ const onDepartement = async () => {
   if(departement.value){
     try{
       const response = await getById("categorie", departement.value )
-      console.log("RESPONSE------------: "+JSON.stringify(response))
       if(!response.error){
         selectServices.value = response.data.children
       }

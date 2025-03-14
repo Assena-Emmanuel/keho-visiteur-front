@@ -28,7 +28,6 @@ onMounted(async () => {
 
     if (!response.data.error) {
       detailServ.value = { ...response.data.data }; // Copier les données de manière sécurisée
-    console.log("--------------------! ",detailServ.value)
     }
 
   } catch (error) {

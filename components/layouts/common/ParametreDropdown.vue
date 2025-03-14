@@ -98,8 +98,6 @@
   import { defineModel } from "vue";
 
   const menus = defineModel('menusParam')
-  watch(menus, (newMenus) => {
-    console.log("Menus ----------: "+ JSON.stringify(newMenus))
-  })
+
   </script>
   

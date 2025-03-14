@@ -181,7 +181,6 @@ const onUpdateDepartement = async () => {
 
     // Vérification de la réponse
     if (!response.data.error) {
-      console.log("Modification réussie : ", response.data.message);
       departements();  // Recharger les départements après la mise à jour
       erreur.value = false;  // Réinitialiser l'état d'erreur
       resetForm();  // Réinitialiser le formulaire après une mise à jour réussie

@@ -109,7 +109,7 @@
               </BCol> 
               <BCol sm="4" md="4" v-if="authStore.user.role.code == 'SUPADM'">
                 <div>
-                  <div class="input-group border border-secondary rounded-1">
+                  <div class="input-group  rounded-1">
                   <span class="input-group-text">
                       <i class="fas fa-search font-size-10"></i>
                   </span>
@@ -130,7 +130,7 @@
               </BCol> -->
               <BCol sm="2" md="2" class="">
                 <BButton size="sm"  variant="primary" class="me-2"  @click="recherche">Rechercher</BButton>
-                <BButton size="sm" @click="resetAction" :disabled="loadingReset" class="btn btn-outline-primary btn-sm">
+                <BButton size="sm" @click="resetAction" :disabled="loadingReset" class="btn btn-sm" style="background-color: #4CAF50;">
                   <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
                   <i v-else class="fas fa-spinner fa-spin"></i> 
                 </BButton>
@@ -148,13 +148,13 @@
             :pageSize="params.pagesize"
             :showNumbersCount="3"
             class="alt-pagination"
-            :pageSizeOptions="[5, 10, 15, 20]"
+            :pageSizeOptions="[5, 10, 50, 200]"
             paginationInfo="Afficher de {0} à {1} sur {2} elements"
             skin="bh-table-striped"
             pageSize="5"
             noDataContent="Aucune donnée disponible"
             @change="changeServer"
-        >
+          >
 
         <template #lib_statut="data" >
           <!-- <strong>{{ data.value.email }}</strong> -->
@@ -282,8 +282,9 @@ import Viewer from 'viewerjs'
  import 'viewerjs/dist/viewer.css';
 
 const authStore = useAuthStore();
+
 const headers = ref([
-  { title: "Date", field: "created_at", width: "_0px", sortable: true },
+  { title: "Date", field: "created_at", width: "80px", sortable: true },
   { title: "Nom & Prénoms", width: "40px", field: "visiteur" },
   { title: "Société", width: "40px", field: "entreprise" },
   { title: "Code visiteur", width: "40px", field: "code_visiteur" },
@@ -308,7 +309,6 @@ const loadingDetail = ref(false)
 const dateDebut = ref(null)
 const dateFin = ref(null)
 const dateselect = ref(null)
-const itemsPerPage = ref(1)
 const currentPage = ref(1)
 const params = reactive({ current_page: 1, pagesize: 5 });
 const serverOptions = ref({
@@ -353,12 +353,9 @@ function formatDate(dateString) {
   const day = date.getDate().toString().padStart(2, '0'); // Jour avec 2 chiffres
   const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Mois (1-12) avec 2 chiffres
   const year = date.getFullYear();  // Année
-  const hours = date.getHours().toString().padStart(2, '0');  // Heures avec 2 chiffres
-  const minutes = date.getMinutes().toString().padStart(2, '0');  // Minutes avec 2 chiffres
-  const seconds = date.getSeconds().toString().padStart(2, '0');  // Secondes avec 2 chiffres
-
+  
   // Retourner la date formatée
-  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  return `${day}-${month}-${year}`;
 }
 
 // reactualiser
@@ -479,7 +476,7 @@ const recherche = async () => {
     resetAction()
     return
   }
-  // console.log("data---------------: "+JSON.stringify(date))
+
   try {
     const param = {
       page: 1,
@@ -530,7 +527,6 @@ const recherche = async () => {
 
     // Vérification de la réponse de l'API
     if (!response.data.error) {
-      console.log("Réponse reçue:", response.data.data);
       const data = response.data.data;
       items.value = data?.data;
       serverItemsLength.value = response.data.data.total;
@@ -663,8 +659,7 @@ const confirmDelete = async (uuid) => {
           });
 
           if (!response.data.error) {
-            
-            console.log("Sup-----------: " + JSON.stringify(response.data));
+
             loadFromServer();
             swalLoading.close();
             Swal.fire('Supprimé!', `${response.data.message}`, 'success');

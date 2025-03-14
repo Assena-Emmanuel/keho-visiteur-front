@@ -366,7 +366,6 @@
 
             // Recuperer les infos du visité
             employe.value = data.visiteurs[0].visite
-            console.log("employ-------------------: "+JSON.stringify(employe.value))
 
           }else{
             
@@ -434,13 +433,11 @@
 
         if (response.status === 200) {
 
-          console.log("Ticket imprimé avec succès:", JSON.stringify(response.data));
           // Créer un objet URL pour ouvrir le PDF dans un nouvel onglet
           // const fileURL = URL.createObjectURL(response.data);
 
           // Ouvrir le PDF dans un nouvel onglet
           window.open(fileURL, '_blank');
-          console.log("Ticket imprimé avec succès:", response.data);
         } else {
           console.error("Erreur dans la réponse de l'API");
         }
@@ -454,7 +451,7 @@
       }
 
     }catch(e){
-      console.log("Erreur lors de l'impression: "+e)
+      console.error("Erreur lors de l'impression: "+e)
 
     }finally{
       loadingImpression.value = false

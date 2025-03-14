@@ -64,7 +64,6 @@ export default {
                 )
                 .then(response => {
                   let data = response.data; 
-                  console.log(data)
 
                   if(data.error){
                     this.isError = true
@@ -77,7 +76,7 @@ export default {
                   
                 })
               }catch(error){
-                console.log(error)
+                console.error(error)
               }
 
             }

@@ -219,8 +219,6 @@ export default {
         const startFormatted = `${startDateTime.toISOString().split('T')[0]} ${startDateTime.toTimeString().split(' ')[0]}`;
         const endFormatted = `${endDateTime.toISOString().split('T')[0]} ${endDateTime.toTimeString().split(' ')[0]}`;
 
-        console.log(`Start: ${startFormatted}, End: ${endFormatted}`);
-
         this.loading = true
         try{
           const response = await apiClient.post("/event",{
@@ -284,8 +282,6 @@ export default {
         // Formatage des dates au format souhaité
         const startFormatted = `${startDateTime.toISOString().split('T')[0]} ${startDateTime.toTimeString().split(' ')[0]}`;
         const endFormatted = `${endDateTime.toISOString().split('T')[0]} ${endDateTime.toTimeString().split(' ')[0]}`;
-
-        console.log(`Start: ${startFormatted}, End: ${endFormatted}`);
 
         this.loading = true
         if(this.uuid){

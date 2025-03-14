@@ -32,7 +32,7 @@ const libelle = ref("");
 const target = ref("");
 const type = ref("");
 const icon = ref("");
-const position = ref("");
+const position = ref(0);
 const name = ref("");
 const statut = ref("");
 const menu_id = ref(null);
@@ -78,7 +78,7 @@ const onSaveMenu = async () => {
       type: type.value,
       menu_id: menu_id.value,
       icon: icon.value,
-      position: 0,
+      position: position.value,
       statut: statut.value,
       };
 
@@ -134,9 +134,9 @@ watch(
         statut.value = menu.data.statut
         type.value = menu.data.type
         icon.value = menu.data.icon
+        position.value = menu.data.position
         menu_id.value = menu.data.menu_id
 
-        // console.log("Menu------------------: "+JSON.stringify(menu.data))
         // tous les menus
         const menus = await getAll("menu")
         menus.value = menus.data
@@ -148,14 +148,10 @@ watch(
         loading.value = false
 
       }
-      
-
-     
-
-      
+        
     }
   },
-  { immediate: true }  // Lance le watch dès que possible, même si la prop est déjà présente
+  { immediate: true }  
 );
 
 // Fonction de mise à jour du département
@@ -166,13 +162,14 @@ const onUpdateMenu = async () => {
   
   // Vérification des erreurs de validation
   if (v$.value.libelle.$error  || v$.value.name.$error || v$.value.target.$error) {
-
-    return; // Si des erreurs existent, on arrête la fonction
+    return; 
+    
   }
 
 
-  loadingEdit.value = true;
+  
   try {
+    loadingEdit.value = true;
     // Préparation des données à envoyer via FormData
     const formData = {
       libelle: libelle.value,
@@ -181,7 +178,7 @@ const onUpdateMenu = async () => {
       type: type.value,
       menu_id: menu_id.value,
       icon: icon.value,
-      position: 0,
+      position: position.value,
       statut: statut.value,
     };
 
@@ -193,7 +190,6 @@ const onUpdateMenu = async () => {
     });
 
     // Vérification de la réponse
-    console.log("Mise ajour: "+id.value+" "+JSON.stringify(response.data));
     if (!response.data.error) {
       const menus = await getAll("menu")
       alertMessage(response.data.message, "success")
@@ -247,7 +243,7 @@ const resetForm = () => {
   icon.value = "";
   target.value = "";
   type.value = "";
-  position.value = "";
+  position.value = 0;
   statut.value = "";
   menu_id.value = "";
 
@@ -364,11 +360,7 @@ const resetForm = () => {
                     id="icon" 
                     class="form-control form-control-sm"  
                     type="text"
-                    :class="{
-                    'is-invalid': submitted && v$.icon.$error,
-                    'border border-danger': submitted && v$.icon.$error,
-                    'border border-secondary': !(submitted && v$.icon.$error)
-                    }">
+                    >
                     
                 </div>
             </div>
@@ -393,6 +385,21 @@ const resetForm = () => {
                     <select v-model="menu_id" id="menu" class="form-select form-select-sm border border-secondary rounded-2" aria-label="Default select example">
                         <option v-for="menu in menus" :key="menu.id" :value="menu.id" :selected="menu_id == menu.id ">{{ menu.libelle }}</option>
                     </select>
+                </div>
+            </div>
+        </BCol>
+        <BCol md="6">
+            <div class="mb-3">
+                <label for="posi" style="font-size: 12px;">Position </label>
+                <div>
+                    <input 
+                    v-model="position" 
+                    id="posi" 
+                    class="form-control form-control-sm border border-secondary rounded-2"  
+                    type="number"
+                    min="0"
+                  >
+                    
                 </div>
             </div>
         </BCol>

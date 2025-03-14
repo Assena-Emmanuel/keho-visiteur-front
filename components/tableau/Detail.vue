@@ -9,7 +9,7 @@ const user = ref({})
 
 watch(
   () => props.user, (newUuid) => {  
-    console.log('------------------------Detail user: '+newUuid)
+
     // if (newUuid) {
     //   data.value = await getUser(newUuid);  
     //   if(data.value){

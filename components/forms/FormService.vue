@@ -93,7 +93,6 @@ const onSaveService = async () => {
         
       }else{
         erreur.value = true
-        console.log(JSON.stringify(data.data))
         errorMessage.value =`${data.data?.data?.libelle} \n ${data.data?.data?.code}`
       }
       

@@ -131,7 +131,7 @@ const showModal = async (notif) =>{
   });
 
   if(response.data.error){
-    console.log("Erreur "+response.data.message)
+    console.error("Erreur "+response.data.message)
   }else{
     notifiedStore.getNotification();
   }

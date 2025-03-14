@@ -81,8 +81,6 @@
 
     // watch:{
     //   code(newValue, oldValue) {
-    //     alert(1)
-    //     console.log('Code visite modifié de', oldValue, 'à', newValue);
     //     this.getEven(newValue)
     //   }
 
@@ -139,7 +137,6 @@
           });
 
           if(!response.data.error){
-            console.log(response.data.data.particular_event)
             this.events = response.data.data.particular_event
           }else{
             alert(1)

@@ -93,7 +93,6 @@ watch(
     isEditMode.value = true
     data.value = await getUser(newUuid); 
     if(data.value) {
-      console.log("DATA----------------------: "+JSON.stringify(data.value))
       nom.value = data.value.nom;
       prenom.value = data.value.prenom;
       e_mail.value = data.value.email;
@@ -355,7 +354,6 @@ const onDepartement = async () => {
   if(departement.value){
     try{
       const response = await getById("categorie", departement.value )
-      console.log("RESPONSE------------: "+JSON.stringify(response))
       if(!response.error){
         selectServices.value = response.data.children
       }

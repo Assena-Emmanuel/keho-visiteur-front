@@ -378,7 +378,7 @@ const recherche = async () => {
       param.sort_type = 3;
       param.date_debut = date.start;
       param.date_fin = dateselect.value[1] != null ? date.end : date.start;
-      console.log("-------------data: ",param.date_debut)
+
     } 
     // Vérification si searchValue est défini et pas dateDebut et dateFin
     else if (date.start == null && dateselect.value[1] == null && searchValue.value != "") {
@@ -406,7 +406,6 @@ const recherche = async () => {
 
     // Vérification de la réponse de l'API
     if (!response.data.error) {
-      console.log("Réponse reçue:", response.data.data);
       const data = response.data.data;
       items.value = data?.data;
       serverItemsLength.value = response.data.data.total;
@@ -516,8 +515,7 @@ const confirmDelete = async (uuid) => {
           });
 
           if (!response.data.error) {
-            
-            console.log("Sup-----------: " + JSON.stringify(response.data));
+
             loadFromServer();
             // Fermer l'alerte de chargement et afficher une alerte de succès
             swalLoading.close();

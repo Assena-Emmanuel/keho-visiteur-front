@@ -125,7 +125,7 @@
               </BCol>
               <BCol sm="2" md="2" class="">
                 <BButton size="sm"  variant="primary" class="me-2"  @click="recherche">Rechercher</BButton>
-                <BButton size="sm" @click="resetAction" :disabled="loadingReset" class="btn btn-outline-primary btn-sm">
+                <BButton size="sm" @click="resetAction" :disabled="loadingReset" class="btn btn-sm" style="background-color: #4CAF50;">
                   <i v-if="!loadingReset" class="fas fa-sync-alt"></i>
                   <i v-else class="fas fa-spinner fa-spin"></i> 
                 </BButton>
@@ -153,17 +153,17 @@
 
         <template #lib_statut="data" >
           <!-- <strong>{{ data.value.email }}</strong> -->
-          <span style="font-size: 11px;" v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
+          <span style="font-size: 11px;" v-if="data.value.statut == 0" class="text-warning fw-bold">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 1" class="text-info fw-bold">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 2" class="text-success fw-bold">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 3" class="text-danger fw-bold">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 4" class="text-success fw-bold">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 5" class="text-dark fw-bold">{{ data.value.lib_statut }}</span>
         </template>
 
 
         <template #visiteur="data">
-          <div><span class="tableElement fw-bold" style="font-size: 11px;">{{ data.value.visiteur }}</span></div>
+          <div><span class="tableElement fw-bold" style="font-size: 11px;">{{ (data.value.visiteur).toUpperCase() }}</span></div>
           <div><span style="font-size: 11px;">{{ data.value.numero_piece }}</span></div>
         </template>
 
@@ -192,7 +192,10 @@
         </template>
 
         <template #heure_entree="data">
-          <div><span style="font-size: 11px;">{{ data.value.heure_entree }} / {{ data.value.heure_fin != null ? data.value.heure_fin : "----" }}</span></div>
+          <div>
+            <span style="font-size: 11px;" v-if="data.value.heure_fin == null">{{ data.value.heure_entree }} / ---- </span>
+            <span style="font-size: 11px;" v-else>{{ data.value.heure_entree }} / <span class="fw-bold text-success">{{ data.value.heure_fin }}</span> </span>
+          </div>
         </template>
 
 
@@ -429,12 +432,9 @@ function formatDate(dateString) {
   const day = date.getDate().toString().padStart(2, '0'); // Jour avec 2 chiffres
   const month = (date.getMonth() + 1).toString().padStart(2, '0');  // Mois (1-12) avec 2 chiffres
   const year = date.getFullYear();  // Année
-  const hours = date.getHours().toString().padStart(2, '0');  // Heures avec 2 chiffres
-  const minutes = date.getMinutes().toString().padStart(2, '0');  // Minutes avec 2 chiffres
-  const seconds = date.getSeconds().toString().padStart(2, '0');  // Secondes avec 2 chiffres
-
+  
   // Retourner la date formatée
-  return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  return `${day}-${month}-${year}`;
 }
 
 const paginatedData = computed(() => {
@@ -531,7 +531,6 @@ const recherche = async () => {
 
     // Vérification de la réponse de l'API
     if (!response.data.error) {
-      console.log("Réponse reçue:", response.data.data);
       const data = response.data.data;
       items.value = data?.data;
       serverItemsLength.value = response.data.data.total;
@@ -813,5 +812,9 @@ const hideModal = () => {
   padding: 0.3rem 0; /* Réduit le padding ici */
   text-align: left;
 }
-  
+
+table tfoot tr, .bh-table-responsive table thead tr {
+    --tw-bg-opacity: 1;
+    background-color: #138CE9;
+}
 </style>
