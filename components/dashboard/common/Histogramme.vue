@@ -1,32 +1,34 @@
 <template>
-    <BCard no-body >
-      <BCardBody>
-        <div class="d-flex">
-          <canvas id="bar-chart" style="max-height: 200px;"></canvas>
-        </div>
-        <div class="text-center titreDiagramme">DIAGRAMME DES VISITES</div>
-      </BCardBody>
-    </BCard>
+  <BCard no-body >
+    <BCardBody>
+      <div class="d-flex">
+        <canvas id="bar-chart" style="max-height: 200px;"></canvas>
+      </div>
+      <div class="text-center titreDiagramme">DIAGRAMME DES VISITES</div>
+    </BCardBody>
+  </BCard>
 </template>
+
 <style>
 .titreDiagramme{
     font-size: 15px;
     text-decoration: underline;
-    color: #EEC747;
-  }
+    color: #2065FA;
+}
 </style>
+
 <script>
 import { Chart, registerables } from 'chart.js';
-import {barChartData} from "./data";
+import { barChartData } from "./data";
 
 export default {
-    name: "BarChart",
-    data() {
-        return {
-            barChartData
-        }
-    },
-    mounted() {
+  name: "BarChart",
+  data() {
+    return {
+      barChartData
+    };
+  },
+  mounted() {
     this.$nextTick(() => {
       const ctx = document.getElementById("bar-chart");
       if (ctx) {
