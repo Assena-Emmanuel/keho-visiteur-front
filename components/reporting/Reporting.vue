@@ -158,12 +158,12 @@
 
           <template #lib_statut="data" >
           <!-- <strong>{{ data.value.email }}</strong> -->
-          <span style="font-size: 11px;" v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
+          <span style="font-size: 11px;" v-if="data.value.statut == 0" class="fw-bold text-warning">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 1" class="fw-bold text-info">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 2" class="fw-bold text-success">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 3" class="fw-bold text-danger">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 4" class="fw-bold text-success">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 5" class="fw-bold text-dark">{{ data.value.lib_statut }}</span>
         </template>
 
 
@@ -254,7 +254,8 @@
           </template>
           <template #heure_fin="data">
               <div>
-                  <span>----</span>
+                  <span v-if="data.value.heure_fin == null">----</span>
+                  <span v-else class="fw-bold text-success">{{ data.value.heure_fin }}</span>
               </div>
           </template>
 

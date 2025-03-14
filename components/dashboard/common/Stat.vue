@@ -13,7 +13,7 @@ export default {
       ],
       dataStatic: [
         {imageUrl: '/images/stats/visiteurs.png', couleur: '#60F6FD'},
-        {imageUrl: '/images/stats/surRDV.png', couleur: '#3BF2CB'},
+        {imageUrl: '/images/stats/surRDV.png', couleur: '#118214'},
         {imageUrl: '/images/stats/inopinees.png', couleur: '#EFC257'},
         {imageUrl: '/images/stats/rejetes.png', couleur: '#F1947F'},
       ],

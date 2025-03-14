@@ -2,98 +2,100 @@
   <DashboardCommonStat />
 
   <!-- Modal détail -->
-  <BModal  v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur" >
-      <!-- <template v-slot:header>
-        <div class="d-flex justify-content-start w-100" style="position: relative;">
-          <img src="/images/total-removebg.png" alt="" width="50">
-        </div>
-      </template> -->
-    <ScaleLoader :loading="loadingDetail" style="margin: 10em 0;" :height="'30px'" :color="'#FE0201'" />
-    <div v-if="data && data.visiteurs && !loadingDetail"  v-for="item in paginatedData" :key="item['Code visite']">
-      <div class="text-center"><h3>{{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</h3>
-        <span v-if="item.delegation && item.chef_equipe " class="badge bg-danger rounded">délégué</span>
-      </div>
-      <div class="d-flex justify-content-between">
-        <div>
-          <span v-if="data.fvisite.statut==2" class="text-succes px-2 ms-2">statut: <span class="">terminé</span></span>
-          <span v-if="data.fvisite.statut==1" class="text-warning px-2 ms-2">statut: <span class="">Notifié</span></span>
-          <span v-if="data.fvisite.statut==0" class="text-warning px-2 ms-2">statut: <span class="">En cours</span></span>
-          <span v-if="data.fvisite.statut==3" class="text-danger px-2 ms-2">statut: <span class="">Rejeté</span></span>
-          <span v-if="data.fvisite.statut==4" class="text-info px-2 ms-2">statut: <span class="">Confirmé</span></span>
-          <span v-if="data.fvisite.statut==5" class="text-succes px-2 ms-2">statut: <span class="">Clôturé</span></span>
-        </div>
-        <div><small class=" px-2 ms-2 "><i class="fa fa-clock"></i> <small>{{ formatDate(data.value.created_at)  }}</small></small></div>
-      </div>
-      <hr class="text-secondary">
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>Téléphone:</strong> {{ item.visiteur.users.telephone2 }}</p>
-        </div>
-        <div class="col col-md-6">
-          <p><strong>Société:</strong> {{ item.visiteur.entreprise.libelle }}</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>E-mail:</strong> {{ item.visiteur.users.email }}</p>
-        </div>
-        <div class="col col-md-6">
-          <p><strong>Code visiteur:</strong> {{ data.fvisite.code_fvisite }}</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>Type pièce:</strong> {{ item.visiteur.type_piece.code == 'CNI' ? item.visiteur.type_piece.code :  item.visiteur.libelle }}</p>
-        </div>
-        <div class="col col-md-6">
-          <p><strong>Num pièce:</strong> {{ item.visiteur.numero_piece }}</p>
-        </div>
-      </div>
-     
-      <div class="row">
-        <div class="col col-md-6">
-          <p><strong>Heure d'entrée:</strong> {{ data.fvisite.heure_entree }}</p>
-        </div>
-        <div class="col col-md-6">
-          <p><strong>Heure de Sortie:</strong> {{ !data.fvisite.heure_fin ? "---------" : data.fvisite.heure_fin }}</p>
-        </div>
-      </div>
-
-      <div class="row carte mt-2 mb-2">
-        <div class="col-6 d-flex justify-content-center">
-          <img @click="imgViewer('image-recto')" 
-              id="image-recto"  
-              :src="`data:${item.visiteur.mime_type_p};base64,${item.visiteur.image_p}`" 
-              height="80" 
-              class="cni" 
-              alt="CNI recto">
-        </div>
-        <div class="col-6 d-flex justify-content-center">
-          <img @click="imgViewer('image-verso')" 
-              id="image-verso" 
-              :src="`data:${item.visiteur.mime_type_v};base64,${item.visiteur.image_v}`" 
-              height="80" 
-              class="cni" 
-              alt="CNI verso">
-        </div>
-      </div>
-
-      <div class="bg-danger text-center text-light" v-if="item.delegation">En délégation</div>
-      <hr />
-    </div>
-
-
-    <div class="d-flex justify-content-end" v-if="data && data.visiteurs && data.visiteurs.length > 1 && !loadingDetail">
-
-    <vue-awesome-paginate
-      :total-items="data.visiteurs.length"
-      :items-per-page="1"
-      :max-pages-shown="data.visiteurs.length>= 18 ? 2 : 5"
-      v-model="currentPage"
-    />
-    </div>
+  <BModal v-model="detailModal" @hide="hideModal" hide-footer title="Détail Visiteur">
+    <!-- Loader Customisé -->
+    <ScaleLoader :loading="loadingDetail" style="margin: 3em auto;" :height="'30px'" :color="'#FE0201'" />
     
-  </BModal> 
+    <div v-if="data && data.visiteurs && !loadingDetail" v-for="item in paginatedData" :key="item['Code visite']" class="ticket">
+        <!-- Section Header Visiteur -->
+        <div style="background-color: #a7cae4;">
+          <div class="text-center">
+              <h3 class="fw-bold">{{ item.visiteur.civilite }} {{ item.visiteur.users.nom }} {{ item.visiteur.users.prenom }}</h3>
+              <span v-if="item.delegation && item.chef_equipe" class="badge bg-danger rounded">délégué</span>
+          </div>
+          
+          <!-- Statut du Visiteur -->
+          <div class="d-flex justify-content-between">
+              <div>
+                  <span v-if="data.fvisite.statut == 2" class="badge bg-success">terminé</span>
+                  <span v-if="data.fvisite.statut == 1" class="badge bg-warning text-dark">Notifié</span>
+                  <span v-if="data.fvisite.statut == 0" class="badge bg-info text-white">En cours</span>
+                  <span v-if="data.fvisite.statut == 3" class="badge bg-danger">Rejeté</span>
+                  <span v-if="data.fvisite.statut == 4" class="badge bg-primary">Confirmé</span>
+                  <span v-if="data.fvisite.statut == 5" class="badge bg-success">Clôturé</span>
+              </div>
+              <div><small class="text-muted"><i class="fa fa-clock"></i> {{ formatDateTime(data.fvisite.created_at) }}</small></div>
+          </div>
+          
+          <!-- Détails du Visiteur -->
+        </div>
+        <hr class="text-secondary">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Téléphone:</strong> {{ item.visiteur.users.telephone2 }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Société:</strong> {{ item.visiteur.entreprise.libelle }}</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>E-mail:</strong> {{ item.visiteur.users.email }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Code visiteur:</strong> {{ data.fvisite.code_fvisite }}</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Type pièce:</strong> {{ item.visiteur.type_piece.code == 'CNI' ? item.visiteur.type_piece.code : item.visiteur.libelle }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Num pièce:</strong> {{ item.visiteur.numero_piece }}</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Heure d'entrée:</strong> {{ data.fvisite.heure_entree }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Heure de Sortie:</strong> {{ data.fvisite.heure_fin ? data.fvisite.heure_fin : '---------' }}</p>
+            </div>
+        </div>
+
+        <!-- Images du Visiteur -->
+        <div class="row carte mt-2 mb-2">
+            <div class="col-6 d-flex justify-content-center">
+                <img @click="imgViewer('image-recto')"  id="image-recto" :src="`data:${item.visiteur.mime_type_p};base64,${item.visiteur.image_p}`" height="100" class="cni border border-primary" alt="CNI recto">
+            </div>
+            <div class="col-6 d-flex justify-content-center">
+                <img @click="imgViewer('image-verso')"  id="image-verso" :src="`data:${item.visiteur.mime_type_v};base64,${item.visiteur.image_v}`" height="100" class="cni border border-primary" alt="CNI verso">
+            </div>
+        </div>
+
+        <div class="bg-danger text-center text-light" v-if="item.delegation">En délégation</div>
+        <hr />
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-end" v-if="data && data.visiteurs && data.visiteurs.length > 1 && !loadingDetail">
+        <vue-awesome-paginate
+            :total-items="data.visiteurs.length"
+            :items-per-page="1"
+            :max-pages-shown="data.visiteurs.length >= 18 ? 2 : 5"
+            v-model="currentPage"
+        />
+    </div>
+
+    <!-- Copyright Footer -->
+    <div class="text-center mt-3">
+        <span>&copy; KH Groupe 2024</span>
+    </div>
+</BModal>
+
  
 
   <BCard style="min-height: 10em; margin: 0;">
@@ -158,17 +160,17 @@
 
         <template #lib_statut="data" >
           <!-- <strong>{{ data.value.email }}</strong> -->
-          <span style="font-size: 11px;" v-if="data.value.statut == 0" class="text-warning">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 1" class="text-info">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 2" class="text-success">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 3" class="text-danger">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 4" class="text-success">{{ data.value.lib_statut }}</span>
-            <span style="font-size: 11px;" v-if="data.value.statut == 5" class="text-dark">{{ data.value.lib_statut }}</span>
+          <span style="font-size: 11px;" v-if="data.value.statut == 0" class="fw-bold text-warning">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 1" class="fw-bold text-info">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 2" class="fw-bold text-success">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 3" class="fw-bold text-danger">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 4" class="fw-bold text-success">{{ data.value.lib_statut }}</span>
+            <span style="font-size: 11px;" v-if="data.value.statut == 5" class="fw-bold text-dark">{{ data.value.lib_statut }}</span>
         </template>
 
 
         <template #visiteur="data">
-          <div><span class="tableElement fw-bold" style="font-size: 11px;">{{ data.value.visiteur }}</span></div>
+          <div><span class="tableElement fw-bold" style="font-size: 11px;">{{ (data.value.visiteur).toUpperCase() }}</span></div>
           <div><span style="font-size: 11px;">{{ data.value.numero_piece }}</span></div>
         </template>
 
@@ -255,7 +257,8 @@
           </template>
           <template #heure_fin="data">
               <div>
-                  <span>----</span>
+                  <span v-if="data.value.heure_fin == null">----</span>
+                  <span v-else class="fw-bold text-success">{{ data.value.heure_fin }}</span>
               </div>
           </template>
 
@@ -777,5 +780,14 @@ const hideModal = () => {
 .bh-table-responsive table thead tr th {
   padding: 0.3rem 0; /* Réduit le padding ici */
   text-align: left;
+}
+
+.ticket {
+  background-image: linear-gradient(rgba(255, 254, 254, 0.93), rgba(255, 255, 255, 0.93)), url("/images/total-removebg.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  block-size: 100%;
+  inline-size: 100%;
 }
 </style>

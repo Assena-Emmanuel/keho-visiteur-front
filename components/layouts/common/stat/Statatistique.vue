@@ -6,77 +6,109 @@ export default {
     imageUrl: String,
     couleur: String,
     type: String
+  },
+
+  data() {
+    return {
+      coul: "rgba(255, 255, 255, 1)" // Valeur par défaut
+    };
+  },
+
+  watch: {
+    // Surveille les changements de la prop `type`
+    type(newVal) {
+      if (newVal === 'TV') {
+        this.coul = 'rgba(54, 162, 235, 1)'; // Si type est TV, couleur bleue
+      } else if (newVal === 'AR') {
+        this.coul = 'rgba(75, 192, 192, 1)'; // Exemple pour un autre type
+      } else if (newVal === 'ARj') {
+        this.coul = 'rgba(255, 99, 132, 1)'; // Exemple pour un autre type
+      }
+    }
   }
-}
+};
 </script>
+
 
 <template>
     <BCard no-body style="height: 80px;">
-        <BCardBody style="padding: 10px"> 
-            <!-- //TV: total visiteurs -->
-            <div class="d-flex justify-content-between align-items-center" v-if="type=='TV'"> 
-                <div class="circle-container" :style="{ backgroundColor: couleur }">
-                    <img :src="imageUrl" class="responsive-image">
-                </div>
-                <div class="text-end">
-                    <p class="text-muted mb-0 title-text">{{ titre }}:  <span style="font-size:30px; font-weight:bold">{{ valeur }}</span></p>
-                    <!-- <h4 class="mt-1 value-text">{{ valeur }}</h4> -->
-                </div>
+      <BCardBody style="padding: 10px">
+        <!-- TV: total visiteurs -->
+        <div class="d-flex justify-content-between align-items-center" v-if="type === 'TV'">
+          <div class="circle-container" :style="{ backgroundColor: couleur }">
+            <img :src="imageUrl" class="responsive-image" />
+          </div>
+          <div class="text-end">
+            <p class="text-muted mb-0 title-text" style="font-size: 13px;">{{ titre }}:  
+              <span style="font-size:30px; font-weight:bold">{{ valeur }}</span>
+            </p>
+          </div>
+        </div>
+  
+        <!-- AR: Accepté Rejeté -->
+        <div class="d-flex justify-content-between align-items-center" v-else-if="type === 'AR'">
+          <div class="d-flex justify-content-between gap-2">
+            <div class="circle-container" :style="{ backgroundColor: couleur }">
+              <img :src="imageUrl" class="responsive-image" />
             </div>
-
-            <div class="d-flex justify-content-between align-items-center" v-else-if="type=='AR'"> <!-- //AR: Accepté Rejeté -->
-                
-                <div class="d-flex justify-content-between gap-2">
-                    <div class="circle-container" :style="{ backgroundColor: couleur }">
-                        <img :src="imageUrl" class="responsive-image">
-                    </div>
-                    <div>
-                        <p class="text-muted mb-0 title-text"> <span class="d-none d-sm-inline">Visites acceptées</span> <span class="text-success" style="font-size:18px; font-weight:bold"> 111 </span></p>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-between gap-2">
-                    <div class="circle-container" style="background-color: #F1947F">
-                        <img src="/images/stats/rejetes.png" class="responsive-image">
-                    </div>
-
-                    <div>
-                        <p class="text-muted mb-0 title-text"><span class="d-none d-sm-inline">Visites rejetées</span>  <span class="text-danger" style="font-size:18px; font-weight:bold"> 12</span></p>
-                    </div>
-                </div>
+            <div>
+              <p class="text-muted mb-0 title-text">
+                <span class="d-none d-sm-inline" style="font-size: 13px;">Visites acceptées</span>
+                <span class="text-success" style="font-size:18px; font-weight:bold"> 111 </span>
+              </p>
             </div>
-
-            <!-- Total visite jour -->
-            <div v-else-if="type=='ARj'" > <!-- //AR: Accepté Rejeté -->
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex justify-content-between gap-2">
-                        <div class="circle-container" :style="{ backgroundColor: couleur }">
-                            <img :src="imageUrl" class="responsive-image">
-                        </div>
-                        <div>
-                            <p class="text-muted mb-0 title-text"> <span class="d-none d-sm-inline">Visites acceptées</span> <span class="text-success" style="font-size:18px; font-weight:bold"> 09 </span></p>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between gap-2">
-                        <div class="circle-container" style="background-color: #F1947F">
-                            <img src="/images/stats/rejetes.png" class="responsive-image">
-                        </div>
-
-                        <div>
-                            <p class="text-muted mb-0 title-text"><span class="d-none d-sm-inline">Visites rejetées</span>  <span class="text-danger" style="font-size:18px; font-weight:bold"> 01</span></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-center">
-                    <small class="fw-bold text-secondary">Journaliere</small>
-                </div>
-                
+          </div>
+  
+          <div class="d-flex justify-content-between gap-2">
+            <div class="circle-container" style="background-color: #F1947F">
+              <img src="/images/stats/rejetes.png" class="responsive-image" />
             </div>
-        </BCardBody>
-</BCard>
-
-</template>
+  
+            <div>
+              <p class="text-muted mb-0 title-text">
+                <span class="d-none d-sm-inline" style="font-size: 13px;">Visites rejetées</span>
+                <span class="text-danger" style="font-size:18px; font-weight:bold"> 12</span>
+              </p>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Total visite jour -->
+        <div v-else-if="type === 'ARj'">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between gap-2">
+              <div class="circle-container" :style="{ backgroundColor: couleur }">
+                <img :src="imageUrl" class="responsive-image" />
+              </div>
+              <div>
+                <p class="text-muted mb-0 title-text">
+                  <span class="d-none d-sm-inline" style="font-size: 13px;">Visites acceptées</span>
+                  <span class="text-success" style="font-size:18px; font-weight:bold"> 09 </span>
+                </p>
+              </div>
+            </div>
+  
+            <div class="d-flex justify-content-between gap-2">
+              <div class="circle-container" style="background-color: #F1947F">
+                <img src="/images/stats/rejetes.png" class="responsive-image" />
+              </div>
+  
+              <div>
+                <p class="text-muted mb-0 title-text">
+                  <span class="d-none d-sm-inline" style="font-size: 13px;">Visites rejetées</span>
+                  <span class="text-danger" style="font-size:18px; font-weight:bold"> 01</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="text-center" style="margin-top: -8px;">
+            <small class="text-secondary">Journalière</small>
+          </div>
+        </div>
+      </BCardBody>
+    </BCard>
+  </template>
+  
 <style>
 .circle-container {
     width: 33px; /* Largeur de la div */

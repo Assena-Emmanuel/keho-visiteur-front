@@ -1,7 +1,7 @@
 <template>
 
   <BCard no-body >
-    <BCardBody>
+    <BCardBody class="ticket">
       <div class="d-flex">
         <canvas id="pieChart" class="pie-chart" style="max-height: 200px;"></canvas>
       </div>
@@ -23,6 +23,14 @@
     text-decoration: underline;
     color: #EEC747
   }
+  .ticket {
+  background-image: linear-gradient(rgba(255, 254, 254, 0.95), rgba(255, 255, 255, 0.95)), url("/images/total-removebg.png");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  block-size: 100%;
+  inline-size: 100%;
+}
   </style>
   
 <script>
